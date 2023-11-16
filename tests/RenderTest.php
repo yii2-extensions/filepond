@@ -45,7 +45,7 @@ final class RenderTest extends TestCase
             ],
         );
 
-        $result = $view->renderFile(__DIR__ . '/support/main.php');
+        $result = $view->renderFile(__DIR__ . '/Support/main.php');
 
         $this->assertStringContainsString('"className":"TestClass"', $result);
     }
@@ -64,7 +64,7 @@ final class RenderTest extends TestCase
             ],
         );
 
-        $result = $view->renderFile(__DIR__ . '/support/main.php');
+        $result = $view->renderFile(__DIR__ . '/Support/main.php');
 
         $this->assertStringContainsString('"forceRevert":true,"storeAsFile":true', $result);
     }
@@ -110,7 +110,7 @@ final class RenderTest extends TestCase
             $filePond,
         );
 
-        $result = $view->renderFile(__DIR__ . '/support/main.php');
+        $result = $view->renderFile(__DIR__ . '/Support/main.php');
 
         $this->assertStringContainsString('functionFileRename()', $result);
 
@@ -138,7 +138,7 @@ final class RenderTest extends TestCase
             $filePond,
         );
 
-        $result = $view->renderFile(__DIR__ . '/support/main.php');
+        $result = $view->renderFile(__DIR__ . '/Support/main.php');
 
         $this->assertStringContainsString('fileValidateTypeDetectType: (source, type) =>', $result);
         $this->assertStringContainsString('functionFileRename()', $result);
@@ -158,7 +158,7 @@ final class RenderTest extends TestCase
             ],
         );
 
-        $result = $view->renderFile(__DIR__ . '/support/main.php');
+        $result = $view->renderFile(__DIR__ . '/Support/main.php');
 
         $this->assertStringContainsString(
             '"labelIdle":"Drag & Drop or <span class=\"filepond--label-action\"> Browse <\/span>"',
@@ -180,7 +180,7 @@ final class RenderTest extends TestCase
             ],
         );
 
-        $result = $view->renderFile(__DIR__ . '/support/main.php');
+        $result = $view->renderFile(__DIR__ . '/Support/main.php');
 
         $this->assertStringContainsString('"maxFiles":3', $result);
     }
@@ -217,7 +217,7 @@ final class RenderTest extends TestCase
             ],
         );
 
-        $result = $view->renderFile(__DIR__ . '/support/main.php');
+        $result = $view->renderFile(__DIR__ . '/Support/main.php');
 
         $this->assertStringContainsString('FilePondPluginFileEncode', $result);
         $this->assertStringContainsString('FilePondPluginFileValidateSize', $result);
@@ -257,7 +257,7 @@ final class RenderTest extends TestCase
             ],
         );
 
-        $result = $view->renderFile(__DIR__ . '/support/main.php');
+        $result = $view->renderFile(__DIR__ . '/Support/main.php');
 
         $this->assertSame(
             '<input class="filepond" id="testform-array" name="TestForm[array][]" type="file" required>',
