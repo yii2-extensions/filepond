@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Yii\FilePond\Tests;
+namespace Yii2\Extensions\FilePond\Tests;
 
 use Yii;
-use Yii\FilePond\FilePond;
-use Yii\FilePond\Tests\Support\TestForm;
+use Yii2\Extensions\FilePond\FilePond;
+use Yii2\Extensions\FilePond\Tests\Support\TestForm;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor

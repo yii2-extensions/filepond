@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yii\FilePond\Asset;
+namespace Yii2\Extensions\FilePond\Asset;
 
 use yii\web\AssetBundle;
 

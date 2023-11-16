@@ -1,7 +1,7 @@
 {
     "name": "yii2-extensions/filepond",
-    "type": "yii2-extension",
-    "description": "FilePond widget for PHP.",
+    "type": "library",
+    "description": "FilePond Widget for Yii Framework.",
     "keywords": [
         "yii2",
         "filepond",
@@ -37,12 +37,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Yii\\FilePond\\": "src"
+            "Yii2\\Extensions\\FilePond\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Yii\\FilePond\\Tests\\": "tests"
+            "Yii2\\Extensions\\FilePond\\Tests\\": "tests"
         }
     },
     "extra": {
