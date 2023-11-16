@@ -24,6 +24,7 @@
         "npm-asset/filepond-plugin-image-transform": "^3.8",
         "npm-asset/filepond-plugin-pdf-preview": "^1.0",
         "oomphinc/composer-installers-extender": "^2.0",
+        "php-forge/awesome-widget": "dev-main",
         "php-forge/html": "dev-main",
         "yiisoft/yii2": "*"
     },
