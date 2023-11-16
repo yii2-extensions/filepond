@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yii\FilePond;
+namespace Yii2\Extensions\FilePond;
 
 use PHPForge\Html\Attribute;
 use PHPForge\Html\Helper\Utils;

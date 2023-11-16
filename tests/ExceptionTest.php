@@ -2,16 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Yii\FilePond\Tests;
+namespace Yii2\Extensions\FilePond\Tests;
 
 use RuntimeException;
-use Yii;
-use Yii\FilePond\FilePond;
-use Yii\FilePond\Tests\Support\TestForm;
+use Yii2\Extensions\FilePond\FilePond;
+use Yii2\Extensions\FilePond\Tests\Support\TestForm;
 
-/**
- * @psalm-suppress PropertyNotSetInConstructor
- */
 final class ExceptionTest extends TestCase
 {
     public function testNotSetAttribute(): void

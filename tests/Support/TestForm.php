@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yii\FilePond\Tests\Support;
+namespace Yii2\Extensions\FilePond\Tests\Support;
 
 use yii\base\Model;
 

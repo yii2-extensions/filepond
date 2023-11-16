@@ -58,7 +58,9 @@ to the require-dev section of your `composer.json` file.
 ### View 
 
 ```php
-$form
+use Yii2\Extensions\Filepond\FilePond;
+
+echo $form
     ->field($formModel, 'image_file')
     ->widget(
         FilePond::class,
@@ -76,6 +78,8 @@ $form
 ### Controller or Model
 
 ```php
+use Yii2\Extensions\Filepond\FileProcessing;
+
 $imageFile = FileProcessing::saveWithReturningFile(
     $categoryForm->image_file,
     Yii::getAlias('@uploads'),

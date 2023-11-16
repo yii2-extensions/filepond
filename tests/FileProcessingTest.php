@@ -2,18 +2,14 @@
 
 declare(strict_types=1);
 
-namespace PHPForge\FilePond\Tests\Helper;
+namespace Yii2\Extensions\FilePond\Tests;
 
 use JsonException;
 use PHPForge\Support\Assert;
-use PHPUnit\Framework\TestCase;
-use Yii\FilePond\FileProcessing;
+use Yii2\Extensions\FilePond\FileProcessing;
 
 use function json_encode;
 
-/**
- * @psalm-suppress PropertyNotSetInConstructor
- */
 final class FileProcessingTest extends TestCase
 {
     protected function tearDown(): void

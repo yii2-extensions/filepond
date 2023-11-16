@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Yii\FilePond\Asset\Prod;
+namespace Yii2\Extensions\FilePond\Asset\Prod;
 
-use Yii\FilePond\Asset\FilePondAsset;
+use Yii2\Extensions\FilePond\Asset\FilePondAsset;
 use yii\web\AssetBundle;
 
 /**

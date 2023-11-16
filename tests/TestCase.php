@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yii\FilePond\Tests;
+namespace Yii2\Extensions\FilePond\Tests;
 
 use Yii;
 use yii\di\Container;

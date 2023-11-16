@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yii\FilePond\Asset\Cdn;
+namespace Yii2\Extensions\FilePond\Asset\Cdn;
 
 use yii\web\AssetBundle;
 

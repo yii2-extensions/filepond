@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yii\FilePond;
+namespace Yii2\Extensions\FilePond;
 
 use function base64_decode;
 use function fclose;

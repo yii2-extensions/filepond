@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Yii\FilePond;
+namespace Yii2\Extensions\FilePond;
 
 use JsonException;
 use PHPForge\Html\Helper\CssClass;
 use PHPForge\Html\Helper\Utils;
 use RuntimeException;
+use Yii2\Extensions\FilePond\Asset\FilePondAsset;
+use Yii2\Extensions\FilePond\Asset\FilePondCdnAsset;
+use Yii2\Extensions\FilePond\Asset\FilePondProdAsset;
 use Yii;
-use Yii\FilePond\Asset\FilePondAsset;
-use Yii\FilePond\Asset\FilePondCdnAsset;
-use Yii\FilePond\Asset\FilePondProdAsset;
 use yii\widgets\InputWidget;
 
 final class FilePond extends InputWidget
