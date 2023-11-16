@@ -19,6 +19,9 @@
     <a href="https://codecov.io/gh/yii2-extensions/filepond" target="_blank">
         <img src="https://codecov.io/gh/yii2-extensions/filepond/branch/main/graph/badge.svg?token=MF0XUGVLYC" alt="Codecov">
     </a>
+    <a href="https://dashboard.stryker-mutator.io/reports/github.com/yii2-extensions/filepond/main" target="_blank">
+        <img src="https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyii2-extensions%2Ffilepond%2Fmain" alt="Infection">
+    </a>
     <a href="https://github.com/yii2-extensions/filepond/actions/workflows/static.yml" target="_blank">
         <img src="https://github.com/yii2-extensions/gii/actions/workflows/static.yml/badge.svg" alt="PHPStan">
     </a>
