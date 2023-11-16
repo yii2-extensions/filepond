@@ -1,41 +1,78 @@
 {
-    "name": "yii2/template",
-    "type": "library",
-    "description": "_____",
+    "name": "yii2-extensions/filepond",
+    "type": "yii2-extension",
+    "description": "FilePond widget for PHP.",
     "keywords": [
-        "_____"
+        "yii2",
+        "filepond",
+        "widget"
     ],
     "license": "mit",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
         "php": ">=8.1",
-        "yiisoft/yii2": "^2.2"
+        "ext-intl": "*",
+        "npm-asset/filepond": "^4.3",
+        "npm-asset/filepond-plugin-file-encode": "^2.1",
+        "npm-asset/filepond-plugin-file-rename": "^1.1",
+        "npm-asset/filepond-plugin-file-validate-size": "^2.2",
+        "npm-asset/filepond-plugin-file-validate-type": "^1.2",
+        "npm-asset/filepond-plugin-image-crop": "^2.0",
+        "npm-asset/filepond-plugin-image-exif-orientation": "^1.0",
+        "npm-asset/filepond-plugin-image-preview": "^4.6",
+        "npm-asset/filepond-plugin-image-transform": "^3.8",
+        "npm-asset/filepond-plugin-pdf-preview": "^1.0",
+        "oomphinc/composer-installers-extender": "^2.0",
+        "php-forge/awesome-widget": "dev-main",
+        "php-forge/html": "dev-main",
+        "yiisoft/yii2": "*"
     },
     "require-dev": {
         "maglnet/composer-require-checker": "^4.6",
+        "php-forge/support": "dev-main",
         "phpunit/phpunit": "^10.2",
+        "roave/infection-static-analysis-plugin": "^1.32",
         "yii2-extensions/phpstan": "dev-main"
     },
     "autoload": {
         "psr-4": {
-            "yii\\template\\": "src"
+            "Yii\\FilePond\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "yii\\template\\tests\\": "tests"
+            "Yii\\FilePond\\Tests\\": "tests"
         }
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "1.0.x-dev"
+            "dev-master": "1.0.x-dev"
+        },
+        "config-plugin": {
+            "yii2-filepond": "extension.php"
+        },
+        "config-plugin-options": {
+            "source-directory": "config"
+        },
+        "installer-types": [
+            "bower-asset",
+            "npm-asset"
+        ],
+        "installer-paths": {
+            "./node_modules/{$name}/": [
+                "type:bower-asset",
+                "type:npm-asset"
+            ]
         }
     },
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            "yiisoft/yii2-composer": true
+            "yiisoft/yii2-composer": true,
+            "composer/installers": true,
+            "oomphinc/composer-installers-extender": true,
+            "infection/extension-installer": true
         }
     },
     "scripts": {
