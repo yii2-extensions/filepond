@@ -40,7 +40,7 @@ The preferred way to install this extension is through [composer](https://getcom
 Either run
 
 ```
-php composer.phar require --dev --prefer-dist yii2-extensions/filepond
+composer require --dev --prefer-dist yii2-extensions/filepond
 ```
 
 or add
@@ -56,21 +56,19 @@ to the require-dev section of your `composer.json` file.
 ### View 
 
 ```php
-<?=
-    $form
-        ->field($formModel, 'image_file')
-        ->widget(
-            FilePond::class,
-            [
-                'labelIdle' => Yii::t(
-                    'yii.blog', 'Drag & Drop your files or <span class="filepond--label-action">Browse</span>',
-                ),
-                'loadFileDefault' => $imageFile,
-                'imagePreviewHeight' => 170,
-                'imageCropAspectRatio' => '1:1',
-            ],
-        )
-?>
+$form
+    ->field($formModel, 'image_file')
+    ->widget(
+        FilePond::class,
+        [
+            'labelIdle' => Yii::t(
+                'yii.blog', 'Drag & Drop your files or <span class="filepond--label-action">Browse</span>',
+            ),
+            'loadFileDefault' => $imageFile,
+            'imagePreviewHeight' => 170,
+            'imageCropAspectRatio' => '1:1',
+        ],
+    );
 ```
 
 ### Controller or Model
