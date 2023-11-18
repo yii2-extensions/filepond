@@ -203,6 +203,42 @@ final class RenderTest extends TestCase
         );
     }
 
+    public function testNotClassFormControl(): void
+    {
+        $this->mockApplication();
+
+        $filePond = FilePond::widget(
+            [
+                'attribute' => 'array',
+                'model' => new TestForm(),
+                'options' => ['class' => 'form-control'],
+            ],
+        );
+
+        $this->assertSame(
+            '<input class="filepond" id="testform-array" name="TestForm[array][]" type="file">',
+            $filePond,
+        );
+    }
+
+    public function testNotClassPlaceholder(): void
+    {
+        $this->mockApplication();
+
+        $filePond = FilePond::widget(
+            [
+                'attribute' => 'array',
+                'model' => new TestForm(),
+                'options' => ['placeholder' => true],
+            ],
+        );
+
+        $this->assertSame(
+            '<input class="filepond" id="testform-array" name="TestForm[array][]" type="file">',
+            $filePond,
+        );
+    }
+
     public function testPluingDefault(): void
     {
         $this->mockApplication();
