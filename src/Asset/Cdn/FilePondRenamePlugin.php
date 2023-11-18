@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yii2\Extensions\FilePond\Asset\Cdn;
 
-use Yii2\Extensions\FilePond\Asset\FilePondAsset;
+use Yii2\Extensions\FilePond\Asset\FilePondCdnAsset;
 use yii\web\AssetBundle;
 
 /**
@@ -24,6 +24,6 @@ final class FilePondRenamePlugin extends AssetBundle
      * {@inheritDoc}
      */
     public $depends = [
-        FilePondAsset::class,
+        FilePondCdnAsset::class,
     ];
 }

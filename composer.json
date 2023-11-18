@@ -26,7 +26,7 @@
         "oomphinc/composer-installers-extender": "^2.0",
         "php-forge/awesome-widget": "dev-main",
         "php-forge/html": "dev-main",
-        "yiisoft/yii2": "*"
+        "yiisoft/yii2": "^2.2"
     },
     "require-dev": {
         "maglnet/composer-require-checker": "^4.6",
