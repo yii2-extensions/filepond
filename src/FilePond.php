@@ -10,16 +10,11 @@ use PHPForge\Html\Helper\Utils;
 use RuntimeException;
 use Yii2\Extensions\FilePond\Asset\FilePondAsset;
 use Yii2\Extensions\FilePond\Asset\FilePondCdnAsset;
-use Yii2\Extensions\FilePond\Asset\FilePondProdAsset;
 use Yii;
 use yii\widgets\InputWidget;
 
 final class FilePond extends InputWidget
 {
-    /**
-     * @var array The HTML attributes for the input tag.
-     */
-    public array $attributes = [];
     /**
      * @var array The accepted file types. Can be mime types or wild cards.
      * For instance ['image/*'] will accept all images. ['image/png', 'image/jpeg'] will only accept PNGs and JPEGs.
@@ -385,7 +380,6 @@ final class FilePond extends InputWidget
 
         match ($this->environment) {
             'cdn' => FilePondCdnAsset::register($view),
-            'prod' => FilePondProdAsset::register($view),
             default => FilePondAsset::register($view),
         };
 
@@ -397,22 +391,22 @@ final class FilePond extends InputWidget
      */
     private function renderInputFile(): string
     {
-        $attributes = $this->attributes;
+        $options = $this->options;
 
         if (array_key_exists('allowMultiple', $this->config) && $this->config['allowMultiple']) {
-            $attributes['multiple'] = true;
+            $options['multiple'] = true;
         }
 
         if (array_key_exists('className', $this->config) && is_string($this->config['className'])) {
-            CssClass::add($attributes, $this->config['className']);
+            CssClass::add($options, $this->config['className']);
         }
 
         if (array_key_exists('required', $this->config) && $this->config['required']) {
-            $attributes['required'] = true;
+            $options['required'] = true;
         }
 
-        CssClass::add($attributes, 'filepond');
+        CssClass::add($options, 'filepond');
 
-        return File::widget($this->model, $this->attribute)->attributes($attributes)->render();
+        return File::widget($this->model, $this->attribute)->attributes($options)->render();
     }
 }

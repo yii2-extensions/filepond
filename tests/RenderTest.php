@@ -192,8 +192,8 @@ final class RenderTest extends TestCase
         $filePond = FilePond::widget(
             [
                 'attribute' => 'array',
-                'attributes' => ['name' => 'test-name'],
                 'model' => new TestForm(),
+                'options' => ['name' => 'test-name'],
             ],
         );
 

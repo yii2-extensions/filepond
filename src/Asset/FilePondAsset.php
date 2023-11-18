@@ -16,38 +16,29 @@ final class FilePondAsset extends AssetBundle
      */
     public $sourcePath = '@npm/filepond';
 
-    /**
-     * {@inheritdoc}
-     */
-    public $css = [
-        'dist/filepond.css',
-    ];
+    public function init(): void
+    {
+        parent::init();
+
+        $this->css = YII_ENV === 'prod'
+            ? ['dist/filepond.min.css'] : ['dist/filepond.css'];
+
+        $this->js = YII_ENV === 'prod'
+            ? ['dist/filepond.min.js'] : ['dist/filepond.js'];
+
+        $this->publishOptions['only'] = array_merge($this->css, $this->js);
+    }
 
     /**
      * {@inheritdoc}
-     */
-    public $js = [
-        'dist/filepond.js'
-    ];
-
-    /**
-     * {@inheritdoc}
+     *
+     * @phpstan-var array<array-key, mixed>
      */
     public $depends = [
-        Dev\FilePondEncodePlugin::class,
-        Dev\FilePondImageExifOrientationPlugin::class,
-        Dev\FilePondImagePreviewPlugin::class,
-        Dev\FilePondValidateSizePlugin::class,
-        Dev\FilePondValidateTypePlugin::class,
-    ];
-
-    /**
-     * {@inheritdoc}
-     */
-    public $publishOptions = [
-        'only' => [
-            'dist/filepond.css',
-            'dist/filepond.js',
-        ],
+        FilePondEncodePlugin::class,
+        FilePondImageExifOrientationPlugin::class,
+        FilePondImagePreviewPlugin::class,
+        FilePondValidateSizePlugin::class,
+        FilePondValidateTypePlugin::class,
     ];
 }
