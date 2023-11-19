@@ -9,10 +9,13 @@
 <p align="center">
     <a href="https://www.php.net/releases/8.1/en.php" target="_blank">
         <img src="https://img.shields.io/badge/PHP-%3E%3D8.1-787CB5" alt="php-version">
-    </a>
+    </a>  
     <a href="https://github.com/yii2-extensions/filepond/actions/workflows/build.yml" target="_blank">
         <img src="https://github.com/yii2-extensions/filepond/actions/workflows/build.yml/badge.svg" alt="PHPUnit">
     </a>
+    <a href="https://github.com/yii2-extensions/filepond/actions/workflows/compatibility.yml" target="_blank">
+        <img src="https://github.com/yii2-extensions/filepond/actions/workflows/compatibility.yml/badge.svg" alt="PHPUnit">
+    </a>      
     <a href="https://codecov.io/gh/yii2-extensions/filepond" target="_blank">
         <img src="https://codecov.io/gh/yii2-extensions/filepond/branch/main/graph/badge.svg?token=MF0XUGVLYC" alt="Codecov">
     </a>
