@@ -13,24 +13,15 @@
     <a href="https://github.com/yii2-extensions/filepond/actions/workflows/build.yml" target="_blank">
         <img src="https://github.com/yii2-extensions/filepond/actions/workflows/build.yml/badge.svg" alt="PHPUnit">
     </a>
-    <a href="https://codecov.io/gh/yii2-extensions/filepond" target="_blank">
-        <img src="https://codecov.io/gh/yii2-extensions/filepond/branch/main/graph/badge.svg?token=MF0XUGVLYC" alt="Codecov">
-    </a>
     <a href="https://github.com/yii2-extensions/filepond/actions/workflows/compatibility.yml" target="_blank">
         <img src="https://github.com/yii2-extensions/filepond/actions/workflows/compatibility.yml/badge.svg" alt="PHPUnit">
-    </a>      
+    </a>    
+    <a href="https://codecov.io/gh/yii2-extensions/filepond" target="_blank">
+        <img src="https://codecov.io/gh/yii2-extensions/filepond/branch/main/graph/badge.svg?token=MF0XUGVLYC" alt="Codecov">
+    </a>   
     <a href="https://dashboard.stryker-mutator.io/reports/github.com/yii2-extensions/filepond/main" target="_blank">
         <img src="https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyii2-extensions%2Ffilepond%2Fmain" alt="Infection">
-    </a>
-    <a href="https://github.com/yii2-extensions/filepond/actions/workflows/static.yml" target="_blank">
-        <img src="https://github.com/yii2-extensions/gii/actions/workflows/static.yml/badge.svg" alt="PHPStan">
-    </a>
-    <a href="https://github.com/yii2-extensions/filepond/actions/workflows/static.yml" target="_blank">
-        <img src="https://img.shields.io/badge/PHPStan%20level-5-blue" alt="PHPStan level">
-    </a>    
-    <a href="https://github.styleci.io/repos/698621511?branch=main" target="_blank">
-        <img src="https://github.styleci.io/repos/698621511/shield?branch=main" alt="Code style">
-    </a>        
+    </a>       
 </p>
 
 ![filepond](docs/images/filepond.png)
@@ -88,16 +79,16 @@ $imageFile = FileProcessing::saveWithReturningFile(
 );        
 ```
 
+## Quality code
+
+[![static-analysis](https://github.com/yii2-extensions/gii/actions/workflows/static.yml/badge.svg)](https://github.com/yii2-extensions/filepond/actions/workflows/static.yml)
+[![phpstan-level](https://img.shields.io/badge/PHPStan%20level-5-blue)](https://github.com/yii2-extensions/filepond/actions/workflows/static.yml)
+[![style-ci](https://github.styleci.io/repos/698621511/shield?branch=main)](https://github.styleci.io/repos/698621511?branch=main)
+
 ## Support versions Yii2
 
-<p>
-    <a href="https://github.com/yiisoft/yii2/tree/2.2" target="_blank">
-        <img src="https://img.shields.io/badge/Yii2%20version-2.2-blue" alt="yii2-version">
-    </a>
-    <a href="https://github.com/yiisoft/yii2/tree/2.0.49.3" target="_blank">
-        <img src="https://img.shields.io/badge/Yii2%20version-2.0.49.3-blue" alt="yii2-version">
-    </a>
-</p>
+[![Yii20](https://img.shields.io/badge/Yii2%20version-2.0-blue)](https://github.com/yiisoft/yii2/tree/2.0.49.3)
+[![Yii22](https://img.shields.io/badge/Yii2%20version-2.2-blue)](https://img.shields.io/badge/Yii2%20version-2.2-blue)
 
 ## Testing
 
