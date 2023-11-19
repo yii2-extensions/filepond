@@ -10,9 +10,6 @@
     <a href="https://www.php.net/releases/8.1/en.php" target="_blank">
         <img src="https://img.shields.io/badge/PHP-%3E%3D8.1-787CB5" alt="php-version">
     </a>
-    <a href="https://github.com/yiisoft/yii2/tree/2.2" target="_blank">
-        <img src="https://img.shields.io/badge/Yii2%20version-2.2-blue" alt="yii2-version">
-    </a>
     <a href="https://github.com/yii2-extensions/filepond/actions/workflows/build.yml" target="_blank">
         <img src="https://github.com/yii2-extensions/filepond/actions/workflows/build.yml/badge.svg" alt="PHPUnit">
     </a>
@@ -87,6 +84,17 @@ $imageFile = FileProcessing::saveWithReturningFile(
     false
 );        
 ```
+
+## Support versions Yii2
+
+<p>
+    <a href="https://github.com/yiisoft/yii2/tree/2.2" target="_blank">
+        <img src="https://img.shields.io/badge/Yii2%20version-2.2-blue" alt="yii2-version">
+    </a>
+    <a href="https://github.com/yiisoft/yii2/tree/2.0.49.3" target="_blank">
+        <img src="https://img.shields.io/badge/Yii2%20version-2.0.49.3-blue" alt="yii2-version">
+    </a>
+</p>
 
 ## Testing
 
