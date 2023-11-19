@@ -81,7 +81,7 @@ $imageFile = FileProcessing::saveWithReturningFile(
 
 ## Quality code
 
-[![static-analysis](https://github.com/yii2-extensions/gii/actions/workflows/static.yml/badge.svg)](https://github.com/yii2-extensions/filepond/actions/workflows/static.yml)
+[![static-analysis](https://github.com/yii2-extensions/filepond/actions/workflows/static.yml/badge.svg)](https://github.com/yii2-extensions/filepond/actions/workflows/static.yml)
 [![phpstan-level](https://img.shields.io/badge/PHPStan%20level-5-blue)](https://github.com/yii2-extensions/filepond/actions/workflows/static.yml)
 [![style-ci](https://github.styleci.io/repos/698621511/shield?branch=main)](https://github.styleci.io/repos/698621511?branch=main)
 
