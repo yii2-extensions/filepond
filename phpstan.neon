@@ -1,5 +1,6 @@
 includes:
 	- vendor/yii2-extensions/phpstan/extension.neon
+    
 parameters:
     bootstrapFiles:
         - tests/bootstrap.php
