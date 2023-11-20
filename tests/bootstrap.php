@@ -5,9 +5,9 @@ declare(strict_types=1);
 // ensure we get report on all possible php errors
 error_reporting(-1);
 
+defined('YII_DEBUG') or define('YII_DEBUG', false);
 define('YII_ENABLE_ERROR_HANDLER', false);
 define('YII_ENV', 'test');
-defined('YII_DEBUG') or define('YII_DEBUG', false);
 
 $_SERVER['SCRIPT_NAME'] = '/' . __DIR__;
 $_SERVER['SCRIPT_FILENAME'] = __FILE__;
