@@ -5,7 +5,7 @@ declare(strict_types=1);
 // ensure we get report on all possible php errors
 error_reporting(-1);
 
-defined('YII_DEBUG') or define('YII_DEBUG', false);
+defined('YII_DEBUG') || define('YII_DEBUG', false);
 define('YII_ENABLE_ERROR_HANDLER', false);
 define('YII_ENV', 'test');
 

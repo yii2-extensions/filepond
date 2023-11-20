@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yii2\Extensions\FilePond\Asset;
 
-use Yii2\Extensions\FilePond\Asset\FilePondAsset;
 use yii\web\AssetBundle;
 
 /**
