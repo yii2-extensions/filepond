@@ -309,10 +309,12 @@ final class FilePond extends InputWidget
                 'imageTransformVariantsDefaultName' => $this->imageTransformVariantsDefaultName,
                 'imageTransformVariantsIncludeOriginal' => $this->imageTransformVariantsIncludeDefault,
                 'labelFileTypeNotAllowed' => Yii::t('yii.filepond', 'File type not allowed'),
-                'labelIdle' => Yii::t(
-                    'yii.filepond',
-                    'Drag & Drop your files or <span class="filepond--label-action"> Browse </span>',
-                ),
+                'labelIdle' => $this->labelIdle === ''
+                    ? Yii::t(
+                        'yii.filepond',
+                        'Drag & Drop your files or <span class="filepond--label-action"> Browse </span>',
+                    )
+                    : $this->labelIdle,
                 'labelMaxFileSize' => Yii::t('yii.filepond', 'Maximum file size is {filesize}'),
                 'labelMaxFileSizeExceeded' => Yii::t('yii.filepond', 'File is too large'),
                 'labelMaxTotalFileSize' => Yii::t('yii.filepond', 'Maximum total file size is {filesize}'),
