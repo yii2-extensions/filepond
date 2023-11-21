@@ -56,9 +56,6 @@ echo $form
     ->widget(
         FilePond::class,
         [
-            'labelIdle' => Yii::t(
-                'yii.blog', 'Drag & Drop your files or <span class="filepond--label-action">Browse</span>',
-            ),
             'loadFileDefault' => $imageFile,
             'imagePreviewHeight' => 170,
             'imageCropAspectRatio' => '1:1',
