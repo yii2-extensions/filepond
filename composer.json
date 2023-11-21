@@ -50,6 +50,7 @@
             "dev-master": "1.0.x-dev"
         },
         "config-plugin": {
+            "params": "params.php",
             "yii2-filepond": "extension.php"
         },
         "config-plugin-options": {
