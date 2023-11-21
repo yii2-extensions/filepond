@@ -10,6 +10,7 @@ return [
             'translations' => [
                 'yii.filepond' => [
                     'class' => PhpMessageSource::class,
+                    'basePath' => '@yii-filepond/resource/message',
                 ],
             ],
         ],
