@@ -76,6 +76,19 @@ $imageFile = FileProcessing::saveWithReturningFile(
 );        
 ```
 
+### Translation support
+
+The extension supports translation. You can translate the extension into your language,
+for default the extension supports the following languages:
+
+- Chinese
+- English
+- French
+- German
+- Portuguese
+- Russian
+- Spanish
+
 ## Quality code
 
 [![static-analysis](https://github.com/yii2-extensions/filepond/actions/workflows/static.yml/badge.svg)](https://github.com/yii2-extensions/filepond/actions/workflows/static.yml)
