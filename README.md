@@ -46,7 +46,15 @@ to the require-dev section of your `composer.json` file.
 
 ## Usage
 
-### View 
+### Name
+
+```php
+use Yii2\Extensions\Filepond\FilePond;
+
+echo FilePond::widget(['name' => 'image_file']);
+```
+
+### Active Field 
 
 ```php
 use Yii2\Extensions\Filepond\FilePond;
