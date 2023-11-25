@@ -7,7 +7,6 @@ namespace Yii2\Extensions\FilePond\Tests;
 use Yii2\Extensions\FilePond\Asset;
 use Yii2\Extensions\FilePond\FilePond;
 use Yii;
-use yii\web\AssetBundle;
 use yii\web\View;
 
 final class AssetTest extends TestCase

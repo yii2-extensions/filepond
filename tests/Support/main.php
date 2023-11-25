@@ -7,8 +7,8 @@ declare(strict_types=1);
  * @var string $widget
  */
 $this->beginPage();
-    $this->head();
-    $this->beginBody();
-        echo $widget;
-    $this->endBody();
+$this->head();
+$this->beginBody();
+echo $widget;
+$this->endBody();
 $this->endPage();
