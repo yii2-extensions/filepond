@@ -402,10 +402,6 @@ final class FilePond extends InputWidget
             $options['class'] = str_replace('form-control', '', $options['class']);
         }
 
-        if (isset($options['placeholder']) && $options['placeholder'] === true) {
-            unset($options['placeholder']);
-        }
-
         if (array_key_exists('allowMultiple', $this->config) && $this->config['allowMultiple']) {
             $options['multiple'] = true;
         }
