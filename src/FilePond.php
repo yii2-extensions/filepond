@@ -15,64 +15,19 @@ use yii\widgets\InputWidget;
 
 final class FilePond extends InputWidget
 {
-    /**
-     * @var array The accepted file types. Can be mime types or wild cards.
-     * For instance ['image/*'] will accept all images. ['image/png', 'image/jpeg'] will only accept PNGs and JPEGs.
-     */
     public array $acceptedFileTypes = [];
-    /**
-     * @var bool Whether to allow file type validation.
-     */
     public bool $allowFileTypeValidation = true;
-    /**
-     * @var bool Whether to allow file rename.
-     */
     public bool $allowFileRename = false;
-    /**
-     * @var bool Whether to allow file size validation.
-     */
     public bool $allowFileValidateSize = true;
-    /**
-     * @var bool Whether to allow image crop.
-     */
     public bool $allowImageCrop = false;
-    /**
-     * @var bool Whether to allow image exif orientation.
-     */
     public bool $allowImageExifOrientation = true;
-    /**
-     * @var bool Whether to allow image preview.
-     */
     public bool $allowImagePreview = true;
-    /**
-     * @var bool Whether to allow image transform.
-     */
     public bool $allowImageTransform = false;
-    /**
-     * @var bool Whether to allow multiple file upload.
-     */
     public bool $allowMultiple = false;
-    /**
-     * @var bool Whether to allow PDF preview.
-     */
     public bool $allowPdfPreview = false;
-    /**
-     * @var string The CSS class to add to the root element.
-     */
     public string $cssClass = '';
-    /**
-     * @var array The FilePond configuration.
-     */
+    public bool $cdn = false;
     public array $config = [];
-    /**
-     * @var string The environment to use.
-     */
-    public string $environment = '';
-    /**
-     * @var string The file rename function.
-     *
-     * use: `fileRenameFunction: (file) => return `my_new_name${file.extension}`;
-     */
     public string $fileRename = '';
     /**
      * @var string The file validate type detect type function.
@@ -89,13 +44,7 @@ final class FilePond extends InputWidget
      * @link https://pqina.nl/filepond/docs/api/plugins/file-validate-type/#custom-type-detection
      */
     public string $fileValidateTypeDetectType = '';
-    /**
-     * @var string The file validate When message shown to indicate the allowed file types.
-     */
     public string $fileValidateTypeLabelExpectedTypes = '';
-    /**
-     * @var string The aspect ratio of the crop in human-readable format, for example, '1:1' or '16:10'.
-     */
     public string|null $imageCropAspectRatio = null;
     /**
      * @var string The image preview height.
@@ -103,9 +52,6 @@ final class FilePond extends InputWidget
      * Fixed image preview height, overrides min and max preview height.
      */
     public string|null $imagePreviewHeight = null;
-    /**
-     * @var bool Whether to show the image preview markup.
-     */
     public bool $imagePreviewMarkupShow = true;
     /**
      * @var string The image preview max file size.
@@ -178,9 +124,6 @@ final class FilePond extends InputWidget
      * requirements (e.g. resize or crop).
      */
     public string $imageTransformOutputQualityMode = 'always';
-    /**
-     * @var bool Whether to strip the image head.
-     */
     public bool $imageTransformOutputStripImageHead = true;
     /**
      * @var array The image transform variants.
@@ -206,49 +149,16 @@ final class FilePond extends InputWidget
      * Should the transform plugin output the original file.
      */
     public bool $imageTransformVariantsIncludeOriginal = false;
-    /**
-     * @var string The label to show when there are no files.
-     */
     public string $labelIdle = '';
-    /**
-     * @var string Label for max files size.
-     */
     public string $labelMaxFileSize = '';
-    /**
-     * @var string Label for max file size exceeded.
-     */
     public string $labelMaxFileSizeExceeded = '';
-    /**
-     * @var string Label for max total file size.
-     */
     public string $labelMaxTotalFileSize = '';
-    /**
-     * @var string Label for max total file size exceeded.
-     */
     public string $labelMaxTotalFileSizeExceeded = '';
-    /**
-     * @var string Label for a file type not allowed error.
-     */
     public string $labelFileTypeNotAllowed = '';
-    /**
-     * @var string The default file to load.
-     */
     public string $loadFileDefault = '';
-    /**
-     * @var int The maximum number of files allowed.
-     */
     public int $maxFiles = 1;
-    /**
-     * @var string The maximum file size allowed.
-     */
     public string|null $maxFileSize = null;
-    /**
-     * @var string The maximum total file size allowed.
-     */
     public string|null $maxTotalFileSize = null;
-    /**
-     * @var string The minimum file size allowed.
-     */
     public string|null $minFileSize = null;
     /**
      * @phpstan-var string[] The default plugins to load.
@@ -260,17 +170,8 @@ final class FilePond extends InputWidget
         'FilePondPluginImageExifOrientation',
         'FilePondPluginImagePreview',
     ];
-    /**
-     * @var int The pdf preview height.
-     */
     public int $pdfPreviewHeight = 320;
-    /**
-     * @var string The pdf component extra params.
-     */
     public string $pdfComponentExtraParams = 'toolbar=0&view=fit&page=1';
-    /**
-     * @var bool Whether the field is required.
-     */
     public bool $required = false;
 
     private string $id = '';
@@ -378,12 +279,8 @@ final class FilePond extends InputWidget
     {
         $view = $this->getView();
 
-        if ($this->environment === '') {
-            $this->environment = YII_ENV;
-        }
-
-        match ($this->environment) {
-            'cdn' => FilePondCdnAsset::register($view),
+        match ($this->cdn) {
+            true => FilePondCdnAsset::register($view),
             default => FilePondAsset::register($view),
         };
 
