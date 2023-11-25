@@ -7,7 +7,7 @@ namespace Yii2\Extensions\FilePond;
 use JsonException;
 use PHPForge\Html\Helper\CssClass;
 use PHPForge\Html\Helper\Utils;
-use RuntimeException;
+use PHPForge\Html\Input;
 use Yii2\Extensions\FilePond\Asset\FilePondAsset;
 use Yii2\Extensions\FilePond\Asset\FilePondCdnAsset;
 use Yii;
@@ -57,7 +57,7 @@ final class FilePond extends InputWidget
      */
     public bool $allowPdfPreview = false;
     /**
-     * @var string The CSS class for the filepond container.
+     * @var string The CSS class to add to the root element.
      */
     public string $cssClass = '';
     /**
@@ -273,8 +273,12 @@ final class FilePond extends InputWidget
      */
     public bool $required = false;
 
+    private string $id = '';
+
     public function init(): void
     {
+        parent::init();
+
         $this->config = array_merge(
             [
                 'acceptedFileTypes' => $this->acceptedFileTypes,
@@ -329,18 +333,14 @@ final class FilePond extends InputWidget
             ],
             $this->config,
         );
+
+        $this->id = $this->hasModel()
+            ? Utils::generateInputId($this->model->formName(), $this->attribute)
+            : $this->getId() . '-filepond';
     }
 
     public function run(): string
     {
-        if ($this->model === null) {
-            throw new RuntimeException('The model is not set.');
-        }
-
-        if ($this->attribute === null) {
-            throw new RuntimeException('The attribute is not set.');
-        }
-
         $this->registerClientScript();
 
         return $this->renderInputFile();
@@ -357,7 +357,6 @@ final class FilePond extends InputWidget
             $closure = "{$this->fileValidateTypeDetectType} {$closure}";
         }
 
-        $id = Utils::generateInputId($this->model->formName(), $this->attribute);
         $loadFileDefault = $this->loadFileDefault;
         $pluginConfig = implode(', ', $this->pluginDefault);
         $setOptions = json_encode($this->config, JSON_THROW_ON_ERROR);
@@ -367,7 +366,7 @@ final class FilePond extends InputWidget
         FilePond.setOptions($setOptions)
 
         const loadFileDefault = "$loadFileDefault"
-        const pond = FilePond.create(document.querySelector('input[type="file"][id="$id"]'), {$closure})
+        const pond = FilePond.create(document.querySelector('input[type="file"][id="$this->id"]'), {$closure})
 
         if (loadFileDefault !== '') {
             pond.addFiles(loadFileDefault)
@@ -396,6 +395,7 @@ final class FilePond extends InputWidget
      */
     private function renderInputFile(): string
     {
+        $name = $this->name;
         $options = $this->options;
 
         if (isset($options['class']) && str_contains($options['class'], 'form-control')) {
@@ -411,7 +411,8 @@ final class FilePond extends InputWidget
         }
 
         if (array_key_exists('className', $this->config) && is_string($this->config['className'])) {
-            CssClass::add($options, $this->config['className']);
+            $class = str_replace('form-control', '', $this->config['className']);
+            CssClass::add($options, $class);
         }
 
         if (array_key_exists('required', $this->config) && $this->config['required']) {
@@ -420,6 +421,27 @@ final class FilePond extends InputWidget
 
         CssClass::add($options, 'filepond');
 
-        return File::widget($this->model, $this->attribute)->attributes($options)->render();
+        $name = match ($this->hasModel()) {
+            true => Utils::generateArrayableName(Utils::generateInputName($this->model->formName(), $this->attribute)),
+            default => Utils::generateArrayableName($name),
+        };
+
+        // input type="file" not supported value attribute.
+        unset($options['id'], $options['placeholder'], $options['value']);
+
+        return match ($this->hasModel()) {
+            true => Input::widget()
+                ->attributes($options)
+                ->id($this->id)
+                ->name($name)
+                ->type('file')
+                ->render(),
+            default => Input::widget()
+                ->attributes($options)
+                ->id($this->id)
+                ->name($name)
+                ->type('file')
+                ->render(),
+        };
     }
 }

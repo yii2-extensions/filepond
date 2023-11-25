@@ -13,10 +13,18 @@ use Yii2\Extensions\FilePond\Tests\Support\TestForm;
  */
 final class RenderTest extends TestCase
 {
-    public function testAllowMultiple(): void
+    public function setup(): void
     {
+        parent::setUp();
         $this->mockApplication();
 
+        FilePond::$counter = 0;
+
+        $this->view = Yii::$app->getView();
+    }
+
+    public function testAllowMultiple(): void
+    {
         $filePond = FilePond::widget(
             [
                 'attribute' => 'array',
@@ -29,50 +37,14 @@ final class RenderTest extends TestCase
             '<input class="filepond" id="testform-array" name="TestForm[array][]" type="file" multiple>',
             $filePond,
         );
+
+        $result = $this->view->renderFile(__DIR__ . '/Support/main.php', ['widget' => $filePond]);
+
+        $this->assertStringContainsString('"allowMultiple":true', $result);
     }
 
     public function testCssClass(): void
     {
-        $this->mockApplication();
-
-        $view = Yii::$app->getView();
-
-        FilePond::widget(
-            [
-                'attribute' => 'array',
-                'cssClass' => 'TestClass',
-                'model' => new TestForm(),
-            ],
-        );
-
-        $result = $view->renderFile(__DIR__ . '/Support/main.php');
-
-        $this->assertStringContainsString('"className":"TestClass"', $result);
-    }
-
-    public function testConfig(): void
-    {
-        $this->mockApplication();
-
-        $view = Yii::$app->getView();
-
-        FilePond::widget(
-            [
-                'attribute' => 'array',
-                'config' => ['forceRevert' => true, 'storeAsFile' => true],
-                'model' => new TestForm(),
-            ],
-        );
-
-        $result = $view->renderFile(__DIR__ . '/Support/main.php');
-
-        $this->assertStringContainsString('"forceRevert":true,"storeAsFile":true', $result);
-    }
-
-    public function testConfigWithClassName(): void
-    {
-        $this->mockApplication();
-
         $filePond = FilePond::widget(
             [
                 'attribute' => 'array',
@@ -85,14 +57,29 @@ final class RenderTest extends TestCase
             '<input class="test-class filepond" id="testform-array" name="TestForm[array][]" type="file">',
             $filePond,
         );
+
+        $result = $this->view->renderFile(__DIR__ . '/Support/main.php', ['widget' => $filePond]);
+
+        $this->assertStringContainsString('"className":"test-class"', $result);
+    }
+
+    public function testConfig(): void
+    {
+        $filePond = FilePond::widget(
+            [
+                'attribute' => 'array',
+                'config' => ['forceRevert' => true, 'storeAsFile' => true],
+                'model' => new TestForm(),
+            ],
+        );
+
+        $result = $this->view->renderFile(__DIR__ . '/Support/main.php', ['widget' => $filePond]);
+
+        $this->assertStringContainsString('"forceRevert":true,"storeAsFile":true', $result);
     }
 
     public function testFileRename(): void
     {
-        $this->mockApplication();
-
-        $view = Yii::$app->getView();
-
         $filePond = FilePond::widget(
             [
                 'attribute' => 'array',
@@ -110,7 +97,7 @@ final class RenderTest extends TestCase
             $filePond,
         );
 
-        $result = $view->renderFile(__DIR__ . '/Support/main.php');
+        $result = $this->view->renderFile(__DIR__ . '/Support/main.php', ['widget' => $filePond]);
 
         $this->assertStringContainsString('functionFileRename()', $result);
 
@@ -138,7 +125,7 @@ final class RenderTest extends TestCase
             $filePond,
         );
 
-        $result = $view->renderFile(__DIR__ . '/Support/main.php');
+        $result = $this->view->renderFile(__DIR__ . '/Support/main.php', ['widget' => $filePond]);
 
         $this->assertStringContainsString('fileValidateTypeDetectType: (source, type) =>', $result);
         $this->assertStringContainsString('functionFileRename()', $result);
@@ -146,11 +133,7 @@ final class RenderTest extends TestCase
 
     public function testLabelIdle(): void
     {
-        $this->mockApplication();
-
-        $view = Yii::$app->getView();
-
-        FilePond::widget(
+        $filePond = FilePond::widget(
             [
                 'attribute' => 'array',
                 'labelIdle' => 'Drag & Drop or <span class="filepond--label-action"> Browse </span>',
@@ -158,7 +141,7 @@ final class RenderTest extends TestCase
             ],
         );
 
-        $result = $view->renderFile(__DIR__ . '/Support/main.php');
+        $result = $this->view->renderFile(__DIR__ . '/Support/main.php', ['widget' => $filePond]);
 
         $this->assertStringContainsString(
             '"labelIdle":"Drag & Drop or <span class=\"filepond--label-action\"> Browse <\/span>"',
@@ -168,11 +151,7 @@ final class RenderTest extends TestCase
 
     public function testMaxFiles(): void
     {
-        $this->mockApplication();
-
-        $view = Yii::$app->getView();
-
-        FilePond::widget(
+        $filePond = FilePond::widget(
             [
                 'attribute' => 'array',
                 'maxFiles' => 3,
@@ -180,33 +159,31 @@ final class RenderTest extends TestCase
             ],
         );
 
-        $result = $view->renderFile(__DIR__ . '/Support/main.php');
+        $result = $this->view->renderFile(__DIR__ . '/Support/main.php', ['widget' => $filePond]);
 
         $this->assertStringContainsString('"maxFiles":3', $result);
     }
 
     public function testName(): void
     {
-        $this->mockApplication();
-
         $filePond = FilePond::widget(
             [
-                'attribute' => 'array',
-                'model' => new TestForm(),
-                'options' => ['name' => 'test-name'],
+                'name' => 'filepond',
             ],
         );
 
         $this->assertSame(
-            '<input class="filepond" id="testform-array" name="test-name[]" type="file">',
+            '<input class="filepond" id="w0-filepond" name="filepond[]" type="file">',
             $filePond,
         );
+
+        $result = $this->view->renderFile(__DIR__ . '/Support/main.php', ['widget' => $filePond]);
+
+        $this->assertStringContainsString('input[type="file"][id="w0-filepond"]', $result);
     }
 
     public function testNotClassFormControl(): void
     {
-        $this->mockApplication();
-
         $filePond = FilePond::widget(
             [
                 'attribute' => 'array',
@@ -219,17 +196,28 @@ final class RenderTest extends TestCase
             '<input class="filepond" id="testform-array" name="TestForm[array][]" type="file">',
             $filePond,
         );
-    }
-
-    public function testNotClassPlaceholder(): void
-    {
-        $this->mockApplication();
 
         $filePond = FilePond::widget(
             [
                 'attribute' => 'array',
+                'cssClass' => 'form-control',
                 'model' => new TestForm(),
-                'options' => ['placeholder' => true],
+            ],
+        );
+
+        $this->assertSame(
+            '<input class="filepond" id="testform-array" name="TestForm[array][]" type="file">',
+            $filePond,
+        );
+    }
+
+    public function testNotPlaceholder(): void
+    {
+        $filePond = FilePond::widget(
+            [
+                'attribute' => 'array',
+                'model' => new TestForm(),
+                'options' => ['placeholder' => 'test-placeholder'],
             ],
         );
 
@@ -241,11 +229,7 @@ final class RenderTest extends TestCase
 
     public function testPluingDefault(): void
     {
-        $this->mockApplication();
-
-        $view = Yii::$app->getView();
-
-        FilePond::widget(
+        $filePond = FilePond::widget(
             [
                 'attribute' => 'array',
                 'maxFiles' => 3,
@@ -253,7 +237,7 @@ final class RenderTest extends TestCase
             ],
         );
 
-        $result = $view->renderFile(__DIR__ . '/Support/main.php');
+        $result = $this->view->renderFile(__DIR__ . '/Support/main.php', ['widget' => $filePond]);
 
         $this->assertStringContainsString('FilePondPluginFileEncode', $result);
         $this->assertStringContainsString('FilePondPluginFileValidateSize', $result);
@@ -264,8 +248,6 @@ final class RenderTest extends TestCase
 
     public function testRender(): void
     {
-        $this->mockApplication();
-
         $filePond = FilePond::widget(
             [
                 'attribute' => 'array',
@@ -277,14 +259,29 @@ final class RenderTest extends TestCase
             '<input class="filepond" id="testform-array" name="TestForm[array][]" type="file">',
             $filePond,
         );
+
+        $result = $this->view->renderFile(__DIR__ . '/Support/main.php', ['widget' => $filePond]);
+
+        $this->assertStringContainsString(
+            <<<JS
+            <script>jQuery(function ($) {
+            FilePond.registerPlugin(FilePondPluginFileEncode, FilePondPluginFileValidateSize, FilePondPluginFileValidateType, FilePondPluginImageExifOrientation, FilePondPluginImagePreview)
+            FilePond.setOptions({"acceptedFileTypes":[],"allowFileRename":false,"allowFileTypeValidation":true,"allowFileValidateSize":true,"allowImageCrop":false,"allowImageExifOrientation":true,"allowImagePreview":true,"allowImageTransform":false,"allowMultiple":false,"className":"","fileValidateTypeLabelExpectedTypes":"Expects {allButLastType} or {lastType}","imageCropAspectRatio":null,"imagePreviewHeight":null,"imagePreviewMarkupShow":true,"imagePreviewMaxFileSize":null,"imagePreviewMaxHeight":256,"imagePreviewMaxInstantPreviewFileSize":null,"imagePreviewMinHeight":44,"imagePreviewTransparencyIndicator":null,"imageTransformAfterCreateBlob":null,"imageTransformBeforeCreateBlob":null,"imageTransformClientTransforms":null,"imageTransformOutputQuality":null,"imageTransformOutputQualityMode":null,"imageTransformOutputStripImageHead":true,"imageTransformVariants":null,"imageTransformVariantsDefaultName":null,"imageTransformVariantsIncludeOriginal":true,"labelFileTypeNotAllowed":"File type not allowed","labelIdle":"Drag & Drop your files or <span class=\"filepond--label-action\"> Browse <\/span>","labelMaxFileSize":"Maximum file size is {filesize}","labelMaxFileSizeExceeded":"File is too large","labelMaxTotalFileSize":"Maximum total file size is {filesize}","labelMaxTotalFileSizeExceeded":"Maximum total size exceeded","maxFiles":1,"maxFileSize":null,"maxTotalFileSize":null,"minFileSize":null,"pdfPreviewHeight":320,"pdfComponentExtraParams":"toolbar=0&view=fit&page=1","required":false})
+
+            const loadFileDefault = ""
+            const pond = FilePond.create(document.querySelector('input[type="file"][id="testform-array"]'), )
+
+            if (loadFileDefault !== '') {
+                pond.addFiles(loadFileDefault)
+            }
+            });</script>
+            JS,
+            $result,
+        );
     }
 
     public function testRequired(): void
     {
-        $this->mockApplication();
-
-        $view = Yii::$app->getView();
-
         $filePond = FilePond::widget(
             [
                 'attribute' => 'array',
@@ -293,7 +290,7 @@ final class RenderTest extends TestCase
             ],
         );
 
-        $result = $view->renderFile(__DIR__ . '/Support/main.php');
+        $result = $this->view->renderFile(__DIR__ . '/Support/main.php', ['widget' => $filePond]);
 
         $this->assertSame(
             '<input class="filepond" id="testform-array" name="TestForm[array][]" type="file" required>',
