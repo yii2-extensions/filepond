@@ -26,7 +26,7 @@ final class FilePond extends InputWidget
     public bool $allowMultiple = false;
     public bool $allowPdfPreview = false;
     public string $cssClass = '';
-    public bool $cdn= false;
+    public bool $cdn = false;
     public array $config = [];
     public string $fileRename = '';
     /**
