@@ -105,23 +105,23 @@ $imageFile = FileProcessing::saveWithReturningFile(
 |                                         |               | use: `fileRenameFunction: (file) => return `my_new_name${file.extension}`; |                                         |
 | `fileValidateTypeDetectType`            | `string`      | The file validate type detect type function.                               | `''`                                    |
 | `fileValidateTypeLabelExpectedTypes`    | `string`      | The file validate type label expected types.                               | `''`                                    |
-| `imageCropAspectRatio`                  | `string|null` | The image crop aspect ratio.                                               | `null`                                  |
-| `imagePreviewHeight`                    | `string|null` | The image preview height.                                                  | `null`                                  |
+| `imageCropAspectRatio`                  | `string,null` | The image crop aspect ratio.                                               | `null`                                  |
+| `imagePreviewHeight`                    | `string,null` | The image preview height.                                                  | `null`                                  |
 | `imagePreviewMarkupShow`                | `bool`        | Whether to show the image preview markup.                                  | `true`                                  |
-| `imagePreviewMaxFileSize`               | `string|null` | The image preview max file size.                                           | `null`                                  |
+| `imagePreviewMaxFileSize`               | `string,null` | The image preview max file size.                                           | `null`                                  |
 | `imagePreviewMaxHeight`                 | `int`         | The image preview max height.                                              | `256`                                   |
 | `imagePreviewMaxInstantPreviewFileSize` | `int`         | The image preview max instant preview file size.                           | `10000000`                              |
 | `imagePreviewMinHeight`                 | `int`         | The image preview min height.                                              | `44`                                    |
-| `imagePreviewTransparencyIndicator`     | `string!null` | The image preview transparency indicator.                                  | `null`                                  |
-| `imageTransformAfterCreateBlob`         | `array|null`  | The image transform after create blob.                                     | `null`                                  |
-| `imageTransformBeforeCreateBlob`        | `array|null`  | The image transform before create blob.                                    | `null`                                  |
-| `imageTransformOutputQuality`           | `int|null`    | The image transform output quality.                                        | `null`                                  |
-| `imageTransformClientTransforms`        | `array|null`  | The image transform client transforms.                                     | `null`                                  |
-| `imageTransformOutputQualityMode`       | `string|null` | The image transform output quality mode.                                   | `añways`                                |
+| `imagePreviewTransparencyIndicator`     | `string,null` | The image preview transparency indicator.                                  | `null`                                  |
+| `imageTransformAfterCreateBlob`         | `array,null`  | The image transform after create blob.                                     | `null`                                  |
+| `imageTransformBeforeCreateBlob`        | `array,null`  | The image transform before create blob.                                    | `null`                                  |
+| `imageTransformOutputQuality`           | `int,null`    | The image transform output quality.                                        | `null`                                  |
+| `imageTransformClientTransforms`        | `array,null`  | The image transform client transforms.                                     | `null`                                  |
+| `imageTransformOutputQualityMode`       | `string,null` | The image transform output quality mode.                                   | `añways`                                |
 | `imageTransformOutputStripImageHead`    | `bool`        | The image transform output strip image head.                               | `true`                                  |
-| `imageTransformVariants`                | `array|null`  | The image transform variants.                                              | `null`                                  |
+| `imageTransformVariants`                | `array,null`  | The image transform variants.                                              | `null`                                  |
 | `imageTransformVariantsIncludeDefault`  | `bool`        | The image transform variants include default.                              | `true`                                  |
-| `imageTransformVariantsDefaultName`     | `string|null` | The image transform variants default name.                                 | `null`                                  |
+| `imageTransformVariantsDefaultName`     | `string,null` | The image transform variants default name.                                 | `null`                                  |
 | `imageTransformVariantsIncludeOriginal` | `bool`        | The image transform variants include original.                             | `false`                                 |
 | `labelIdle`                             | `string`      | The label idle.                                                            | `''`                                    |
 | `labelMaxFileSize`                      | `string`      | The label max file size.                                                   | `''`                                    |    
@@ -131,9 +131,9 @@ $imageFile = FileProcessing::saveWithReturningFile(
 | `labelFileTypeNotAllowed`               | `string`      | The label file type not allowed.                                           | `''`                                    |
 | `loadFileDefault`                       | `string`      | The load file default.                                                     | `''`                                    |
 | `maxFiles`                              | `int`         | The max files.                                                             | `1`                                     |
-| `maxFileSize`                           | `string|null` | The max file size.                                                         | `null`                                  |
-| `maxTotalFileSize`                      | `string|null` | The max total file size.                                                   | `null`                                  |
-| `minFileSize`                           | `string|null` | The min file size.                                                         | `null`                                  |
+| `maxFileSize`                           | `string,null` | The max file size.                                                         | `null`                                  |
+| `maxTotalFileSize`                      | `string,null` | The max total file size.                                                   | `null`                                  |
+| `minFileSize`                           | `string,null` | The min file size.                                                         | `null`                                  |
 | `pluginDefault`                         | `array`       | The plugins default.                                                       | `[`                                     |  
 |                                         |               |                                                                            |   `FilePondPluginFileValidateType,`     |
 |                                         |               |                                                                            |   `FilePondPluginFileValidateSize,`     |
