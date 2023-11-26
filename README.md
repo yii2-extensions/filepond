@@ -154,6 +154,7 @@ for default the extension supports the following languages:
 - English
 - French
 - German
+- Poland
 - Portuguese
 - Russian
 - Spanish
