@@ -11,7 +11,6 @@ use PHPForge\Html\Tag;
 use Yii2\Extensions\FilePond\Asset\FilePondAsset;
 use Yii2\Extensions\FilePond\Asset\FilePondCdnAsset;
 use Yii;
-use yii\helpers\Html;
 use yii\widgets\InputWidget;
 
 final class FilePond extends InputWidget
