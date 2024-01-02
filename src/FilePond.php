@@ -7,10 +7,11 @@ namespace Yii2\Extensions\FilePond;
 use JsonException;
 use PHPForge\Html\Helper\CssClass;
 use PHPForge\Html\Helper\Utils;
-use PHPForge\Html\Input;
+use PHPForge\Html\Tag;
 use Yii2\Extensions\FilePond\Asset\FilePondAsset;
 use Yii2\Extensions\FilePond\Asset\FilePondCdnAsset;
 use Yii;
+use yii\helpers\Html;
 use yii\widgets\InputWidget;
 
 final class FilePond extends InputWidget
@@ -322,19 +323,6 @@ final class FilePond extends InputWidget
         // input type="file" not supported value attribute.
         unset($options['id'], $options['placeholder'], $options['value']);
 
-        return match ($this->hasModel()) {
-            true => Input::widget()
-                ->attributes($options)
-                ->id($this->id)
-                ->name($name)
-                ->type('file')
-                ->render(),
-            default => Input::widget()
-                ->attributes($options)
-                ->id($this->id)
-                ->name($name)
-                ->type('file')
-                ->render(),
-        };
+        return Tag::widget()->attributes($options)->id($this->id)->name($name)->tagName('input')->type('file')->render();
     }
 }
