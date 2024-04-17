@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace Yii2\Extensions\FilePond;
 
 use JsonException;
-use PHPForge\Html\Helper\CssClass;
-use PHPForge\Html\Helper\Utils;
-use PHPForge\Html\Tag;
-use Yii2\Extensions\FilePond\Asset\FilePondAsset;
-use Yii2\Extensions\FilePond\Asset\FilePondCdnAsset;
+use UIAwesome\Html\{FormControl\Input\File, Helper\CssClass, Helper\Utils};
+use Yii2\Extensions\FilePond\Asset\{FilePondAsset, FilePondCdnAsset};
 use Yii;
 use yii\widgets\InputWidget;
 
@@ -322,6 +319,6 @@ final class FilePond extends InputWidget
         // input type="file" not supported value attribute.
         unset($options['id'], $options['placeholder'], $options['value']);
 
-        return Tag::widget()->attributes($options)->id($this->id)->name($name)->tagName('input')->type('file')->render();
+        return File::widget()->attributes($options)->id($this->id)->name($name)->render();
     }
 }

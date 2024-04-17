@@ -23,9 +23,9 @@
         "npm-asset/filepond-plugin-image-preview": "^4.6",
         "npm-asset/filepond-plugin-image-transform": "^3.8",
         "npm-asset/filepond-plugin-pdf-preview": "^1.0",
-        "oomphinc/composer-installers-extender": "^2.0",
-        "php-forge/awesome-widget": "dev-main",
-        "php-forge/html": "dev-main",
+        "php-forge/awesome-widget": "^0.1",
+        "ui-awesome/html": "^0.1",
+        "ui-awesome/html-helper": "^0.1",
         "yiisoft/yii2": "*"
     },
     "require-dev": {
@@ -55,16 +55,6 @@
         },
         "config-plugin-options": {
             "source-directory": "config"
-        },
-        "installer-types": [
-            "bower-asset",
-            "npm-asset"
-        ],
-        "installer-paths": {
-            "./node_modules/{$name}/": [
-                "type:bower-asset",
-                "type:npm-asset"
-            ]
         }
     },
     "config": {
