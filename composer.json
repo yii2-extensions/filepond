@@ -24,8 +24,8 @@
         "npm-asset/filepond-plugin-image-transform": "^3.8",
         "npm-asset/filepond-plugin-pdf-preview": "^1.0",
         "php-forge/awesome-widget": "^0.1",
-        "ui-awesome/html": "^0.1",
-        "ui-awesome/html-helper": "^0.1",
+        "ui-awesome/html": "^0.3",
+        "ui-awesome/html-helper": "^0.2",
         "yiisoft/yii2": "*"
     },
     "require-dev": {
