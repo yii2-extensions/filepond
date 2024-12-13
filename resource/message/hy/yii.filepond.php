@@ -20,11 +20,11 @@ declare(strict_types=1);
  * NOTE: this file must be saved in UTF-8 encoding.
  */
 return [
-    'Drag & Drop your files or <span class="filepond--label-action"> Browse </span>' => 'Перетащите файлы или <span class="filepond--label-action"> Обзор </span>',
-    'Expects {allButLastType} or {lastType}' => 'Ожидает {allButLastType} или {lastType}',
-    'File is too large' => 'Файл слишком большой',
-    'File type not allowed' => 'Тип файла не разрешен',
-    'Maximum file size is {filesize}' => 'Максимальный размер файла {filesize}',
-    'Maximum total file size is {filesize}' => 'Максимальный общий размер файла {filesize}',
-    'Maximum total size exceeded' => 'Превышен максимальный общий размер',
+    'Drag & Drop your files or <span class="filepond--label-action"> Browse </span>' => 'Քաշեք և թողեք ձեր ֆայլերը կամ <span class="filepond--label-action"> Ընտրեք </span>',
+    'Expects {allButLastType} or {lastType}' => 'Ակնկալվում է {allButLastType} կամ {lastType}',
+    'File is too large' => 'Ֆայլը չափազանց մեծ է',
+    'File type not allowed' => 'Ֆայլի տեսակը չի թույլատրվում',
+    'Maximum file size is {filesize}' => 'Ֆայլի առավելագույն չափը {filesize} է',
+    'Maximum total file size is {filesize}' => 'Ֆայլի առավելագույն ընդհանուր չափը {filesize} է',
+    'Maximum total size exceeded' => 'Առավելագույն ընդհանուր չափը գերազանցվել է',
 ];
