@@ -431,6 +431,7 @@ final class ImageCropperTest extends TestCase
         );
     }
 
+    #[RequiresOperatingSystem('Linux')]
     public function testCropReadsRealExifOrientation(): void
     {
         $jpeg = self::withExif(self::encode('jpeg'), [0x0112 => 6]);
