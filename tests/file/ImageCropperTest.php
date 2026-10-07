@@ -97,6 +97,48 @@ final class ImageCropperTest extends TestCase
         }
     }
 
+    public function testCropClampsNegativeOriginToImageBounds(): void
+    {
+        $cropped = (new ImageCropper())->crop(self::png(['x' => -4, 'y' => -2, 'width' => 10, 'height' => 5]));
+
+        $image = self::decode($cropped);
+
+        self::assertSame(
+            6,
+            imagesx($image),
+            'Width must exclude the columns left of the image.',
+        );
+        self::assertSame(
+            3,
+            imagesy($image),
+            'Height must exclude the rows above the image.',
+        );
+        self::assertRed(
+            $image,
+            0,
+            0,
+            'Origin pixel must come from the image, not from padding.',
+        );
+    }
+
+    public function testCropClampsRectangleBeforeImageToFirstPixel(): void
+    {
+        $cropped = (new ImageCropper())->crop(self::png(['x' => -20, 'y' => -20, 'width' => 5, 'height' => 5]));
+
+        $image = self::decode($cropped);
+
+        self::assertSame(
+            1,
+            imagesx($image),
+            'Rectangle left of the image must keep the first column.',
+        );
+        self::assertSame(
+            1,
+            imagesy($image),
+            'Rectangle above the image must keep the first row.',
+        );
+    }
+
     public function testCropClampsRectanglePositionToImageBounds(): void
     {
         $cropped = (new ImageCropper())->crop(self::png(['x' => 20, 'y' => 20, 'width' => 10, 'height' => 10]));
@@ -112,6 +154,11 @@ final class ImageCropperTest extends TestCase
             1,
             imagesy($image),
             'Position past the bottom edge must keep the last row.',
+        );
+        self::assertSame(
+            127,
+            (imagecolorat($image, 0, 0) >> 24) & 0x7F,
+            'Kept pixel must be the transparent corner, not opaque padding.',
         );
     }
 

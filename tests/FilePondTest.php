@@ -203,6 +203,109 @@ final class FilePondTest extends TestCase
         );
     }
 
+    public function testConfigAllowMultipleControlsInputMarkup(): void
+    {
+        $this->mockWebApplication();
+
+        $enabled = FilePond::widget(
+            ['name' => 'documents', 'config' => ['allowMultiple' => true], 'view' => $this->view()],
+        );
+        $disabled = FilePond::widget(
+            [
+                'name' => 'documents',
+                'allowMultiple' => true,
+                'config' => ['allowMultiple' => false],
+                'view' => $this->view(),
+            ],
+        );
+
+        self::assertStringContainsString(
+            'name="documents[]"',
+            $enabled,
+            'Enabling through config must add the array suffix.',
+        );
+        self::assertStringContainsString(
+            'multiple',
+            $enabled,
+            'Enabling through config must add the `multiple` attribute.',
+        );
+        self::assertStringContainsString(
+            'name="documents"',
+            $disabled,
+            'Disabling through config must drop the array suffix.',
+        );
+        self::assertStringNotContainsString(
+            'multiple',
+            $disabled,
+            'Disabling through config must drop the `multiple` attribute.',
+        );
+    }
+
+    public function testConfigCanDisableImageEditAssets(): void
+    {
+        $this->mockWebApplication();
+
+        $view = $this->view();
+
+        FilePond::widget(
+            ['name' => 'file', 'allowImageEdit' => true, 'config' => ['allowImageEdit' => false], 'view' => $view],
+        );
+
+        $bundles = array_keys($view->assetBundles);
+
+        self::assertStringNotContainsString(
+            'createEditor',
+            self::script($view),
+            'Editor must not be injected.',
+        );
+        self::assertNotContains(
+            CropperAsset::class,
+            $bundles,
+            'Cropper.js must not load.',
+        );
+        self::assertNotContains(
+            FilePondCropperAsset::class,
+            $bundles,
+            'Editor adapter must not load.',
+        );
+    }
+
+    public function testConfigImageEditLoadsCropperAssetsAndOptions(): void
+    {
+        $this->mockWebApplication();
+
+        $view = $this->view();
+
+        FilePond::widget(
+            [
+                'name' => 'file',
+                'config' => ['allowImageEdit' => true, 'imageCropAspectRatio' => '16:9'],
+                'cropper' => ['aspectRatios' => ['16:9']],
+                'view' => $view,
+            ],
+        );
+
+        $script = self::script($view);
+
+        $bundles = array_keys($view->assetBundles);
+
+        self::assertStringContainsString(
+            'yii2FilePond.cropper.createEditor({"aspectRatio":"16:9","aspectRatios":["16:9"]',
+            $script,
+            'Editor must receive the effective ratio and the cropper presets.',
+        );
+        self::assertContains(
+            CropperAsset::class,
+            $bundles,
+            'Cropper.js bundle must be registered.',
+        );
+        self::assertContains(
+            FilePondCropperAsset::class,
+            $bundles,
+            'Editor adapter bundle must be registered.',
+        );
+    }
+
     public function testConfigOverridesTypedPropertiesAndLabels(): void
     {
         $this->mockWebApplication();
@@ -233,6 +336,56 @@ final class FilePondTest extends TestCase
         self::assertTrue(
             $options['storeAsFile'] ?? null,
             'Arbitrary FilePond options must pass through.',
+        );
+    }
+
+    public function testConfigRequiredControlsInputAttribute(): void
+    {
+        $this->mockWebApplication();
+
+        $enabled = FilePond::widget(['name' => 'file', 'config' => ['required' => true], 'view' => $this->view()]);
+        $disabled = FilePond::widget(
+            ['name' => 'file', 'required' => true, 'config' => ['required' => false], 'view' => $this->view()],
+        );
+
+        self::assertStringContainsString(
+            ' required',
+            $enabled,
+            'Enabling through config must add the `required` attribute.',
+        );
+        self::assertStringNotContainsString(
+            ' required',
+            $disabled,
+            'Disabling through config must drop the `required` attribute.',
+        );
+    }
+
+    public function testConfigValidationFlagsControlLabels(): void
+    {
+        $this->mockWebApplication();
+
+        $view = $this->view();
+
+        FilePond::widget(
+            [
+                'name' => 'file',
+                'allowFileSizeValidation' => false,
+                'config' => ['allowFileSizeValidation' => true, 'allowFileTypeValidation' => false],
+                'view' => $view,
+            ],
+        );
+
+        $options = self::decodeOptions($view);
+
+        self::assertSame(
+            'Maximum file size is {filesize}',
+            $options['labelMaxFileSize'] ?? null,
+            'Size labels must follow the config flag.',
+        );
+        self::assertArrayNotHasKey(
+            'labelFileTypeNotAllowed',
+            $options,
+            'Type labels must follow the config flag.',
         );
     }
 
@@ -804,6 +957,18 @@ final class FilePondTest extends TestCase
             $script,
             'Options object must close the call.',
         );
+    }
+
+    public function testThrowInvalidConfigExceptionForAspectRatioWithLeadingText(): void
+    {
+        $this->mockWebApplication();
+
+        $this->expectException(InvalidConfigException::class);
+        $this->expectExceptionMessage(
+            Message::INVALID_CROP_ASPECT_RATIO->getMessage('x1:1'),
+        );
+
+        new FilePond(['name' => 'file', 'imageCropAspectRatio' => 'x1:1']);
     }
 
     public function testThrowInvalidConfigExceptionForAspectRatioWithTrailingText(): void

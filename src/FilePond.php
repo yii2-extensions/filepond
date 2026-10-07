@@ -19,6 +19,7 @@ use function array_filter;
 use function array_key_exists;
 use function array_map;
 use function array_replace;
+use function array_values;
 use function is_array;
 use function is_string;
 use function preg_match;
@@ -172,14 +173,17 @@ final class FilePond extends InputWidget
         ];
 
         $options = [
-            ...$this->getLabels(),
             ...array_filter($typed, static fn(mixed $value): bool => $value !== null),
             ...$this->config,
         ];
 
-        if (($options['allowImageEdit'] ?? null) === true && array_key_exists('imageEditEditor', $options) === false) {
+        $options = [...$this->getLabels($options), ...$options];
+
+        if (self::isEnabled($options, 'allowImageEdit') && array_key_exists('imageEditEditor', $options) === false) {
+            $cropperOptions = $this->getCropperOptions($options['imageCropAspectRatio'] ?? null);
+
             $options['imageEditEditor'] = new JsExpression(
-                'yii2FilePond.cropper.createEditor(' . Json::htmlEncode($this->getCropperOptions()) . ')',
+                'yii2FilePond.cropper.createEditor(' . Json::htmlEncode($cropperOptions) . ')',
             );
         }
 
@@ -193,14 +197,7 @@ final class FilePond extends InputWidget
      */
     public function getPlugins(): array
     {
-        $options = $this->getOptions();
-
-        return array_values(
-            array_filter(
-                Plugin::cases(),
-                static fn(Plugin $plugin): bool => ($options[$plugin->option()] ?? null) === true,
-            ),
-        );
+        return self::filterPlugins($this->getOptions());
     }
 
     /**
@@ -218,7 +215,7 @@ final class FilePond extends InputWidget
             self::assertAspectRatio($this->imageCropAspectRatio);
         }
 
-        if ($this->cropper !== [] && $this->allowImageEdit === false) {
+        if ($this->cropper !== [] && self::isEnabled($this->getOptions(), 'allowImageEdit') === false) {
             throw new InvalidConfigException(
                 Message::CROPPER_REQUIRES_IMAGE_EDIT->getMessage(),
             );
@@ -227,9 +224,11 @@ final class FilePond extends InputWidget
 
     public function run(): string
     {
-        $this->registerAssets();
+        $options = $this->getOptions();
 
-        return $this->renderInput();
+        $this->registerAssets($options);
+
+        return $this->renderInput($options);
     }
 
     /**
@@ -249,9 +248,26 @@ final class FilePond extends InputWidget
     }
 
     /**
+     * @param array<string, mixed> $options Effective FilePond options.
+     *
+     * @return list<Plugin> Plugins whose option is `true`, in registration order.
+     */
+    private static function filterPlugins(array $options): array
+    {
+        return array_values(
+            array_filter(
+                Plugin::cases(),
+                static fn(Plugin $plugin): bool => self::isEnabled($options, $plugin->option()),
+            ),
+        );
+    }
+
+    /**
+     * @param mixed $aspectRatio Effective `imageCropAspectRatio`, used as the initial editor ratio.
+     *
      * @return array<string, mixed> Editor options with localized labels.
      */
-    private function getCropperOptions(): array
+    private function getCropperOptions(mixed $aspectRatio): array
     {
         $labels = [
             'apply' => Yii::t(self::TRANSLATION_CATEGORY, 'Apply'),
@@ -267,7 +283,7 @@ final class FilePond extends InputWidget
 
         $options = array_replace(
             [
-                'aspectRatio' => $this->imageCropAspectRatio,
+                'aspectRatio' => $aspectRatio,
                 'aspectRatios' => ['free', '1:1', '16:9', '4:3', '3:2'],
                 'options' => [],
             ],
@@ -289,9 +305,11 @@ final class FilePond extends InputWidget
     }
 
     /**
+     * @param array<string, mixed> $options Typed properties merged with {@see $config}.
+     *
      * @return array<string, string> Localized labels for the core and the enabled validation plugins.
      */
-    private function getLabels(): array
+    private function getLabels(array $options): array
     {
         $labels = [
             'labelIdle' => Yii::t(
@@ -300,7 +318,7 @@ final class FilePond extends InputWidget
             ),
         ];
 
-        if ($this->allowFileSizeValidation) {
+        if (self::isEnabled($options, 'allowFileSizeValidation')) {
             $labels += [
                 'labelMaxFileSize' => Yii::t(self::TRANSLATION_CATEGORY, 'Maximum file size is {filesize}'),
                 'labelMaxFileSizeExceeded' => Yii::t(self::TRANSLATION_CATEGORY, 'File is too large'),
@@ -311,7 +329,7 @@ final class FilePond extends InputWidget
             ];
         }
 
-        if ($this->allowFileTypeValidation) {
+        if (self::isEnabled($options, 'allowFileTypeValidation')) {
             $labels += [
                 'fileValidateTypeLabelExpectedTypes' => Yii::t(
                     self::TRANSLATION_CATEGORY,
@@ -324,38 +342,58 @@ final class FilePond extends InputWidget
         return $labels;
     }
 
-    private function getScript(): string
+    /**
+     * @param array<string, mixed> $options Effective FilePond options.
+     * @param list<Plugin> $plugins Plugins enabled by the options.
+     */
+    private function getScript(array $options, array $plugins): string
     {
-        $plugins = array_map(static fn(Plugin $plugin): string => $plugin->value, $this->getPlugins());
+        $names = array_map(static fn(Plugin $plugin): string => $plugin->value, $plugins);
 
         return 'yii2FilePond.create('
             . Json::htmlEncode($this->inputId) . ', '
-            . Json::htmlEncode($plugins) . ', '
-            . Json::htmlEncode($this->getOptions())
+            . Json::htmlEncode($names) . ', '
+            . Json::htmlEncode($options)
             . ');';
     }
 
-    private function registerAssets(): void
+    /**
+     * @param array<string, mixed> $options Effective FilePond options.
+     */
+    private static function isEnabled(array $options, string $option): bool
+    {
+        return ($options[$option] ?? null) === true;
+    }
+
+    /**
+     * @param array<string, mixed> $options Effective FilePond options.
+     */
+    private function registerAssets(array $options): void
     {
         $view = $this->getView();
 
+        $plugins = self::filterPlugins($options);
+
         FilePondAsset::registerWith($view, $this->cdn);
 
-        foreach ($this->getPlugins() as $plugin) {
+        foreach ($plugins as $plugin) {
             $plugin->assetClass()::registerWith($view, $this->cdn);
         }
 
         FilePondWidgetAsset::register($view);
 
-        if ($this->allowImageEdit) {
+        if (self::isEnabled($options, 'allowImageEdit')) {
             CropperAsset::registerWith($view, $this->cdn);
             FilePondCropperAsset::register($view);
         }
 
-        $view->registerJs($this->getScript(), View::POS_END);
+        $view->registerJs($this->getScript($options, $plugins), View::POS_END);
     }
 
-    private function renderInput(): string
+    /**
+     * @param array<string, mixed> $options Effective FilePond options.
+     */
+    private function renderInput(array $options): string
     {
         $attributes = $this->options;
 
@@ -379,8 +417,8 @@ final class FilePond extends InputWidget
             ->attributes($attributes)
             ->id($this->inputId)
             ->name($this->getInputName())
-            ->multiple($this->allowMultiple ? true : null)
-            ->required($this->required ? true : null)
+            ->multiple(self::isEnabled($options, 'allowMultiple') ? true : null)
+            ->required(self::isEnabled($options, 'required') ? true : null)
             ->render();
     }
 }

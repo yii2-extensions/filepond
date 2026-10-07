@@ -20,6 +20,7 @@ use function imagesy;
 use function in_array;
 use function is_array;
 use function is_int;
+use function max;
 use function min;
 use function ob_get_clean;
 use function ob_start;
@@ -59,7 +60,8 @@ final readonly class ImageCropper
     /**
      * Returns a copy of the file cropped to its {@see EncodedFile::getCropRectangle()} rectangle.
      *
-     * The rectangle is intersected with the image bounds. Files without a rectangle are returned unchanged.
+     * The rectangle is intersected with the image bounds, keeping at least the nearest edge pixel when they do not
+     * overlap. Files without a rectangle are returned unchanged.
      *
      * @param EncodedFile $file Image file carrying crop metadata.
      *
@@ -89,14 +91,14 @@ final readonly class ImageCropper
 
         $width = imagesx($image);
         $height = imagesy($image);
-        $x = min($rect['x'], $width - 1);
-        $y = min($rect['y'], $height - 1);
+        $x = max(0, min($rect['x'], $width - 1));
+        $y = max(0, min($rect['y'], $height - 1));
 
         $bounds = [
             'x' => $x,
             'y' => $y,
-            'width' => min($rect['width'], $width - $x),
-            'height' => min($rect['height'], $height - $y),
+            'width' => max(1, min($rect['x'] + $rect['width'], $width) - $x),
+            'height' => max(1, min($rect['y'] + $rect['height'], $height) - $y),
         ];
 
         $cropped = imagecrop($image, $bounds);
