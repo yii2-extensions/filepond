@@ -47,7 +47,7 @@ Requires PHP 8.3 or newer and Yii2 `2.0.54` or `22.x`.
 
 ```bash
 composer config allow-plugins.php-forge/foxy true
-composer require php-forge/foxy:^0.3 yii2-extensions/filepond
+composer require php-forge/foxy:^0.3 yii2-extensions/filepond:^0.1
 ```
 
 Yii2 `2.0.x` applications must point the `@npm` alias to `@app/node_modules`; see the

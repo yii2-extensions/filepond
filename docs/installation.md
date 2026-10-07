@@ -15,7 +15,7 @@ Authorize Foxy in the application, so Composer installs the frontend packages de
 
 ```bash
 composer config allow-plugins.php-forge/foxy true
-composer require php-forge/foxy:^0.3 yii2-extensions/filepond
+composer require php-forge/foxy:^0.3 yii2-extensions/filepond:^0.1
 ```
 
 Foxy merges the `filepond`, `filepond-plugin-*`, and `cropperjs` packages into the application `package.json` and
