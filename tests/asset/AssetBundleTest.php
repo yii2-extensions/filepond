@@ -23,6 +23,7 @@ use function array_keys;
 use function file_put_contents;
 use function is_dir;
 use function mkdir;
+use function str_replace;
 
 /**
  * Unit tests for {@see AbstractNpmAsset} delivery modes and the concrete FilePond, plugin, and Cropper.js bundles.
@@ -111,7 +112,7 @@ final class AssetBundleTest extends TestCase
         );
         self::assertStringEndsWith(
             '/node_modules/filepond',
-            (string) $bundle->sourcePath,
+            str_replace('\\', '/', (string) $bundle->sourcePath),
             'Source must be `@npm`.',
         );
         self::assertStringEndsWith(

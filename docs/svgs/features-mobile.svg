@@ -1,0 +1,52 @@
+<!-- Mobile version - Single column -->
+<svg viewBox="0 0 620 620" width="100%" height="580" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .box-bg { fill: #e6f4ea; stroke: #a7cdb3; stroke-width: 1; }
+        .title { font-weight: 700; font-size: 14px; fill: #1a202c; }
+        .content { font-size: 11px; fill: #4a5568; }
+    </style>
+
+    <g>
+        <rect class="box-bg" x="16" y="16" width="588" height="84" rx="6"/>
+        <rect x="16" y="16" width="4" height="84" fill="#1f883d"/>
+        <text class="title" x="32" y="42">Eleven Plugins</text>
+        <text class="content" x="32" y="66">Every allow* flag registers its plugin</text>
+        <text class="content" x="32" y="84">Asset bundles published on demand</text>
+    </g>
+    <g>
+        <rect class="box-bg" x="16" y="116" width="588" height="84" rx="6"/>
+        <rect x="16" y="116" width="4" height="84" fill="#1f883d"/>
+        <text class="title" x="32" y="142">Cropper.js Image Editing</text>
+        <text class="content" x="32" y="166">Native dialog &#8226; aspect ratio presets &#8226; zoom</text>
+        <text class="content" x="32" y="184">Crop stored as FilePond metadata</text>
+    </g>
+    <g>
+        <rect class="box-bg" x="16" y="216" width="588" height="84" rx="6"/>
+        <rect x="16" y="216" width="4" height="84" fill="#1f883d"/>
+        <text class="title" x="32" y="242">Server-side Helpers</text>
+        <text class="content" x="32" y="266">EncodedFile &#8226; FileSaver &#8226; ImageCropper</text>
+        <text class="content" x="32" y="284">EncodedFileValidator checks MIME type and size</text>
+    </g>
+    <g>
+        <rect class="box-bg" x="16" y="316" width="588" height="84" rx="6"/>
+        <rect x="16" y="316" width="4" height="84" fill="#1f883d"/>
+        <text class="title" x="32" y="342">Modern Delivery</text>
+        <text class="content" x="32" y="366">Foxy &#8226; node_modules &#8226; CDN pinned to versions</text>
+        <text class="content" x="32" y="384">No jQuery &#8226; vanilla runtime</text>
+    </g>
+    <g>
+        <rect class="box-bg" x="16" y="416" width="588" height="84" rx="6"/>
+        <rect x="16" y="416" width="4" height="84" fill="#1f883d"/>
+        <text class="title" x="32" y="442">Client &amp; Server Validation</text>
+        <text class="content" x="32" y="466">Extensions &#8226; MIME types &#8226; min/max size &#8226; file count</text>
+        <text class="content" x="32" y="484">Real MIME type checked server-side</text>
+    </g>
+    <g>
+        <rect class="box-bg" x="16" y="516" width="588" height="84" rx="6"/>
+        <rect x="16" y="516" width="4" height="84" fill="#1f883d"/>
+        <text class="title" x="32" y="542">Localized Labels</text>
+        <text class="content" x="32" y="566">Nine languages</text>
+        <text class="content" x="32" y="584">Registered by the extension bootstrap</text>
+    </g>
+</svg>

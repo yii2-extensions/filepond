@@ -6,7 +6,7 @@ namespace yii2\extensions\filepond\tests\file;
 
 use GdImage;
 use Generator;
-use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\{Group, RequiresOperatingSystem};
 use RuntimeException;
 use Yii;
 use yii\base\InvalidArgumentException;
@@ -27,6 +27,8 @@ use function mkdir;
 use function ob_get_clean;
 use function ob_start;
 use function umask;
+
+use const DIRECTORY_SEPARATOR;
 
 /**
  * Unit tests for {@see FileSaver} directory handling and file naming.
@@ -65,6 +67,7 @@ final class FileSaverTest extends TestCase
         );
     }
 
+    #[RequiresOperatingSystem('Linux')]
     public function testSaveAppliesDirectoryAndFileModes(): void
     {
         $this->mockWebApplication();
@@ -105,7 +108,7 @@ final class FileSaverTest extends TestCase
         $path = (new FileSaver('@uploads/avatars'))->save(self::file('My Photo (1).PNG', 'content'));
 
         self::assertSame(
-            self::RUNTIME_PATH . '/uploads/avatars/My-Photo-1.png',
+            self::RUNTIME_PATH . '/uploads/avatars' . DIRECTORY_SEPARATOR . 'My-Photo-1.png',
             $path,
             'Path must be sanitized.',
         );
@@ -256,7 +259,7 @@ final class FileSaverTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
-            Message::FILE_WRITE_FAILED->getMessage(self::RUNTIME_PATH . '/uploads/a.txt'),
+            Message::FILE_WRITE_FAILED->getMessage(self::RUNTIME_PATH . '/uploads' . DIRECTORY_SEPARATOR . 'a.txt'),
         );
 
         (new FileSaver(self::RUNTIME_PATH . '/uploads'))->save(self::file('a.txt', 'a'));

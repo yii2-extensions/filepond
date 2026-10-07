@@ -34,15 +34,10 @@
 
 ## Features
 
-- **One widget, eleven plugins.** Every `allow*` flag registers the FilePond plugin and publishes its asset bundle;
-  nothing else is loaded.
-- **Image editing.** Cropper.js 2 in a native dialog with aspect ratio presets, zoom, and reset. The crop is stored
-  as FilePond metadata, so the Image Transform plugin, the preview, and the server see the same rectangle.
-- **Server-side helpers.** `EncodedFile` decodes File Encode payloads, `FileSaver` stores them with sanitized
-  names, `ImageCropper` applies the crop with GD, and `EncodedFileValidator` checks the real MIME type and size.
-- **Modern delivery.** Frontend packages come from `node_modules` through [`php-forge/foxy`](https://github.com/php-forge/foxy),
-  locally or from a CDN pinned to the installed versions.
-- **Localized.** Labels ship in nine languages and register automatically through the extension bootstrap.
+<picture>
+    <source media="(min-width: 768px)" srcset="./docs/svgs/features.svg">
+    <img src="./docs/svgs/features-mobile.svg" alt="Feature Overview" style="width: 100%;">
+</picture>
 
 ## Quick start
 

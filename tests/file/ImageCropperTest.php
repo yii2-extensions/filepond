@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace yii2\extensions\filepond\tests\file;
 
 use GdImage;
-use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\{Group, RequiresOperatingSystem};
 use RuntimeException;
 use yii2\extensions\filepond\exception\Message;
 use yii2\extensions\filepond\file\{EncodedFile, ImageCropper};
@@ -62,6 +62,7 @@ final class ImageCropperTest extends TestCase
 
     private const int WIDTH = 16;
 
+    #[RequiresOperatingSystem('Linux|Darwin')]
     public function testCropAppliesEachExifOrientation(): void
     {
         $cropper = new ImageCropper();
@@ -336,6 +337,7 @@ final class ImageCropperTest extends TestCase
         );
     }
 
+    #[RequiresOperatingSystem('Linux')]
     public function testCropReadsRealExifOrientation(): void
     {
         $jpeg = self::withExif(self::encode('jpeg'), [0x0112 => 6]);
