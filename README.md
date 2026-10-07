@@ -61,7 +61,7 @@ use yii2\extensions\filepond\FilePond;
 echo $form->field($model, 'avatar')->widget(
     FilePond::class,
     [
-        'acceptedFileTypes' => ['image/*'],
+        'acceptedFileTypes' => ['image/jpeg', 'image/png', 'image/webp'],
         'allowImageEdit' => true,
         'allowImageTransform' => true,
         'imageCropAspectRatio' => '1:1',
@@ -75,13 +75,21 @@ use yii2\extensions\filepond\file\{EncodedFile, FileSaver};
 use yii2\extensions\filepond\validator\EncodedFileValidator;
 
 // Model rules.
-[['avatar'], EncodedFileValidator::class, 'mimeTypes' => ['image/*'], 'maxSize' => 2 * 1024 * 1024];
+[
+    ['avatar'],
+    EncodedFileValidator::class,
+    'mimeTypes' => ['image/jpeg', 'image/png', 'image/webp'],
+    'maxSize' => 2 * 1024 * 1024,
+];
 
 // Controller.
 foreach (EncodedFile::fromInput($model->avatar) as $file) {
     (new FileSaver('@webroot/uploads'))->save($file, "user-{$model->id}");
 }
 ```
+
+List raster MIME types explicitly for files stored beneath the web root: `image/*` also matches `image/svg+xml`,
+and an SVG served from your origin can run scripts.
 
 ## Documentation
 

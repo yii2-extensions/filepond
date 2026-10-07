@@ -113,7 +113,8 @@
      * Converts a selection expressed in canvas pixels into source image pixels.
      *
      * Cropper.js applies the image transform around the image center, so the inverse maps canvas coordinates back to
-     * natural pixels. Rotation and skew are disabled in the template, which keeps the result a rectangle.
+     * natural pixels. Rotation and skew are disabled in the template, which keeps the result a rectangle. Each edge is
+     * clamped on its own, so a selection that extends past the image keeps only the overlapping area.
      */
     function toSourceRectangle(selection, cropperImage) {
         const image = cropperImage.$image;
@@ -122,10 +123,12 @@
         const [a, , , d, e, f] = cropperImage.$getTransform();
         const centerX = naturalWidth / 2;
         const centerY = naturalHeight / 2;
-        const x = clamp((selection.x - e - centerX) / a + centerX, 0, naturalWidth);
-        const y = clamp((selection.y - f - centerY) / d + centerY, 0, naturalHeight);
-        const width = clamp(selection.width / a, 0, naturalWidth - x);
-        const height = clamp(selection.height / d, 0, naturalHeight - y);
+        const left = (selection.x - e - centerX) / a + centerX;
+        const top = (selection.y - f - centerY) / d + centerY;
+        const x = clamp(left, 0, naturalWidth);
+        const y = clamp(top, 0, naturalHeight);
+        const width = clamp(left + selection.width / a, 0, naturalWidth) - x;
+        const height = clamp(top + selection.height / d, 0, naturalHeight) - y;
 
         return {
             naturalHeight,

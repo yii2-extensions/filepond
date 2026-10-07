@@ -69,7 +69,7 @@ public function rules(): array
             ['avatar'],
             EncodedFileValidator::class,
             'extensions' => ['jpg', 'jpeg', 'png', 'webp'],
-            'mimeTypes' => ['image/*'],
+            'mimeTypes' => ['image/jpeg', 'image/png', 'image/webp'],
             'maxSize' => 2 * 1024 * 1024,
         ],
         [
@@ -83,7 +83,10 @@ public function rules(): array
 }
 ```
 
-The validator decodes the payload, so a renamed file is rejected by its real MIME type.
+The validator decodes the payload, so a renamed file is rejected by its real MIME type. `extensions` checks the
+client file name while `FileSaver` derives the stored extension from the content, so `mimeTypes` is the rule that
+decides what reaches the disk. Avoid `image/*` for files stored beneath the web root: it also accepts SVG, which can
+carry scripts that run on your origin.
 
 ## Multiple documents with PDF previews
 
