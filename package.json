@@ -1,0 +1,18 @@
+{
+    "license": "MIT",
+    "dependencies": {
+        "cropperjs": "^2.2.0",
+        "filepond": "^4.32.12",
+        "filepond-plugin-file-encode": "^2.1.14",
+        "filepond-plugin-file-poster": "^2.5.2",
+        "filepond-plugin-file-rename": "^1.1.8",
+        "filepond-plugin-file-validate-size": "^2.2.8",
+        "filepond-plugin-file-validate-type": "^1.2.9",
+        "filepond-plugin-image-crop": "^2.0.6",
+        "filepond-plugin-image-edit": "^1.6.3",
+        "filepond-plugin-image-exif-orientation": "^1.0.11",
+        "filepond-plugin-image-preview": "^4.6.12",
+        "filepond-plugin-image-transform": "^3.8.8",
+        "filepond-plugin-pdf-preview": "^1.0.4"
+    }
+}

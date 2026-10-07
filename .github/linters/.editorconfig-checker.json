@@ -1,0 +1,9 @@
+{
+    "Exclude": [
+        "^\\.vscode/",
+        "^\\.claude/",
+        "^composer\\.lock$",
+        "^runtime/",
+        "^vendor/"
+    ]
+}

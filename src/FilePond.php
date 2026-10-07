@@ -2,323 +2,385 @@
 
 declare(strict_types=1);
 
-namespace Yii2\Extensions\FilePond;
+namespace yii2\extensions\filepond;
 
-use JsonException;
-use UIAwesome\Html\{FormControl\Input\File, Helper\CssClass, Helper\Utils};
-use Yii2\Extensions\FilePond\Asset\{FilePondAsset, FilePondCdnAsset};
+use UIAwesome\Html\Form\InputFile;
+use UIAwesome\Html\Helper\CSSClass;
 use Yii;
+use yii\base\{InvalidConfigException, Model};
+use yii\helpers\{Html, Json};
+use yii\web\{JsExpression, View};
 use yii\widgets\InputWidget;
+use yii2\extensions\filepond\asset\{CropperAsset, FilePondAsset, FilePondCropperAsset, FilePondWidgetAsset, Plugin};
+use yii2\extensions\filepond\exception\Message;
 
+use function array_diff;
+use function array_filter;
+use function array_key_exists;
+use function array_map;
+use function array_replace;
+use function is_array;
+use function is_string;
+use function preg_match;
+use function preg_split;
+
+/**
+ * Renders a FilePond file input with plugin management, localized labels, and optional Cropper.js image editing.
+ *
+ * Plugins and their asset bundles are registered from the `allow*` flags. Every other FilePond option is passed
+ * through {@see $config}, where JavaScript callbacks are expressed as {@see JsExpression}.
+ *
+ * @see https://pqina.nl/filepond/docs/api/instance/properties/
+ */
 final class FilePond extends InputWidget
 {
-    public array $acceptedFileTypes = [];
-    public bool $allowFileTypeValidation = true;
-    public bool $allowFileRename = false;
-    public bool $allowFileValidateSize = true;
-    public bool $allowImageCrop = false;
-    public bool $allowImageExifOrientation = true;
-    public bool $allowImagePreview = true;
-    public bool $allowImageTransform = false;
-    public bool $allowMultiple = false;
-    public bool $allowPdfPreview = false;
-    public string $cssClass = '';
-    public bool $cdn = false;
-    public array $config = [];
-    public string $fileRename = '';
     /**
-     * @var string The file validate type detect type function.
-     *
-     * ```JS
-     * fileValidateTypeDetectType: (source, type) =>
-     *     new Promise((resolve, reject) => {
-     *     // Do custom type detection here and return with promise
-     *
-     *     resolve(type);
-     * }),
-     * ```
-     *
-     * @link https://pqina.nl/filepond/docs/api/plugins/file-validate-type/#custom-type-detection
+     * Message category used for the widget labels.
      */
-    public string $fileValidateTypeDetectType = '';
-    public string $fileValidateTypeLabelExpectedTypes = '';
+    public const string TRANSLATION_CATEGORY = 'yii.filepond';
+    /**
+     * @var list<string> Accepted MIME types or wildcards such as `image/*`, enforced by the File Validate Type plugin.
+     */
+    public array $acceptedFileTypes = [];
+    /**
+     * Whether to encode files as base64 JSON payloads submitted with the form.
+     */
+    public bool $allowFileEncode = true;
+    /**
+     * Whether to render a poster image for items that carry `metadata.poster`.
+     */
+    public bool $allowFilePoster = false;
+    /**
+     * Whether to rename files on the client through `fileRenameFunction`.
+     */
+    public bool $allowFileRename = false;
+    /**
+     * Whether to validate file sizes on the client.
+     */
+    public bool $allowFileSizeValidation = true;
+    /**
+     * Whether to validate file types on the client.
+     */
+    public bool $allowFileTypeValidation = true;
+    /**
+     * Whether to crop image previews to {@see}.
+     */
+    public bool $allowImageCrop = false;
+    /**
+     * Whether to open the Cropper.js editor for image items.
+     */
+    public bool $allowImageEdit = false;
+    /**
+     * Whether to correct image orientation from EXIF data.
+     */
+    public bool $allowImageExifOrientation = true;
+    /**
+     * Whether to render image previews.
+     */
+    public bool $allowImagePreview = true;
+    /**
+     * Whether to apply crop, resize, and output transforms on the client before submission.
+     */
+    public bool $allowImageTransform = false;
+    /**
+     * Whether to accept multiple files; the input name receives the `[]` suffix.
+     */
+    public bool $allowMultiple = false;
+    /**
+     * Whether to render PDF previews.
+     */
+    public bool $allowPdfPreview = false;
+    /**
+     * Whether to load FilePond, its plugins, and Cropper.js from the CDN instead of publishing them.
+     */
+    public bool $cdn = false;
+    /**
+     * @var array<string, mixed> FilePond options merged last, overriding typed properties and localized labels.
+     */
+    public array $config = [];
+    /**
+     * @var array<string, mixed> Cropper.js editor options: `aspectRatio`, `aspectRatios`, `labels`, and `options`.
+     */
+    public array $cropper = [];
+    /**
+     * @var list<mixed> Initial FilePond `files`, either sources or `{source, options}` entries.
+     */
+    public array $files = [];
+    /**
+     * @var string|null Crop aspect ratio in `width:height` format, for example `1:1`.
+     */
     public string|null $imageCropAspectRatio = null;
     /**
-     * @var string The image preview height.
-     *
-     * Fixed image preview height, overrides min and max preview height.
+     * @var string|null Drop area label, or `null` to use the localized default.
      */
-    public string|null $imagePreviewHeight = null;
-    public bool $imagePreviewMarkupShow = true;
+    public string|null $labelIdle = null;
     /**
-     * @var string The image preview max file size.
-     *
-     * Maximum file size for images to preview immediately, if files are larger and the browser doesn't support
-     * createImageBitmap the preview is queued till FilePond is in rest state.
-     *
-     * By default, no maximum file size is defined, expects a string, like `2MB` or `500KB`.
+     * @var int|null Maximum number of files, or `null` for no limit.
      */
-    public string|null $imagePreviewMaxFileSize = null;
+    public int|null $maxFiles = null;
     /**
-     * @var int The image preview max height.
-     *
-     * Maximum height of the image preview in pixels.
+     * @var int|string|null Maximum file size in bytes or as a FilePond size string such as `2MB`.
      */
-    public int $imagePreviewMaxHeight = 256;
+    public int|string|null $maxFileSize = null;
     /**
-     * @var int The image preview max instant preview file size.
-     *
-     * Maximum file size for images to preview immediately, if files are larger and the browser doesn't support
-     * createImageBitmap the preview is queued till FilePond is in rest state.
+     * @var int|string|null Maximum total size of all files in bytes or as a FilePond size string.
      */
-    public int $imagePreviewMaxInstantPreviewFileSize = 1000000;
+    public int|string|null $maxTotalFileSize = null;
     /**
-     * @var int The image preview min height.
-     *
-     * Minimum height of the image preview in pixels.
+     * @var int|string|null Minimum file size in bytes or as a FilePond size string.
      */
-    public int $imagePreviewMinHeight = 44;
+    public int|string|null $minFileSize = null;
     /**
-     * @var string The image preview transparency indicator.
-     *
-     * Show a grid behind the preview, set to a color value (for example '#f00') to set transparent image background
-     * color.
-     *
-     * Please note that this is only for preview purposes.
-     *
-     * The background color or grid isn't embedded in the output image.
+     * Whether the input is required for form submission.
      */
-    public string|null $imagePreviewTransparencyIndicator = null;
-    /**
-     * @var array The image transform after create blob.
-     *
-     * A hook to make changes to the file after the file has been created.
-     */
-    public array|null $imageTransformAfterCreateBlob = null;
-    /**
-     * @var array The image transform before create blob.
-     *
-     * A hook to make changes to the canvas before the file is created.
-     */
-    public array|null $imageTransformBeforeCreateBlob = null;
-    /**
-     * @var int The image transform output quality.
-     *
-     * A number between 0 and 100 indicating image quality (e.g. 92 => 92%).
-     */
-    public int|null $imageTransformOutputQuality = null;
-    /**
-     * @var array The image transform client transforms.
-     *
-     * An array of transforms to apply on the client, useful if we, for instance, want to do resizing on the client but
-     * cropping on the server. Null means apply all transforms ('resize', 'crop').
-     */
-    public array|null $imageTransformClientTransforms = null;
-    /**
-     * @var string The image transform output quality mode.
-     *
-     * Should output quality be enforced, set the 'optional' to only apply when a transform is required due to other
-     * requirements (e.g. resize or crop).
-     */
-    public string $imageTransformOutputQualityMode = 'always';
-    public bool $imageTransformOutputStripImageHead = true;
-    /**
-     * @var array The image transform variants.
-     *
-     * An object that can be used to output many files based on different transform instructions.
-     */
-    public array|null $imageTransformVariants = null;
-    /**
-     * @var bool Whether the image transform variants include original.
-     *
-     * Should the transform plugin output the original file.
-     */
-    public bool $imageTransformVariantsIncludeDefault = true;
-    /**
-     * @var string The image transform variants default name.
-     *
-     * The name to use in front of the file name.
-     */
-    public string|null $imageTransformVariantsDefaultName = null;
-    /**
-     * @var bool Whether the image transform variants include original.
-     *
-     * Should the transform plugin output the original file.
-     */
-    public bool $imageTransformVariantsIncludeOriginal = false;
-    public string $labelIdle = '';
-    public string $labelMaxFileSize = '';
-    public string $labelMaxFileSizeExceeded = '';
-    public string $labelMaxTotalFileSize = '';
-    public string $labelMaxTotalFileSizeExceeded = '';
-    public string $labelFileTypeNotAllowed = '';
-    public string $loadFileDefault = '';
-    public int $maxFiles = 1;
-    public string|null $maxFileSize = null;
-    public string|null $maxTotalFileSize = null;
-    public string|null $minFileSize = null;
-    /**
-     * @phpstan-var string[] The default plugins to load.
-     */
-    public array $pluginDefault = [
-        'FilePondPluginFileEncode',
-        'FilePondPluginFileValidateSize',
-        'FilePondPluginFileValidateType',
-        'FilePondPluginImageExifOrientation',
-        'FilePondPluginImagePreview',
-    ];
-    public int $pdfPreviewHeight = 320;
-    public string $pdfComponentExtraParams = 'toolbar=0&view=fit&page=1';
     public bool $required = false;
 
-    private string $id = '';
+    /**
+     * Input ID used for the FilePond instance.
+     */
+    private string $inputId = '';
 
+    /**
+     * Returns the FilePond options passed to `FilePond.create()`.
+     *
+     * @return array<string, mixed> Localized labels, typed properties, and {@see $config} merged in that order.
+     */
+    public function getOptions(): array
+    {
+        $typed = [
+            'acceptedFileTypes' => $this->acceptedFileTypes === [] ? null : $this->acceptedFileTypes,
+            'allowFileEncode' => $this->allowFileEncode,
+            'allowFilePoster' => $this->allowFilePoster,
+            'allowFileRename' => $this->allowFileRename,
+            'allowFileSizeValidation' => $this->allowFileSizeValidation,
+            'allowFileTypeValidation' => $this->allowFileTypeValidation,
+            'allowImageCrop' => $this->allowImageCrop,
+            'allowImageEdit' => $this->allowImageEdit,
+            'allowImageExifOrientation' => $this->allowImageExifOrientation,
+            'allowImagePreview' => $this->allowImagePreview,
+            'allowImageTransform' => $this->allowImageTransform,
+            'allowMultiple' => $this->allowMultiple,
+            'allowPdfPreview' => $this->allowPdfPreview,
+            'files' => $this->files === [] ? null : $this->files,
+            'imageCropAspectRatio' => $this->imageCropAspectRatio,
+            'labelIdle' => $this->labelIdle,
+            'maxFiles' => $this->maxFiles,
+            'maxFileSize' => $this->maxFileSize,
+            'maxTotalFileSize' => $this->maxTotalFileSize,
+            'minFileSize' => $this->minFileSize,
+            'required' => $this->required,
+        ];
+
+        $options = [
+            ...$this->getLabels(),
+            ...array_filter($typed, static fn(mixed $value): bool => $value !== null),
+            ...$this->config,
+        ];
+
+        if (($options['allowImageEdit'] ?? null) === true && array_key_exists('imageEditEditor', $options) === false) {
+            $options['imageEditEditor'] = new JsExpression(
+                'yii2FilePond.cropper.createEditor(' . Json::htmlEncode($this->getCropperOptions()) . ')',
+            );
+        }
+
+        return $options;
+    }
+
+    /**
+     * Returns the plugins enabled by the effective options.
+     *
+     * @return list<Plugin> Enabled plugins in registration order.
+     */
+    public function getPlugins(): array
+    {
+        $options = $this->getOptions();
+
+        return array_values(
+            array_filter(
+                Plugin::cases(),
+                static fn(Plugin $plugin): bool => ($options[$plugin->option()] ?? null) === true,
+            ),
+        );
+    }
+
+    /**
+     * @throws InvalidConfigException if {@see $imageCropAspectRatio} or {@see $cropper} is misconfigured.
+     */
     public function init(): void
     {
         parent::init();
 
-        $this->config = array_merge(
-            [
-                'acceptedFileTypes' => $this->acceptedFileTypes,
-                'allowFileRename' => $this->allowFileRename,
-                'allowFileTypeValidation' => $this->allowFileTypeValidation,
-                'allowFileValidateSize' => $this->allowFileValidateSize,
-                'allowImageCrop' => $this->allowImageCrop,
-                'allowImageExifOrientation' => $this->allowImageExifOrientation,
-                'allowImagePreview' => $this->allowImagePreview,
-                'allowImageTransform' => $this->allowImageTransform,
-                'allowMultiple' => $this->allowMultiple,
-                'className' => $this->cssClass,
-                'fileValidateTypeLabelExpectedTypes' => Yii::t(
-                    'yii.filepond',
-                    'Expects {allButLastType} or {lastType}',
-                ),
-                'imageCropAspectRatio' => $this->imageCropAspectRatio,
-                'imagePreviewHeight' => $this->imagePreviewHeight,
-                'imagePreviewMarkupShow' => $this->imagePreviewMarkupShow,
-                'imagePreviewMaxFileSize' => $this->imagePreviewMaxFileSize,
-                'imagePreviewMaxHeight' => $this->imagePreviewMaxHeight,
-                'imagePreviewMaxInstantPreviewFileSize' => $this->imagePreviewMaxFileSize,
-                'imagePreviewMinHeight' => $this->imagePreviewMinHeight,
-                'imagePreviewTransparencyIndicator' => $this->imagePreviewTransparencyIndicator,
-                'imageTransformAfterCreateBlob' => $this->imageTransformAfterCreateBlob,
-                'imageTransformBeforeCreateBlob' => $this->imageTransformBeforeCreateBlob,
-                'imageTransformClientTransforms' => $this->imageTransformClientTransforms,
-                'imageTransformOutputQuality' => $this->imageTransformOutputQuality,
-                'imageTransformOutputQualityMode' => $this->imageTransformOutputQuality,
-                'imageTransformOutputStripImageHead' => $this->imageTransformOutputStripImageHead,
-                'imageTransformVariants' => $this->imageTransformVariants,
-                'imageTransformVariantsDefaultName' => $this->imageTransformVariantsDefaultName,
-                'imageTransformVariantsIncludeOriginal' => $this->imageTransformVariantsIncludeDefault,
-                'labelFileTypeNotAllowed' => Yii::t('yii.filepond', 'File type not allowed'),
-                'labelIdle' => $this->labelIdle === ''
-                    ? Yii::t(
-                        'yii.filepond',
-                        'Drag & Drop your files or <span class="filepond--label-action"> Browse </span>',
-                    )
-                    : $this->labelIdle,
-                'labelMaxFileSize' => Yii::t('yii.filepond', 'Maximum file size is {filesize}'),
-                'labelMaxFileSizeExceeded' => Yii::t('yii.filepond', 'File is too large'),
-                'labelMaxTotalFileSize' => Yii::t('yii.filepond', 'Maximum total file size is {filesize}'),
-                'labelMaxTotalFileSizeExceeded' => Yii::t('yii.filepond', 'Maximum total size exceeded'),
-                'maxFiles' => $this->maxFiles,
-                'maxFileSize' => $this->maxFileSize,
-                'maxTotalFileSize' => $this->maxTotalFileSize,
-                'minFileSize' => $this->minFileSize,
-                'pdfPreviewHeight' => $this->pdfPreviewHeight,
-                'pdfComponentExtraParams' => $this->pdfComponentExtraParams,
-                'required' => $this->required,
-            ],
-            $this->config,
-        );
+        $id = $this->options['id'] ?? null;
 
-        $this->id = $this->hasModel()
-            ? Utils::generateInputId($this->model->formName(), $this->attribute)
-            : $this->getId() . '-filepond';
+        $this->inputId = is_string($id) ? $id : ($this->getId() ?? '');
+
+        if ($this->imageCropAspectRatio !== null) {
+            self::assertAspectRatio($this->imageCropAspectRatio);
+        }
+
+        if ($this->cropper !== [] && $this->allowImageEdit === false) {
+            throw new InvalidConfigException(
+                Message::CROPPER_REQUIRES_IMAGE_EDIT->getMessage(),
+            );
+        }
     }
 
     public function run(): string
     {
-        $this->registerClientScript();
+        $this->registerAssets();
 
-        return $this->renderInputFile();
+        return $this->renderInput();
     }
 
     /**
-     * @throws JsonException
+     * @throws InvalidConfigException if the value is not a `width:height` pair of positive numbers.
      */
-    private function getScript(): string
+    private static function assertAspectRatio(string $value): void
     {
-        $closure = $this->fileRename;
-
-        if ($this->fileValidateTypeDetectType !== '') {
-            $closure = "{$this->fileValidateTypeDetectType} {$closure}";
+        if (
+            preg_match('/^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)$/', $value, $matches) !== 1
+            || $matches[1] <= 0
+            || $matches[2] <= 0
+        ) {
+            throw new InvalidConfigException(
+                Message::INVALID_CROP_ASPECT_RATIO->getMessage($value),
+            );
         }
-
-        $loadFileDefault = $this->loadFileDefault;
-        $pluginConfig = implode(', ', $this->pluginDefault);
-        $setOptions = json_encode($this->config, JSON_THROW_ON_ERROR);
-
-        return <<<JS
-        FilePond.registerPlugin($pluginConfig)
-        FilePond.setOptions($setOptions)
-
-        const loadFileDefault = "$loadFileDefault"
-        const pond = FilePond.create(document.querySelector('input[type="file"][id="$this->id"]'), {$closure})
-
-        if (loadFileDefault !== '') {
-            pond.addFiles(loadFileDefault)
-        }
-        JS;
     }
 
-    private function registerClientScript(): void
+    /**
+     * @return array<string, mixed> Editor options with localized labels.
+     */
+    private function getCropperOptions(): array
+    {
+        $labels = [
+            'apply' => Yii::t(self::TRANSLATION_CATEGORY, 'Apply'),
+            'cancel' => Yii::t(self::TRANSLATION_CATEGORY, 'Cancel'),
+            'free' => Yii::t(self::TRANSLATION_CATEGORY, 'Free'),
+            'reset' => Yii::t(self::TRANSLATION_CATEGORY, 'Reset'),
+            'title' => Yii::t(self::TRANSLATION_CATEGORY, 'Edit image'),
+            'zoomIn' => Yii::t(self::TRANSLATION_CATEGORY, 'Zoom in'),
+            'zoomOut' => Yii::t(self::TRANSLATION_CATEGORY, 'Zoom out'),
+        ];
+
+        $custom = $this->cropper['labels'] ?? [];
+
+        $options = array_replace(
+            [
+                'aspectRatio' => $this->imageCropAspectRatio,
+                'aspectRatios' => ['free', '1:1', '16:9', '4:3', '3:2'],
+                'options' => [],
+            ],
+            $this->cropper,
+        );
+
+        $options['labels'] = array_replace($labels, is_array($custom) ? $custom : []);
+
+        return $options;
+    }
+
+    private function getInputName(): string
+    {
+        if ($this->model instanceof Model && is_string($this->attribute)) {
+            return Html::getInputName($this->model, $this->attribute);
+        }
+
+        return is_string($this->name) ? $this->name : '';
+    }
+
+    /**
+     * @return array<string, string> Localized labels for the core and the enabled validation plugins.
+     */
+    private function getLabels(): array
+    {
+        $labels = [
+            'labelIdle' => Yii::t(
+                self::TRANSLATION_CATEGORY,
+                'Drag & Drop your files or <span class="filepond--label-action"> Browse </span>',
+            ),
+        ];
+
+        if ($this->allowFileSizeValidation) {
+            $labels += [
+                'labelMaxFileSize' => Yii::t(self::TRANSLATION_CATEGORY, 'Maximum file size is {filesize}'),
+                'labelMaxFileSizeExceeded' => Yii::t(self::TRANSLATION_CATEGORY, 'File is too large'),
+                'labelMaxTotalFileSize' => Yii::t(self::TRANSLATION_CATEGORY, 'Maximum total file size is {filesize}'),
+                'labelMaxTotalFileSizeExceeded' => Yii::t(self::TRANSLATION_CATEGORY, 'Maximum total size exceeded'),
+                'labelMinFileSize' => Yii::t(self::TRANSLATION_CATEGORY, 'Minimum file size is {filesize}'),
+                'labelMinFileSizeExceeded' => Yii::t(self::TRANSLATION_CATEGORY, 'File is too small'),
+            ];
+        }
+
+        if ($this->allowFileTypeValidation) {
+            $labels += [
+                'fileValidateTypeLabelExpectedTypes' => Yii::t(
+                    self::TRANSLATION_CATEGORY,
+                    'Expects {allButLastType} or {lastType}',
+                ),
+                'labelFileTypeNotAllowed' => Yii::t(self::TRANSLATION_CATEGORY, 'File type not allowed'),
+            ];
+        }
+
+        return $labels;
+    }
+
+    private function getScript(): string
+    {
+        $plugins = array_map(static fn(Plugin $plugin): string => $plugin->value, $this->getPlugins());
+
+        return 'yii2FilePond.create('
+            . Json::htmlEncode($this->inputId) . ', '
+            . Json::htmlEncode($plugins) . ', '
+            . Json::htmlEncode($this->getOptions())
+            . ');';
+    }
+
+    private function registerAssets(): void
     {
         $view = $this->getView();
 
-        match ($this->cdn) {
-            true => FilePondCdnAsset::register($view),
-            default => FilePondAsset::register($view),
-        };
+        FilePondAsset::registerWith($view, $this->cdn);
 
-        $view->registerJs($this->getScript());
+        foreach ($this->getPlugins() as $plugin) {
+            $plugin->assetClass()::registerWith($view, $this->cdn);
+        }
+
+        FilePondWidgetAsset::register($view);
+
+        if ($this->allowImageEdit) {
+            CropperAsset::registerWith($view, $this->cdn);
+            FilePondCropperAsset::register($view);
+        }
+
+        $view->registerJs($this->getScript(), View::POS_END);
     }
 
-    /**
-     * @return string the generated input tag.
-     */
-    private function renderInputFile(): string
+    private function renderInput(): string
     {
-        $name = $this->name;
-        $options = $this->options;
+        $attributes = $this->options;
 
-        if (isset($options['class']) && str_contains($options['class'], 'form-control')) {
-            $options['class'] = str_replace('form-control', '', $options['class']);
-        }
+        $class = $attributes['class'] ?? '';
 
-        if (array_key_exists('allowMultiple', $this->config) && $this->config['allowMultiple']) {
-            $options['multiple'] = true;
-        }
+        $classes = preg_split('/\s+/', is_string($class) ? $class : '', -1, PREG_SPLIT_NO_EMPTY);
 
-        if (array_key_exists('className', $this->config) && is_string($this->config['className'])) {
-            $class = str_replace('form-control', '', $this->config['className']);
-            CssClass::add($options, $class);
-        }
+        unset(
+            $attributes['class'],
+            $attributes['id'],
+            $attributes['multiple'],
+            $attributes['name'],
+            $attributes['placeholder'],
+            $attributes['required'],
+            $attributes['value'],
+        );
 
-        if (array_key_exists('required', $this->config) && $this->config['required']) {
-            $options['required'] = true;
-        }
+        CSSClass::add($attributes, [...array_diff($classes === false ? [] : $classes, ['form-control']), 'filepond']);
 
-        CssClass::add($options, 'filepond');
-
-        $name = match ($this->hasModel()) {
-            true => Utils::generateArrayableName(Utils::generateInputName($this->model->formName(), $this->attribute)),
-            default => Utils::generateArrayableName($name),
-        };
-
-        // input type="file" not supported value attribute.
-        unset($options['id'], $options['placeholder'], $options['value']);
-
-        return File::widget()->attributes($options)->id($this->id)->name($name)->render();
+        return InputFile::tag()
+            ->attributes($attributes)
+            ->id($this->inputId)
+            ->name($this->getInputName())
+            ->multiple($this->allowMultiple ? true : null)
+            ->required($this->required ? true : null)
+            ->render();
     }
 }
