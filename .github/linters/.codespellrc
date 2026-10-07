@@ -1,0 +1,3 @@
+[codespell]
+skip = ./.git,.claude/*,.vscode/*,composer.lock,resource/*,runtime/*,vendor/*
+ignore-words-list = ist,oder,valide

@@ -1,0 +1,10 @@
+title = "gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allow dummy credentials in test fixtures"
+paths = [
+    '''tests/support/TestCase\.php''',
+]

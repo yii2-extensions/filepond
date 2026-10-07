@@ -1,183 +1,124 @@
+<!-- markdownlint-disable MD041 -->
 <p align="center">
-    <a href="https://github.com/yii2-extensions/filepond" target="_blank">
-        <img src="https://www.yiiframework.com/image/yii_logo_light.svg" height="100px;">
-    </a>
-    <h1 align="center">FilePond.</h1>
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://www.yiiframework.com/image/design/logo/yii3_full_for_dark.svg">
+        <source media="(prefers-color-scheme: light)" srcset="https://www.yiiframework.com/image/design/logo/yii3_full_for_light.svg">
+        <img src="https://www.yiiframework.com/image/design/logo/yii3_full_for_light.svg" alt="Yii Framework" width="80%">
+    </picture>
+    <h1 align="center">FilePond</h1>
     <br>
 </p>
+<!-- markdownlint-enable MD041 -->
 
 <p align="center">
-    <a href="https://www.php.net/releases/8.1/en.php" target="_blank">
-        <img src="https://img.shields.io/badge/PHP-%3E%3D8.1-787CB5" alt="php-version">
-    </a>  
     <a href="https://github.com/yii2-extensions/filepond/actions/workflows/build.yml" target="_blank">
-        <img src="https://github.com/yii2-extensions/filepond/actions/workflows/build.yml/badge.svg" alt="PHPUnit">
+        <img src="https://img.shields.io/github/actions/workflow/status/yii2-extensions/filepond/build.yml?style=for-the-badge&label=PHPUnit&logo=github" alt="PHPUnit">
     </a>
-    <a href="https://github.com/yii2-extensions/filepond/actions/workflows/compatibility.yml" target="_blank">
-        <img src="https://github.com/yii2-extensions/filepond/actions/workflows/compatibility.yml/badge.svg" alt="PHPUnit">
-    </a>    
-    <a href="https://codecov.io/gh/yii2-extensions/filepond" target="_blank">
-        <img src="https://codecov.io/gh/yii2-extensions/filepond/branch/main/graph/badge.svg?token=MF0XUGVLYC" alt="Codecov">
-    </a>   
     <a href="https://dashboard.stryker-mutator.io/reports/github.com/yii2-extensions/filepond/main" target="_blank">
-        <img src="https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyii2-extensions%2Ffilepond%2Fmain" alt="Infection">
-    </a>       
+        <img src="https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyii2-extensions%2Ffilepond%2Fmain" alt="Mutation Testing">
+    </a>
+    <a href="https://github.com/yii2-extensions/filepond/actions/workflows/static.yml" target="_blank">
+        <img src="https://img.shields.io/github/actions/workflow/status/yii2-extensions/filepond/static.yml?style=for-the-badge&label=PHPStan&logo=github" alt="PHPStan">
+    </a>
+    <a href="https://github.com/yii2-extensions/filepond/actions/workflows/security.yml" target="_blank">
+        <img src="https://img.shields.io/github/actions/workflow/status/yii2-extensions/filepond/security.yml?style=for-the-badge&label=Security&logo=github" alt="Security">
+    </a>
 </p>
 
-![filepond](docs/images/filepond.png)
+<p align="center">
+    <strong>FilePond file uploads for Yii2 forms</strong><br>
+    <em>Cropper.js image editing, previews, client and server validation, no jQuery</em>
+</p>
 
-## Installation
+![FilePond widget with the Cropper.js editor](docs/images/filepond.png)
 
-The preferred way to install this extension is through [composer](https://getcomposer.org/download/).
+## Features
 
-Either run
+<picture>
+    <source media="(min-width: 768px)" srcset="./docs/svgs/features.svg">
+    <img src="./docs/svgs/features-mobile.svg" alt="Feature Overview" style="width: 100%;">
+</picture>
 
+## Quick start
+
+### Installation
+
+Requires PHP 8.3 or newer and Yii2 `2.0.54` or `22.x`.
+
+```bash
+composer config allow-plugins.php-forge/foxy true
+composer require php-forge/foxy:^0.3 yii2-extensions/filepond
 ```
-composer require --dev --prefer-dist yii2-extensions/filepond
-```
 
-or add
+Yii2 `2.0.x` applications must point the `@npm` alias to `@app/node_modules`; see the
+[installation guide](docs/installation.md).
 
-```
-"yii2-extensions/filepond": "dev-main"
-```
-
-to the require-dev section of your `composer.json` file.
-
-## Usage
-
-### Name
+### Basic usage
 
 ```php
-use Yii2\Extensions\Filepond\FilePond;
+use yii2\extensions\filepond\FilePond;
 
-echo FilePond::widget(['name' => 'image_file']);
+echo $form->field($model, 'avatar')->widget(
+    FilePond::class,
+    [
+        'acceptedFileTypes' => ['image/jpeg', 'image/png', 'image/webp'],
+        'allowImageEdit' => true,
+        'allowImageTransform' => true,
+        'imageCropAspectRatio' => '1:1',
+        'maxFileSize' => '2MB',
+    ],
+);
 ```
-
-### Active Field 
 
 ```php
-use Yii2\Extensions\Filepond\FilePond;
+use yii2\extensions\filepond\file\{EncodedFile, FileSaver};
+use yii2\extensions\filepond\validator\EncodedFileValidator;
 
-echo $form
-    ->field($formModel, 'image_file')
-    ->widget(
-        FilePond::class,
-        [
-            'loadFileDefault' => $imageFile,
-            'imagePreviewHeight' => 170,
-            'imageCropAspectRatio' => '1:1',
-        ],
-    );
+// Model rules.
+[
+    ['avatar'],
+    EncodedFileValidator::class,
+    'mimeTypes' => ['image/jpeg', 'image/png', 'image/webp'],
+    'maxSize' => 2 * 1024 * 1024,
+];
+
+// Controller.
+foreach (EncodedFile::fromInput($model->avatar) as $file) {
+    (new FileSaver('@webroot/uploads'))->save($file, "user-{$model->id}");
+}
 ```
 
-### Controller or Model
+List raster MIME types explicitly for files stored beneath the web root: `image/*` also matches `image/svg+xml`,
+and an SVG served from your origin can run scripts.
 
-```php
-use Yii2\Extensions\Filepond\FileProcessing;
+## Documentation
 
-$imageFile = FileProcessing::saveWithReturningFile(
-    $categoryForm->image_file,
-    Yii::getAlias('@uploads'),
-    "category{$category->id}",
-    false
-);        
-```
+For detailed configuration options and advanced usage.
 
-### Properties of the widget
+- 📚 [Installation Guide](docs/installation.md)
+- ⚙️ [Configuration Reference](docs/configuration.md)
+- 💡 [Usage Examples](docs/examples.md)
+- 🧪 [Testing Guide](docs/testing.md)
 
-| Property                                | Type          | Description                                                                | Default                                 |
-|-----------------------------------------|---------------|----------------------------------------------------------------------------|-----------------------------------------|
-| `acceptedFileTypes`                     | `string`      | The accepted file types. Can be mime types or wild cards.                  | `[]`                                    |
-| `allowFileTypeValidation`               | `bool`        | Whether to allow file type validation.                                     | `true`                                  |
-| `allowFileRename`                       | `bool`        | Whether to allow file rename.                                              | `false`                                 |
-| `allowFileValidateSize`                 | `bool`        | Whether to allow file size validation.                                     | `true`                                  |
-| `allowImageCrop`                        | `bool`        | Whether to allow image crop.                                               | `false`                                 |
-| `allowImageExifOrientation`             | `bool`        | Whether to allow image exif orientation.                                   | `true`                                  |   
-| `allowImagePreview`                     | `bool`        | Whether to allow image preview.                                            | `true`                                  |
-| `allowImageTransform`                   | `bool`        | Whether to allow image transform.                                          | `false`                                 |
-| `allowMultiple`                         | `bool`        | Whether to allow multiple files.                                           | `false`                                 |
-| `allowpdfPreview`                       | `bool`        | Whether to allow pdf preview.                                              | `false`                                 |
-| `cssClass`                              | `string`      | The css class of the widget.                                               | `''`                                    |
-| `cdn`                                   | `boolean`     | Whether to use the CDN.                                                    | `true`                                  |
-| `config`                                | `array`       | The config of the widget.                                                  | `[]`                                    |
-| `fileRename`                            | `string`      | The file rename.                                                           | `''`                                    |
-|                                         |               | use: `fileRenameFunction: (file) => return `my_new_name${file.extension}`; |                                         |
-| `fileValidateTypeDetectType`            | `string`      | The file validate type detect type function.                               | `''`                                    |
-| `fileValidateTypeLabelExpectedTypes`    | `string`      | The file validate type label expected types.                               | `''`                                    |
-| `imageCropAspectRatio`                  | `string,null` | The image crop aspect ratio.                                               | `null`                                  |
-| `imagePreviewHeight`                    | `string,null` | The image preview height.                                                  | `null`                                  |
-| `imagePreviewMarkupShow`                | `bool`        | Whether to show the image preview markup.                                  | `true`                                  |
-| `imagePreviewMaxFileSize`               | `string,null` | The image preview max file size.                                           | `null`                                  |
-| `imagePreviewMaxHeight`                 | `int`         | The image preview max height.                                              | `256`                                   |
-| `imagePreviewMaxInstantPreviewFileSize` | `int`         | The image preview max instant preview file size.                           | `10000000`                              |
-| `imagePreviewMinHeight`                 | `int`         | The image preview min height.                                              | `44`                                    |
-| `imagePreviewTransparencyIndicator`     | `string,null` | The image preview transparency indicator.                                  | `null`                                  |
-| `imageTransformAfterCreateBlob`         | `array,null`  | The image transform after create blob.                                     | `null`                                  |
-| `imageTransformBeforeCreateBlob`        | `array,null`  | The image transform before create blob.                                    | `null`                                  |
-| `imageTransformOutputQuality`           | `int,null`    | The image transform output quality.                                        | `null`                                  |
-| `imageTransformClientTransforms`        | `array,null`  | The image transform client transforms.                                     | `null`                                  |
-| `imageTransformOutputQualityMode`       | `string,null` | The image transform output quality mode.                                   | `añways`                                |
-| `imageTransformOutputStripImageHead`    | `bool`        | The image transform output strip image head.                               | `true`                                  |
-| `imageTransformVariants`                | `array,null`  | The image transform variants.                                              | `null`                                  |
-| `imageTransformVariantsIncludeDefault`  | `bool`        | The image transform variants include default.                              | `true`                                  |
-| `imageTransformVariantsDefaultName`     | `string,null` | The image transform variants default name.                                 | `null`                                  |
-| `imageTransformVariantsIncludeOriginal` | `bool`        | The image transform variants include original.                             | `false`                                 |
-| `labelIdle`                             | `string`      | The label idle.                                                            | `''`                                    |
-| `labelMaxFileSize`                      | `string`      | The label max file size.                                                   | `''`                                    |    
-| `labelMaxFileSizeExceeded`              | `string`      | The label max file size exceeded.                                          | `''`                                    |
-| `labelMaxTotalFileSize`                 | `string`      | The label max total file size.                                             | `''`                                    |
-| `labelMaxTotalFileSizeExceeded`         | `string`      | The label max total file size exceeded.                                    | `''`                                    |
-| `labelFileTypeNotAllowed`               | `string`      | The label file type not allowed.                                           | `''`                                    |
-| `loadFileDefault`                       | `string`      | The load file default.                                                     | `''`                                    |
-| `maxFiles`                              | `int`         | The max files.                                                             | `1`                                     |
-| `maxFileSize`                           | `string,null` | The max file size.                                                         | `null`                                  |
-| `maxTotalFileSize`                      | `string,null` | The max total file size.                                                   | `null`                                  |
-| `minFileSize`                           | `string,null` | The min file size.                                                         | `null`                                  |
-| `pluginDefault`                         | `array`       | The plugins default.                                                       | `[`                                     |  
-|                                         |               |                                                                            |   `FilePondPluginFileValidateType,`     |
-|                                         |               |                                                                            |   `FilePondPluginFileValidateSize,`     |
-|                                         |               |                                                                            |   `FilePondPluginFileValidateType,`     |
-|                                         |               |                                                                            |   `FilePondPluginImageExifOrientation,` |
-|                                         |               |                                                                            |   `FilePondPluginImagePreview,`         |
-|                                         |               |                                                                            | `]`                                     |
-| `pdfPreviewHeight`                      | `int`         | The pdf preview height.                                                    | `320`                                   |
-| `pdfComponentExtraParams`               | `string`      | The pdf component extra params.                                            | `toolbar=0&view=fit&page=1`             |
-| `required`                              | `bool`        | Whether the field is required.                                             | `false`                                 |
+## Package information
 
-### Translation support
+[![PHP](https://img.shields.io/badge/%3E%3D8.3-777BB4.svg?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/releases/8.3/en.php)
+[![Yii 2.0.x](https://img.shields.io/badge/2.0.54+-0073AA.svg?style=for-the-badge&logo=yii&logoColor=white)](https://github.com/yiisoft/yii2/tree/master)
+[![Yii 22.0.x](https://img.shields.io/badge/22.0.x-0073AA.svg?style=for-the-badge&logo=yii&logoColor=white)](https://github.com/yiisoft/yii2/tree/22.0)
+[![Latest Stable Version](https://img.shields.io/packagist/v/yii2-extensions/filepond.svg?style=for-the-badge&logo=packagist&logoColor=white&label=Stable)](https://packagist.org/packages/yii2-extensions/filepond)
+[![Total Downloads](https://img.shields.io/packagist/dt/yii2-extensions/filepond.svg?style=for-the-badge&logo=composer&logoColor=white&label=Downloads)](https://packagist.org/packages/yii2-extensions/filepond)
 
-The extension supports translation. You can translate the extension into your language,
-for default the extension supports the following languages:
+## Project status
 
-- Chinese
-- English
-- French
-- German
-- Poland
-- Portuguese
-- Russian
-- Spanish
-
-## Quality code
-
-[![static-analysis](https://github.com/yii2-extensions/filepond/actions/workflows/static.yml/badge.svg)](https://github.com/yii2-extensions/filepond/actions/workflows/static.yml)
-[![phpstan-level](https://img.shields.io/badge/PHPStan%20level-5-blue)](https://github.com/yii2-extensions/filepond/actions/workflows/static.yml)
-[![StyleCI](https://github.styleci.io/repos/719070630/shield?branch=main)](https://github.styleci.io/repos/719070630?branch=main)
-
-## Support versions Yii2
-
-[![Yii20](https://img.shields.io/badge/Yii2%20version-2.0-blue)](https://github.com/yiisoft/yii2/tree/2.0.49.3)
-[![Yii22](https://img.shields.io/badge/Yii2%20version-2.2-blue)](https://github.com/yiisoft/yii2/tree/2.2)
-
-## Testing
-
-[Check the documentation testing](/docs/testing.md) to learn about testing.
+[![Codecov](https://img.shields.io/codecov/c/github/yii2-extensions/filepond.svg?style=for-the-badge&logo=codecov&logoColor=white&label=Coverage)](https://codecov.io/github/yii2-extensions/filepond)
+[![PHPStan Level Max](https://img.shields.io/badge/PHPStan-Level%20Max-4F5D95.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/yii2-extensions/filepond/actions/workflows/static.yml)
+[![Quality](https://img.shields.io/github/actions/workflow/status/yii2-extensions/filepond/quality.yml?style=for-the-badge&label=Quality&logo=github)](https://github.com/yii2-extensions/filepond/actions/workflows/quality.yml)
+[![StyleCI](https://img.shields.io/badge/StyleCI-Passed-44CC11.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.styleci.io/repos/719070630?branch=main)
 
 ## Our social networks
 
-[![Twitter](https://img.shields.io/badge/twitter-follow-1DA1F2?logo=twitter&logoColor=1DA1F2&labelColor=555555?style=flat)](https://twitter.com/Terabytesoftw)
+[![Follow on X](https://img.shields.io/badge/-Follow%20on%20X-1DA1F2.svg?style=for-the-badge&logo=x&logoColor=white&labelColor=000000)](https://x.com/Terabytesoftw)
 
 ## License
 
-The MIT License. Please see [License File](LICENSE.md) for more information.
+[![License](https://img.shields.io/badge/License-MIT-brightgreen.svg?style=for-the-badge&logo=opensourceinitiative&logoColor=white&labelColor=555555)](LICENSE)

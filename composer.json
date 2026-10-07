@@ -1,81 +1,91 @@
 {
     "name": "yii2-extensions/filepond",
-    "type": "library",
-    "description": "FilePond Widget for Yii Framework.",
+    "type": "yii2-extension",
+    "description": "FilePond file upload widget for Yii2 with Cropper.js image editing, previews, validation plugins, and server-side helpers for encoded uploads.",
     "keywords": [
-        "yii2",
+        "cropper",
+        "cropperjs",
+        "file-upload",
         "filepond",
-        "widget"
+        "image-crop",
+        "image-upload",
+        "widget",
+        "yii2",
+        "yii2-extension"
     ],
-    "license": "mit",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Wilmer Arambula",
+            "email": "terabytesoftw@gmail.com",
+            "homepage": "https://github.com/terabytesoftw",
+            "role": "Developer"
+        }
+    ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=8.1",
-        "ext-intl": "*",
-        "npm-asset/filepond": "^4.3",
-        "npm-asset/filepond-plugin-file-encode": "^2.1",
-        "npm-asset/filepond-plugin-file-rename": "^1.1",
-        "npm-asset/filepond-plugin-file-validate-size": "^2.2",
-        "npm-asset/filepond-plugin-file-validate-type": "^1.2",
-        "npm-asset/filepond-plugin-image-crop": "^2.0",
-        "npm-asset/filepond-plugin-image-exif-orientation": "^1.0",
-        "npm-asset/filepond-plugin-image-preview": "^4.6",
-        "npm-asset/filepond-plugin-image-transform": "^3.8",
-        "npm-asset/filepond-plugin-pdf-preview": "^1.0",
-        "php-forge/awesome-widget": "^0.1",
-        "ui-awesome/html": "^0.3",
-        "ui-awesome/html-helper": "^0.2",
-        "yiisoft/yii2": "*"
+        "php": ">=8.3",
+        "ext-fileinfo": "*",
+        "ui-awesome/html": "^0.6",
+        "ui-awesome/html-helper": "^0.7",
+        "yiisoft/yii2": "~2.0.54 || ^22.0@dev"
     },
     "require-dev": {
-        "maglnet/composer-require-checker": "^4.6",
-        "php-forge/support": "dev-main",
-        "phpunit/phpunit": "^10.2",
-        "roave/infection-static-analysis-plugin": "^1.32",
-        "yii2-extensions/phpstan": "dev-main"
+        "infection/infection": "^0.35",
+        "maglnet/composer-require-checker": "^4.1",
+        "php-forge/coding-standard": "^0.3",
+        "php-forge/foxy": "^0.3",
+        "php-forge/support": "^0.3",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0.3",
+        "phpunit/phpunit": "^12.5",
+        "xepozz/internal-mocker": "^1.4",
+        "yii2-extensions/phpstan": "^0.5@dev"
+    },
+    "suggest": {
+        "ext-gd": "Required by `ImageCropper` to apply crop rectangles on the server."
     },
     "autoload": {
         "psr-4": {
-            "Yii2\\Extensions\\FilePond\\": "src"
+            "yii2\\extensions\\filepond\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Yii2\\Extensions\\FilePond\\Tests\\": "tests"
+            "yii2\\extensions\\filepond\\tests\\": "tests"
         }
     },
     "extra": {
+        "bootstrap": "yii2\\extensions\\filepond\\Bootstrap",
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-main": "0.1.x-dev"
         },
-        "config-plugin": {
-            "params": "params.php",
-            "yii2-filepond": "extension.php"
-        },
-        "config-plugin-options": {
-            "source-directory": "config"
-        }
+        "foxy": true
     },
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            "yiisoft/yii2-composer": true,
-            "composer/installers": true,
-            "oomphinc/composer-installers-extender": true,
-            "infection/extension-installer": true
+            "infection/extension-installer": true,
+            "php-forge/foxy": true,
+            "phpstan/extension-installer": true,
+            "yiisoft/yii2-composer": true
+        },
+        "foxy": {
+            "manager": "npm"
         }
     },
     "scripts": {
-        "check-dependencies": "composer-require-checker",
-        "mutation": "roave-infection-static-analysis-plugin",
-        "phpstan": "phpstan",
-        "test": "phpunit"
-    },
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://asset-packagist.org"
-        }
-    ]
+        "check-dependencies": "./vendor/bin/composer-require-checker check",
+        "ecs": "./vendor/bin/ecs --fix",
+        "mutation": "php -d memory_limit=-1 vendor/bin/infection --threads=4 --ignore-msi-with-no-mutations --min-msi=100 --min-covered-msi=100",
+        "mutation-static": [
+            "Composer\\Config::disableProcessTimeout",
+            "php -d memory_limit=-1 vendor/bin/infection --threads=4 --ignore-msi-with-no-mutations --min-msi=100 --min-covered-msi=100 --static-analysis-tool=phpstan --static-analysis-tool-options='--memory-limit=-1'"
+        ],
+        "rector": "./vendor/bin/rector process",
+        "static": "./vendor/bin/phpstan --memory-limit=-1",
+        "tests": "./vendor/bin/phpunit"
+    }
 }

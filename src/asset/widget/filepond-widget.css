@@ -1,0 +1,7 @@
+/* Widget styles for yii2-extensions/filepond. */
+
+/* Keep the drop label vertically centered in the compact panel layout. */
+.filepond--root[data-style-panel-layout~="compact"] .filepond--drop-label {
+    bottom: 0;
+    height: auto;
+}
