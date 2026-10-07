@@ -39,6 +39,10 @@ node_modules
 .phpunit.result.cache
 phpunit.xml*
 
+# stryker mutation testing
+.stryker-tmp
+reports/mutation
+
 # vagrant (if present)
 .vagrant
 
