@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\Group;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii2\extensions\filepond\asset\{
+    AbstractLocalAsset,
     AbstractNpmAsset,
     CropperAsset,
     FilePondAsset,
@@ -17,16 +18,18 @@ use yii2\extensions\filepond\asset\{
 };
 use yii2\extensions\filepond\asset\plugin\{FileEncodeAsset, ImageEditAsset, ImagePreviewAsset};
 use yii2\extensions\filepond\exception\Message;
+use yii2\extensions\filepond\tests\support\stub\DottedLocalAsset;
 use yii2\extensions\filepond\tests\support\TestCase;
 
 use function array_keys;
+use function dirname;
 use function file_put_contents;
 use function is_dir;
 use function mkdir;
 use function str_replace;
 
 /**
- * Unit tests for {@see AbstractNpmAsset} delivery modes and the concrete FilePond, plugin, and Cropper.js bundles.
+ * Unit tests for {@see AbstractNpmAsset} and {@see AbstractLocalAsset} delivery modes and the concrete bundles.
  */
 #[Group('asset')]
 final class AssetBundleTest extends TestCase
@@ -85,6 +88,85 @@ final class AssetBundleTest extends TestCase
         );
     }
 
+    public function testLocalBundleMinifiedInsertsInfixBeforeLastExtension(): void
+    {
+        $this->mockWebApplication();
+
+        $bundle = new DottedLocalAsset(['minified' => true]);
+
+        self::assertSame(
+            ['filepond.cropper.min.js', 'worker'],
+            $bundle->js,
+            'Infix must precede the last extension only; extensionless names stay unchanged.',
+        );
+        self::assertSame(
+            ['filepond.cropper.theme.min.css'],
+            $bundle->css,
+            'Dots in the base name must be preserved.',
+        );
+    }
+
+    public function testLocalBundleMinifiedSelectsMinFiles(): void
+    {
+        $this->mockWebApplication();
+
+        $view = $this->view();
+
+        $view->getAssetManager()->bundles = [
+            FilePondCropperAsset::class => ['minified' => true],
+            FilePondWidgetAsset::class => ['minified' => true],
+        ];
+
+        FilePondCropperAsset::register($view);
+
+        $widget = $view->assetBundles[FilePondWidgetAsset::class] ?? null;
+        $cropper = $view->assetBundles[FilePondCropperAsset::class] ?? null;
+
+        self::assertInstanceOf(
+            FilePondWidgetAsset::class,
+            $widget,
+            'Runtime bundle must be registered.',
+        );
+        self::assertInstanceOf(
+            FilePondCropperAsset::class,
+            $cropper,
+            'Adapter bundle must be registered.',
+        );
+        self::assertSame(
+            ['filepond-widget.min.css'],
+            $widget->css,
+            'Minified runtime stylesheet expected.',
+        );
+        self::assertSame(
+            ['filepond-widget.min.js'],
+            $widget->js,
+            'Minified runtime script expected.',
+        );
+        self::assertSame(
+            ['filepond-cropper.min.css'],
+            $cropper->css,
+            'Minified adapter stylesheet expected.',
+        );
+        self::assertSame(
+            ['filepond-cropper.min.js'],
+            $cropper->js,
+            'Minified adapter script expected.',
+        );
+        self::assertSame(
+            ['filepond-cropper.min.css', 'filepond-cropper.min.js'],
+            $cropper->publishOptions['only'] ?? null,
+            'Only the minified files.',
+        );
+        self::assertFileExists(
+            "{$widget->basePath}/filepond-widget.min.js",
+            'Minified runtime script must be published.',
+        );
+        self::assertFileExists(
+            "{$cropper->basePath}/filepond-cropper.min.css",
+            'Minified adapter stylesheet must be published.',
+        );
+    }
+
     public function testLocalBundlePublishesDistFiles(): void
     {
         $this->mockWebApplication();
@@ -119,6 +201,56 @@ final class AssetBundleTest extends TestCase
             '/assets/filepond',
             str_replace('\\', '/', (string) $bundle->basePath),
             'Bundle must be published.',
+        );
+    }
+
+    public function testLocalBundlePublishesReadableFilesInDebugMode(): void
+    {
+        $this->mockWebApplication();
+
+        $bundle = new FilePondWidgetAsset();
+
+        self::assertFalse(
+            $bundle->minified,
+            'Debug mode must disable minification.',
+        );
+        self::assertSame(
+            ['filepond-widget.css'],
+            $bundle->css,
+            'Readable stylesheet expected.',
+        );
+        self::assertSame(
+            ['filepond-widget.css', 'filepond-widget.js'],
+            $bundle->publishOptions['only'] ?? null,
+            'Only the readable files.',
+        );
+    }
+
+    public function testLocalBundlePublishOptionsOnlyIsNotOverridden(): void
+    {
+        $this->mockWebApplication();
+
+        $bundle = new FilePondWidgetAsset(['publishOptions' => ['only' => ['*.js']]]);
+
+        self::assertSame(
+            ['*.js'],
+            $bundle->publishOptions['only'] ?? null,
+            'Configured patterns must be kept.',
+        );
+    }
+
+    public function testLocalBundleResolvesSourcePathAlias(): void
+    {
+        $this->mockWebApplication();
+
+        Yii::setAlias('@filepond-widget', dirname(__DIR__, 2) . '/src/asset/widget');
+
+        $bundle = new FilePondWidgetAsset(['sourcePath' => '@filepond-widget/']);
+
+        self::assertSame(
+            dirname(__DIR__, 2) . '/src/asset/widget',
+            $bundle->sourcePath,
+            'Alias must be resolved without a trailing slash.',
         );
     }
 

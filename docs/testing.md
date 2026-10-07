@@ -1,6 +1,7 @@
 # Testing
 
-This package provides a consistent set of [Composer](https://getcomposer.org/) scripts for local validation.
+This package provides a consistent set of [Composer](https://getcomposer.org/) scripts for local validation, plus
+[npm](https://www.npmjs.com/) scripts for the JavaScript runtime and Cropper.js adapter.
 
 Tool references:
 
@@ -10,6 +11,9 @@ Tool references:
 - [PHPStan](https://phpstan.org/) for static analysis.
 - [PHPUnit](https://phpunit.de/) for unit tests.
 - [Rector](https://github.com/rectorphp/rector) for automated refactoring.
+- [Vitest](https://vitest.dev/) with [jsdom](https://github.com/jsdom/jsdom) for JavaScript unit tests.
+- [StrykerJS](https://stryker-mutator.io/) for JavaScript mutation testing.
+- [esbuild](https://esbuild.github.io/) for minified assets.
 
 ## Automated refactoring (Rector)
 
@@ -33,6 +37,31 @@ Verify that runtime dependencies are correctly declared in `composer.json`.
 
 ```bash
 composer check-dependencies
+```
+
+## JavaScript tests (Vitest)
+
+Install the Node.js toolchain (see `.nvmrc`) and run the tests in `tests/js` with 100% line, branch, and function
+coverage thresholds.
+
+```bash
+npm ci
+npm run test:js
+```
+
+Run mutation testing for the JavaScript sources (minimum score 100%).
+
+```bash
+npm run test:mutation
+```
+
+## Minified assets
+
+Regenerate the committed `*.min.js` and `*.min.css` files after editing `src/asset/widget` or `src/asset/cropper`.
+The `assets` workflow fails when the committed files differ from a fresh build.
+
+```bash
+npm run build
 ```
 
 ## Mutation testing (Infection)
