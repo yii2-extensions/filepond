@@ -117,7 +117,7 @@ final class AssetBundleTest extends TestCase
         );
         self::assertStringEndsWith(
             '/assets/filepond',
-            (string) $bundle->basePath,
+            str_replace('\\', '/', (string) $bundle->basePath),
             'Bundle must be published.',
         );
     }
