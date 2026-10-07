@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace yii2\extensions\filepond\asset;
 
-use yii\web\AssetBundle;
 use yii2\extensions\filepond\asset\plugin\ImageEditAsset;
 
 /**
@@ -13,14 +12,22 @@ use yii2\extensions\filepond\asset\plugin\ImageEditAsset;
  * The adapter is exposed as `window.yii2FilePond.cropper` and is registered automatically by the widget when
  * `allowImageEdit` is enabled.
  */
-final class FilePondCropperAsset extends AssetBundle
+final class FilePondCropperAsset extends AbstractLocalAsset
 {
-    public $css = ['filepond-cropper.css'];
     public $depends = [
         CropperAsset::class,
         FilePondWidgetAsset::class,
         ImageEditAsset::class,
     ];
-    public $js = ['filepond-cropper.js'];
     public $sourcePath = __DIR__ . '/cropper';
+
+    protected function scripts(): array
+    {
+        return ['filepond-cropper.js'];
+    }
+
+    protected function styles(): array
+    {
+        return ['filepond-cropper.css'];
+    }
 }

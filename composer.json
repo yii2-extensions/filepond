@@ -13,7 +13,7 @@
         "yii2",
         "yii2-extension"
     ],
-    "license": "MIT",
+    "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "Wilmer Arambula",
@@ -71,9 +71,6 @@
             "php-forge/foxy": true,
             "phpstan/extension-installer": true,
             "yiisoft/yii2-composer": true
-        },
-        "foxy": {
-            "manager": "npm"
         }
     },
     "scripts": {

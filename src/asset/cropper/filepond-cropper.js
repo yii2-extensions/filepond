@@ -10,6 +10,7 @@
     'use strict';
 
     const CLASS = 'yii2-filepond-cropper';
+    // Stryker disable next-line StringLiteral: any non-numeric preset, including an empty string, is a free selection.
     const DEFAULT_ASPECT_RATIOS = ['free', '1:1', '16:9', '4:3', '3:2'];
     const DEFAULT_LABELS = {
         apply: 'Apply',
@@ -38,7 +39,8 @@
     const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
     /**
-     * Parses an aspect ratio given as a positive number, a `width:height` string, or the `free` keyword.
+     * Parses an aspect ratio given as a positive number or a `width:height` string; anything else, such as the `free`
+     * keyword, means a free selection.
      *
      * @returns {number|null} Width divided by height, or `null` for a free selection.
      */
@@ -47,7 +49,7 @@
             return value > 0 && Number.isFinite(value) ? value : null;
         }
 
-        if (typeof value !== 'string' || value.trim().toLowerCase() === 'free') {
+        if (typeof value !== 'string') {
             return null;
         }
 
@@ -81,14 +83,10 @@
             + '</cropper-canvas>';
     }
 
-    function createElement(tag, className, text) {
+    function createElement(tag, className) {
         const element = document.createElement(tag);
 
         element.className = className;
-
-        if (text !== undefined) {
-            element.textContent = text;
-        }
 
         return element;
     }
@@ -167,13 +165,7 @@
      */
     function createCropMetadata(rect, selectionRatio) {
         const aspectRatio = rect.height / rect.width;
-        let baseWidth = rect.naturalWidth;
-        let baseHeight = baseWidth * aspectRatio;
-
-        if (baseHeight > rect.naturalHeight) {
-            baseHeight = rect.naturalHeight;
-            baseWidth = baseHeight / aspectRatio;
-        }
+        const baseWidth = Math.min(rect.naturalWidth, rect.naturalHeight / aspectRatio);
 
         return {
             aspectRatio,
@@ -227,7 +219,7 @@
         const objectUrl = window.URL.createObjectURL(file);
         const dialog = createElement('dialog', CLASS);
         const header = createElement('header', `${CLASS}__header`);
-        const title = createElement('h2', `${CLASS}__title`, labels.title);
+        const title = createElement('h2', `${CLASS}__title`);
         const body = createElement('div', `${CLASS}__body`);
         const image = createElement('img', `${CLASS}__image`);
         const footer = createElement('footer', `${CLASS}__footer`);
@@ -280,11 +272,10 @@
             selection.$center();
         };
 
-        const restoreSelection = () => {
-            const cropperImage = getImage();
+        const restoreSelection = (cropperImage) => {
             const selection = getSelection();
 
-            if (previousRect === null || cropperImage === null || selection === null) {
+            if (previousRect === null || selection === null) {
                 return;
             }
 
@@ -366,10 +357,6 @@
         };
 
         const initializeCropper = () => {
-            if (cropper !== null) {
-                return;
-            }
-
             const options = Object.assign({ template: createTemplate(activeRatio) }, settings.options);
 
             cropper = new Cropper(image, options);
@@ -378,7 +365,7 @@
 
             if (cropperImage !== null) {
                 cropperImage.$ready(() => {
-                    restoreSelection();
+                    restoreSelection(cropperImage);
                 });
             }
 
@@ -403,6 +390,7 @@
             ratios.appendChild(button);
         });
 
+        title.textContent = labels.title;
         image.alt = '';
         image.addEventListener('load', initializeCropper, { once: true });
         image.addEventListener('error', cancelEditing, { once: true });

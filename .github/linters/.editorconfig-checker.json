@@ -4,6 +4,8 @@
         "^\\.claude/",
         "^composer\\.lock$",
         "^runtime/",
+        "\\.min\\.(css|js)$",
+        "^package-lock\\.json$",
         "^vendor/"
     ]
 }

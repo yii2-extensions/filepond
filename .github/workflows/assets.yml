@@ -1,0 +1,57 @@
+---
+on:
+  pull_request: &ignore-paths
+    paths-ignore:
+      - ".gitattributes"
+      - ".gitignore"
+      - "CHANGELOG.md"
+      - "docs/**"
+      - "README.md"
+
+  push: *ignore-paths
+
+name: assets
+
+permissions:
+  contents: read
+
+concurrency:
+  cancel-in-progress: true
+  group: assets-${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  build:
+    name: Test JavaScript and verify minified assets.
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout.
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Install node.js.
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies.
+        run: npm ci
+
+      - name: Test JavaScript.
+        run: npm run test:js
+
+      - name: Test JavaScript mutations.
+        run: npm run test:mutation
+
+      - name: Build assets.
+        run: npm run build
+
+      - name: Detect minified asset drift.
+        run: |
+          status="$(git status --porcelain --untracked-files=all -- 'src/asset/**/*.min.css' 'src/asset/**/*.min.js')"
+          test -z "$status" || {
+            printf '%s\n' "$status"
+            exit 1
+          }
