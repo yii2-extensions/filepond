@@ -18,6 +18,7 @@ use yii2\extensions\filepond\asset\{
 };
 use yii2\extensions\filepond\asset\plugin\{FileEncodeAsset, ImageEditAsset, ImagePreviewAsset};
 use yii2\extensions\filepond\exception\Message;
+use yii2\extensions\filepond\tests\support\stub\DottedLocalAsset;
 use yii2\extensions\filepond\tests\support\TestCase;
 
 use function array_keys;
@@ -84,6 +85,24 @@ final class AssetBundleTest extends TestCase
             [],
             $bundle->css,
             'Cropper.js ships no stylesheet.',
+        );
+    }
+
+    public function testLocalBundleMinifiedInsertsInfixBeforeLastExtension(): void
+    {
+        $this->mockWebApplication();
+
+        $bundle = new DottedLocalAsset(['minified' => true]);
+
+        self::assertSame(
+            ['filepond.cropper.min.js', 'worker'],
+            $bundle->js,
+            'Infix must precede the last extension only; extensionless names stay unchanged.',
+        );
+        self::assertSame(
+            ['filepond.cropper.theme.min.css'],
+            $bundle->css,
+            'Dots in the base name must be preserved.',
         );
     }
 

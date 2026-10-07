@@ -7,7 +7,8 @@ namespace yii2\extensions\filepond\asset;
 use yii\web\AssetBundle;
 
 use function array_map;
-use function str_replace;
+use function strrpos;
+use function substr_replace;
 
 /**
  * Provides readable or minified delivery for the scripts and stylesheets shipped inside this package.
@@ -63,8 +64,20 @@ abstract class AbstractLocalAsset extends AssetBundle
         $minified = $this->minified === true;
 
         return array_map(
-            static fn(string $file): string => $minified ? str_replace('.', '.min.', $file) : $file,
+            static fn(string $file): string => $minified ? self::minifiedFile($file) : $file,
             $files,
         );
+    }
+
+    /**
+     * Returns the file name with the `.min` infix before its last extension, or unchanged when it has no extension.
+     *
+     * For example, `filepond.cropper.js` becomes `filepond.cropper.min.js`.
+     */
+    private static function minifiedFile(string $file): string
+    {
+        $extension = strrpos($file, '.');
+
+        return $extension === false ? $file : substr_replace($file, '.min', $extension, 0);
     }
 }
