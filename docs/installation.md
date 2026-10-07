@@ -24,11 +24,11 @@ explicitly for reproducible installs:
 
 ```json
 {
-    "config": {
-        "foxy": {
-            "manager": "npm"
-        }
+  "config": {
+    "foxy": {
+      "manager": "npm"
     }
+  }
 }
 ```
 

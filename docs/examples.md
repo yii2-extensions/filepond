@@ -170,10 +170,10 @@ echo FilePond::widget(
 ## Accessing the instance from JavaScript
 
 ```js
-const pond = yii2FilePond.get('model-avatar');
+const pond = yii2FilePond.get("model-avatar");
 
-pond.addFile('/uploads/sample.png');
-yii2FilePond.destroy('model-avatar');
+pond.addFile("/uploads/sample.png");
+yii2FilePond.destroy("model-avatar");
 ```
 
 ## Next steps
