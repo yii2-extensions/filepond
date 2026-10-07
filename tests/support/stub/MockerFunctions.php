@@ -49,7 +49,7 @@ final class MockerFunctions
     public static function file_put_contents(string $filename, mixed $data, int $flags): int|false
     {
         if (array_key_exists('file_put_contents', self::$overrides)) {
-            /** @var int|false */
+            /** @var false|int */
             return self::$overrides['file_put_contents'];
         }
 
@@ -73,7 +73,7 @@ final class MockerFunctions
     public static function imagecrop(GdImage $image, array $rectangle): GdImage|false
     {
         if (array_key_exists('imagecrop', self::$overrides)) {
-            /** @var GdImage|false */
+            /** @var false|GdImage */
             return self::$overrides['imagecrop'];
         }
 
@@ -91,7 +91,7 @@ final class MockerFunctions
     public static function imagerotate(GdImage $image, float $angle, int $backgroundColor): GdImage|false
     {
         if (array_key_exists('imagerotate', self::$overrides)) {
-            /** @var GdImage|false */
+            /** @var false|GdImage */
             return self::$overrides['imagerotate'];
         }
 

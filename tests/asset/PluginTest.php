@@ -83,5 +83,4 @@ final class PluginTest extends TestCase
             'Only plugins with a stylesheet must report styles.',
         );
     }
-
 }

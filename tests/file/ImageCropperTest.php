@@ -293,7 +293,7 @@ final class ImageCropperTest extends TestCase
         );
         self::assertSame(
             127,
-            (imagecolorat($image, 1, 1) >> 24) & 0x7f,
+            (imagecolorat($image, 1, 1) >> 24) & 0x7F,
             'Transparent pixels must be preserved.',
         );
         self::assertSame(
@@ -461,7 +461,7 @@ final class ImageCropperTest extends TestCase
 
         self::assertLessThan(
             100,
-            ($rgb >> 16) & 0xff,
+            ($rgb >> 16) & 0xFF,
             $message,
         );
     }
@@ -472,17 +472,17 @@ final class ImageCropperTest extends TestCase
 
         self::assertGreaterThan(
             150,
-            ($rgb >> 16) & 0xff,
+            ($rgb >> 16) & 0xFF,
             $message,
         );
         self::assertLessThan(
             100,
-            ($rgb >> 8) & 0xff,
+            ($rgb >> 8) & 0xFF,
             $message,
         );
         self::assertLessThan(
             100,
-            $rgb & 0xff,
+            $rgb & 0xFF,
             $message,
         );
     }
@@ -603,7 +603,7 @@ final class ImageCropperTest extends TestCase
             $ifd .= pack('nnNnn', $tag, 3, 1, $value, 0);
         }
 
-        $payload = "Exif\0\0" . 'MM' . pack('nN', 0x2a, 8) . $ifd . pack('N', 0);
+        $payload = "Exif\0\0" . 'MM' . pack('nN', 0x2A, 8) . $ifd . pack('N', 0);
         $segment = "\xFF\xE1" . pack('n', strlen($payload) + 2) . $payload;
 
         return substr($jpeg, 0, 2) . $segment . substr($jpeg, 2);
