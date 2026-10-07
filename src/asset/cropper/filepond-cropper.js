@@ -162,9 +162,10 @@
      *
      * `zoom` is relative to the largest rectangle with the selection aspect ratio that fits in the image, which is
      * how the Image Transform plugin resolves the crop; `scaleToFit` is disabled so the output matches the selection
-     * exactly, and `rect` is carried along for server-side cropping.
+     * exactly, and `rect` is carried along for server-side cropping. `selectionRatio` records the active preset (width
+     * divided by height, or `null` for a free selection) so reopening the editor restores the same constraint.
      */
-    function createCropMetadata(rect) {
+    function createCropMetadata(rect, selectionRatio) {
         const aspectRatio = rect.height / rect.width;
         let baseWidth = rect.naturalWidth;
         let baseHeight = baseWidth * aspectRatio;
@@ -184,6 +185,7 @@
             rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
             rotation: 0,
             scaleToFit: false,
+            selectionRatio,
             zoom: Math.max(baseWidth / rect.width, 1),
         };
     }
@@ -220,7 +222,8 @@
 
         const labels = settings.labels;
         const initialAspectRatio = parseAspectRatio(settings.aspectRatio ?? editor.cropAspectRatio);
-        const previousRect = instructions && instructions.crop ? instructions.crop.rect : null;
+        const previousCrop = instructions && instructions.crop ? instructions.crop : null;
+        const previousRect = previousCrop !== null && previousCrop.rect ? previousCrop.rect : null;
         const objectUrl = window.URL.createObjectURL(file);
         const dialog = createElement('dialog', CLASS);
         const header = createElement('header', `${CLASS}__header`);
@@ -237,6 +240,9 @@
         const cancel = createButton(`${CLASS}__button`, labels.cancel);
         const apply = createButton(`${CLASS}__button ${CLASS}__button--primary`, labels.apply);
         const ratioButtons = [];
+        let activeRatio = previousCrop !== null && 'selectionRatio' in previousCrop
+            ? parseAspectRatio(previousCrop.selectionRatio)
+            : initialAspectRatio;
         let cropper = null;
         let closed = false;
 
@@ -284,7 +290,7 @@
 
             const rect = toCanvasRectangle(previousRect, cropperImage);
 
-            selection.$change(rect.x, rect.y, rect.width, rect.height, NaN, true);
+            selection.$change(rect.x, rect.y, rect.width, rect.height, activeRatio === null ? NaN : activeRatio, true);
         };
 
         const resetEditor = () => {
@@ -300,10 +306,10 @@
             selection.$reset();
             selection.$center();
 
-            const entry = ratioButtons.find((candidate) => candidate.ratio === initialAspectRatio) || null;
+            activeRatio = initialAspectRatio;
 
-            applyRatio(initialAspectRatio);
-            activateRatio(entry);
+            applyRatio(activeRatio);
+            activateRatio(ratioButtons.find((candidate) => candidate.ratio === activeRatio) || null);
         };
 
         const close = () => {
@@ -353,7 +359,7 @@
             }
 
             if (typeof editor.onconfirm === 'function') {
-                editor.onconfirm({ data: { crop: createCropMetadata(rect) } });
+                editor.onconfirm({ data: { crop: createCropMetadata(rect, activeRatio) } });
             }
 
             close();
@@ -364,7 +370,7 @@
                 return;
             }
 
-            const options = Object.assign({ template: createTemplate(initialAspectRatio) }, settings.options);
+            const options = Object.assign({ template: createTemplate(activeRatio) }, settings.options);
 
             cropper = new Cropper(image, options);
 
@@ -376,7 +382,7 @@
                 });
             }
 
-            activateRatio(ratioButtons.find((entry) => entry.ratio === initialAspectRatio) || null);
+            activateRatio(ratioButtons.find((entry) => entry.ratio === activeRatio) || null);
         };
 
         settings.aspectRatios.forEach((value) => {
@@ -389,6 +395,7 @@
             const entry = { button, ratio };
 
             button.addEventListener('click', () => {
+                activeRatio = ratio;
                 applyRatio(ratio);
                 activateRatio(entry);
             });

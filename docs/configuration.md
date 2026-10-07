@@ -88,6 +88,8 @@ unless `config['imageEditEditor']` is set. The `cropper` property accepts:
 | `options`      | `array<string,mixed>`  | `[]`                                    | Options passed to the Cropper.js constructor, such as `template` or `container`. |
 
 The editor opens a native `<dialog>` and confirms a FilePond `crop` metadata object computed in source image pixels.
+The object also stores `selectionRatio`, the active preset as width divided by height or `null` for a free selection,
+so reopening the editor restores the same constraint.
 The Image Transform plugin applies it on the client when `allowImageTransform` is enabled, the Image Preview plugin
 reflects it in the thumbnail, and `metadata.crop.rect` is available to `ImageCropper` on the server.
 

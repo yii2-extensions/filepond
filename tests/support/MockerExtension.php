@@ -73,6 +73,16 @@ final class MockerExtension implements Extension
             ],
             [
                 'namespace' => $namespace,
+                'name' => 'fopen',
+                'function' => static fn(
+                    string $filename,
+                    string $mode,
+                    bool $use_include_path = false,
+                    $context = null,
+                ): mixed => MockerFunctions::fopen($filename, $mode),
+            ],
+            [
+                'namespace' => $namespace,
                 'name' => 'function_exists',
                 'function' => static fn(string $function): bool => MockerFunctions::function_exists($function),
             ],

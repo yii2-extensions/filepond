@@ -19,6 +19,11 @@ $stubs['file_put_contents'] = [
     'arguments' => '$filename, $data, $flags, $context',
 ];
 
+$stubs['fopen'] = [
+    'signatureArguments' => 'string $filename, string $mode, bool $use_include_path = false, $context = null',
+    'arguments' => '$filename, $mode, $use_include_path, $context',
+];
+
 $stubs['imagecrop'] = [
     'signatureArguments' => '\GdImage $image, array $rectangle',
     'arguments' => '$image, $rectangle',

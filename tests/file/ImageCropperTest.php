@@ -316,6 +316,20 @@ final class ImageCropperTest extends TestCase
         );
     }
 
+    public function testCropIgnoresOrientationWhenExifStreamCannotOpen(): void
+    {
+        MockerFunctions::override('exif_read_data', ['Orientation' => 6]);
+        MockerFunctions::override('fopen', false);
+
+        $image = self::decode((new ImageCropper())->crop(self::image('jpeg', self::fullRect())));
+
+        self::assertSame(
+            self::WIDTH,
+            imagesx($image),
+            'Orientation must be skipped without a stream.',
+        );
+    }
+
     public function testCropKeepsImageWhenRotationFails(): void
     {
         MockerFunctions::override('exif_read_data', ['Orientation' => 3]);
@@ -371,6 +385,29 @@ final class ImageCropperTest extends TestCase
         );
     }
 
+    #[RequiresOperatingSystem('Linux')]
+    public function testCropReadsExifFromStreamInsteadOfUrlWrapper(): void
+    {
+        $jpeg = self::withExif(self::encode('jpeg'), [0x0112 => 6]);
+
+        $file = EncodedFile::fromArray(
+            ['name' => 'a.jpg', 'data' => base64_encode($jpeg), 'metadata' => ['crop' => ['rect' => self::fullRect()]]],
+        );
+
+        $image = self::decode((new ImageCropper())->crop($file));
+
+        self::assertSame(
+            'resource (stream)',
+            MockerFunctions::argumentType('exif_read_data'),
+            'EXIF must not depend on `allow_url_fopen`.',
+        );
+        self::assertSame(
+            self::HEIGHT,
+            imagesx($image),
+            'Orientation read from the stream must apply.',
+        );
+    }
+
     public function testCropReadsExifWithoutOrientationTag(): void
     {
         $jpeg = self::withExif(self::encode('jpeg'), [0x0110 => 1]);
@@ -394,7 +431,6 @@ final class ImageCropperTest extends TestCase
         );
     }
 
-    #[RequiresOperatingSystem('Linux')]
     public function testCropReadsRealExifOrientation(): void
     {
         $jpeg = self::withExif(self::encode('jpeg'), [0x0112 => 6]);

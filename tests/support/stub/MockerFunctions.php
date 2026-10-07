@@ -7,7 +7,9 @@ namespace yii2\extensions\filepond\tests\support\stub;
 use GdImage;
 
 use function array_key_exists;
+use function get_debug_type;
 use function is_int;
+use function is_resource;
 use function is_string;
 
 /**
@@ -19,22 +21,36 @@ use function is_string;
 final class MockerFunctions
 {
     /**
+     * @var array<string, string> Debug type of the first argument of the last call, keyed by function name.
+     */
+    private static array $arguments = [];
+    /**
      * @var array<string, mixed> Return values keyed by function name.
      */
     private static array $overrides = [];
+
+    /**
+     * Returns the debug type of the first argument passed to the last call of a mocked function.
+     */
+    public static function argumentType(string $function): string|null
+    {
+        return self::$arguments[$function] ?? null;
+    }
 
     /**
      * @return array<string, mixed>|false
      */
     public static function exif_read_data(mixed $file): array|false
     {
+        self::$arguments['exif_read_data'] = get_debug_type($file);
+
         if (array_key_exists('exif_read_data', self::$overrides)) {
             /** @var array<string, mixed>|false */
             return self::$overrides['exif_read_data'];
         }
 
         /** @var array<string, mixed>|false */
-        return is_string($file) ? @\exif_read_data($file) : false;
+        return is_string($file) || is_resource($file) ? @\exif_read_data($file) : false;
     }
 
     public static function extension_loaded(string $extension): bool
@@ -54,6 +70,18 @@ final class MockerFunctions
         }
 
         return \file_put_contents($filename, $data, $flags);
+    }
+
+    /**
+     * @return false|resource
+     */
+    public static function fopen(string $filename, string $mode): mixed
+    {
+        if (array_key_exists('fopen', self::$overrides)) {
+            return false;
+        }
+
+        return \fopen($filename, $mode);
     }
 
     public static function function_exists(string $function): bool
@@ -131,6 +159,7 @@ final class MockerFunctions
      */
     public static function reset(): void
     {
+        self::$arguments = [];
         self::$overrides = [];
     }
 

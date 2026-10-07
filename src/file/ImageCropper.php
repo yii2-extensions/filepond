@@ -9,7 +9,8 @@ use RuntimeException;
 use yii\helpers\FileHelper;
 use yii2\extensions\filepond\exception\Message;
 
-use function base64_encode;
+use function fclose;
+use function fwrite;
 use function imagecreatefromstring;
 use function imageflip;
 use function imagegif;
@@ -141,7 +142,19 @@ final readonly class ImageCropper
             return $image;
         }
 
-        $exif = @exif_read_data('data://image/jpeg;base64,' . base64_encode($data));
+        // A memory stream keeps EXIF reading independent of `allow_url_fopen`, which disables `data://` URLs.
+        $stream = fopen('php://memory', 'r+b');
+
+        if ($stream === false) {
+            return $image;
+        }
+
+        fwrite($stream, $data);
+
+        $exif = @exif_read_data($stream);
+
+        fclose($stream);
+
         $orientation = is_array($exif) ? ($exif['Orientation'] ?? null) : null;
 
         if (in_array($orientation, self::FLIPPED_ORIENTATIONS, true)) {
