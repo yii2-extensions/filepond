@@ -50,9 +50,10 @@ final readonly class ImageCropper
         'image/webp' => 'webp',
     ];
     /**
-     * Counterclockwise rotation angle, in degrees, for each EXIF orientation that rotates the image.
+     * Counterclockwise rotation angle, in degrees, for each EXIF orientation that rotates the image, applied after
+     * the horizontal mirror of {@see FLIPPED_ORIENTATIONS}.
      */
-    private const array ROTATION_ANGLES = [3 => 180, 4 => 180, 5 => -90, 6 => -90, 7 => 90, 8 => 90];
+    private const array ROTATION_ANGLES = [3 => 180, 4 => 180, 5 => 90, 6 => -90, 7 => -90, 8 => 90];
 
     /**
      * @param int $quality Output quality for lossy formats, from `0` to `100`.

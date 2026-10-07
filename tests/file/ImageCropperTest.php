@@ -45,7 +45,7 @@ final class ImageCropperTest extends TestCase
 
     /**
      * Expected size and probe pixels after applying each EXIF orientation to the 16x8 fixture whose top-left
-     * quadrant is red.
+     * quadrant is red. Values match `magick -auto-orient` on the same fixture tagged with each orientation.
      *
      * @var array<int, array{int, int, array{int, int}, array{int, int}}>
      */
@@ -54,9 +54,9 @@ final class ImageCropperTest extends TestCase
         2 => [16, 8, [13, 1], [2, 6]],
         3 => [16, 8, [13, 6], [2, 1]],
         4 => [16, 8, [2, 6], [13, 1]],
-        5 => [8, 16, [6, 12], [1, 3]],
+        5 => [8, 16, [1, 3], [6, 12]],
         6 => [8, 16, [6, 2], [1, 13]],
-        7 => [8, 16, [1, 3], [6, 12]],
+        7 => [8, 16, [6, 12], [1, 3]],
         8 => [8, 16, [1, 13], [6, 2]],
     ];
 
