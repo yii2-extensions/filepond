@@ -6,6 +6,7 @@ namespace yii2\extensions\filepond\file;
 
 use GdImage;
 use RuntimeException;
+use yii\helpers\FileHelper;
 use yii2\extensions\filepond\exception\Message;
 
 use function base64_encode;
@@ -24,6 +25,7 @@ use function max;
 use function min;
 use function ob_get_clean;
 use function ob_start;
+use function pathinfo;
 
 /**
  * Applies the crop rectangle stored by the Cropper.js editor to an image on the server with GD.
@@ -38,6 +40,15 @@ final readonly class ImageCropper
      * EXIF orientations that mirror the image horizontally before rotating.
      */
     private const array FLIPPED_ORIENTATIONS = [2, 4, 5, 7];
+    /**
+     * Extension given to the output file for each encodable MIME type; other types are encoded as PNG.
+     */
+    private const array OUTPUT_EXTENSIONS = [
+        'image/gif' => 'gif',
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/webp' => 'webp',
+    ];
     /**
      * Counterclockwise rotation angle, in degrees, for each EXIF orientation that rotates the image.
      */
@@ -61,7 +72,8 @@ final readonly class ImageCropper
      * Returns a copy of the file cropped to its {@see EncodedFile::getCropRectangle()} rectangle.
      *
      * The rectangle is intersected with the image bounds, keeping at least the nearest edge pixel when they do not
-     * overlap. Files without a rectangle are returned unchanged.
+     * overlap. GIF, JPEG, PNG, and WebP keep their format; other formats, such as BMP, are encoded as PNG and the copy
+     * receives the `image/png` type and a `.png` extension. Files without a rectangle are returned unchanged.
      *
      * @param EncodedFile $file Image file carrying crop metadata.
      *
@@ -109,7 +121,14 @@ final readonly class ImageCropper
             );
         }
 
-        return $file->withData($this->encode($cropped, $mimeType, $file->name), $mimeType);
+        $extension = self::OUTPUT_EXTENSIONS[$mimeType] ?? 'png';
+        $outputType = $extension === 'png' ? 'image/png' : $mimeType;
+
+        return $file->withData(
+            $this->encode($cropped, $outputType, $file->name),
+            $outputType,
+            self::outputName($file, $outputType, $extension),
+        );
     }
 
     /**
@@ -165,5 +184,17 @@ final readonly class ImageCropper
         imagesavealpha($image, true);
 
         return imagepng($image);
+    }
+
+    /**
+     * Keeps the client name when its extension is registered for the output type, otherwise replaces the extension.
+     */
+    private static function outputName(EncodedFile $file, string $outputType, string $extension): string
+    {
+        if (in_array($file->getExtension(), FileHelper::getExtensionsByMimeType($outputType), true)) {
+            return $file->name;
+        }
+
+        return pathinfo($file->name, PATHINFO_FILENAME) . ".{$extension}";
     }
 }

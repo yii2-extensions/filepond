@@ -11,6 +11,7 @@ use yii2\extensions\filepond\exception\Message;
 
 use function array_values;
 use function chmod;
+use function in_array;
 use function is_dir;
 use function is_string;
 use function mkdir;
@@ -24,6 +25,14 @@ use function trim;
 final readonly class FileSaver
 {
     /**
+     * Preferred extensions for MIME types whose first Yii mapping is uncommon.
+     */
+    private const array MIME_EXTENSIONS = [
+        'image/jpeg' => 'jpg',
+        'text/plain' => 'txt',
+    ];
+
+    /**
      * @param string $directory Target directory, optionally as a registered Yii alias; created when missing.
      * @param int $directoryMode Permissions applied to directories created by the saver.
      * @param int $fileMode Permissions applied to written files.
@@ -35,10 +44,11 @@ final readonly class FileSaver
     ) {}
 
     /**
-     * Writes the file and returns its absolute path.
+     * Writes the file and returns its absolute path, replacing a file with the same name.
      *
-     * The extension comes from the client file name, falling back to the detected MIME type. The base name is
-     * sanitized to `[A-Za-z0-9._-]`, so passing `$name` is the reliable way to control the stored file name.
+     * The extension follows the MIME type detected from the content: the client extension is kept only when it is
+     * registered for that type, so a polyglot such as `avatar.php` holding GIF data is stored as `.gif`. The base name
+     * is sanitized to `[A-Za-z0-9_-]`, so passing `$name` is the reliable way to control the stored file name.
      *
      * @param EncodedFile $file File to write.
      * @param string|null $name Base name without extension, or `null` to derive it from the client file name.
@@ -49,35 +59,17 @@ final readonly class FileSaver
      */
     public function save(EncodedFile $file, string|null $name = null): string
     {
-        $directory = $this->resolveDirectory();
+        $path = self::path($this->resolveDirectory(), self::baseName($file, $name), self::extension($file));
 
-        $baseName = self::sanitize($name ?? pathinfo($file->name, PATHINFO_FILENAME));
-
-        $baseName = $baseName === '' ? 'file' : $baseName;
-
-        $extension = self::sanitize($file->getExtension());
-
-        if ($extension === '') {
-            $extension = self::extensionFromMimeType($file->getMimeType());
-        }
-
-        $path = $directory . DIRECTORY_SEPARATOR . $baseName . ($extension === '' ? '' : ".{$extension}");
-
-        if (@file_put_contents($path, $file->getData(), LOCK_EX) === false) {
-            throw new RuntimeException(
-                Message::FILE_WRITE_FAILED->getMessage($path),
-            );
-        }
-
-        @chmod($path, $this->fileMode);
-
-        return $path;
+        return $this->write($file, $path);
     }
 
     /**
      * Writes every file and returns their absolute paths.
      *
-     * When `$name` is given, the first file keeps it and the following ones receive a numeric suffix.
+     * When `$name` is given, the first file keeps it and the following ones receive a numeric suffix. Files that
+     * would share a path within the batch, such as two uploads with the same client name, receive a `-1`, `-2`, ...
+     * suffix instead of overwriting each other.
      *
      * @param iterable<EncodedFile> $files Files to write.
      * @param string|null $name Base name without extension, or `null` to derive it from each client file name.
@@ -88,29 +80,54 @@ final readonly class FileSaver
      */
     public function saveAll(iterable $files, string|null $name = null): array
     {
+        $directory = $this->resolveDirectory();
+
         $paths = [];
 
         foreach (array_values([...$files]) as $index => $file) {
-            $paths[] = $this->save($file, $name === null || $index === 0 ? $name : "{$name}-{$index}");
+            $baseName = self::baseName($file, $name === null || $index === 0 ? $name : "{$name}-{$index}");
+            $extension = self::extension($file);
+            $path = self::path($directory, $baseName, $extension);
+
+            for ($suffix = 1; in_array($path, $paths, true); $suffix++) {
+                $path = self::path($directory, "{$baseName}-{$suffix}", $extension);
+            }
+
+            $paths[] = $this->write($file, $path);
         }
 
         return $paths;
     }
 
-    private static function extensionFromMimeType(string $mimeType): string
+    private static function baseName(EncodedFile $file, string|null $name): string
     {
-        $known = [
-            'image/jpeg' => 'jpg',
-            'text/plain' => 'txt',
-        ];
+        $baseName = self::sanitize($name ?? pathinfo($file->name, PATHINFO_FILENAME));
 
-        if (isset($known[$mimeType])) {
-            return $known[$mimeType];
+        return $baseName === '' ? 'file' : $baseName;
+    }
+
+    /**
+     * Returns the client extension when it is registered for the detected MIME type, otherwise the preferred extension
+     * of that type, or an empty string for unmapped types.
+     */
+    private static function extension(EncodedFile $file): string
+    {
+        $mimeType = $file->getMimeType();
+
+        $extensions = FileHelper::getExtensionsByMimeType($mimeType);
+
+        if (in_array($file->getExtension(), $extensions, true)) {
+            return $file->getExtension();
         }
 
-        $extension = FileHelper::getExtensionsByMimeType($mimeType)[0] ?? null;
+        $extension = self::MIME_EXTENSIONS[$mimeType] ?? $extensions[0] ?? null;
 
         return is_string($extension) ? $extension : '';
+    }
+
+    private static function path(string $directory, string $baseName, string $extension): string
+    {
+        return $directory . DIRECTORY_SEPARATOR . $baseName . ($extension === '' ? '' : ".{$extension}");
     }
 
     /**
@@ -134,13 +151,30 @@ final readonly class FileSaver
     }
 
     /**
-     * Keeps `[A-Za-z0-9._-]`, collapsing other characters to a dash and trimming leading dots and dashes.
+     * Keeps `[A-Za-z0-9_-]`, collapsing other characters, dots included, to a dash and trimming dashes, so the base
+     * name cannot carry a second extension.
      */
     private static function sanitize(string $value): string
     {
-        $value = preg_replace('/[^A-Za-z0-9._-]+/', '-', $value) ?? '';
+        $value = preg_replace('/[^A-Za-z0-9_-]+/', '-', $value) ?? '';
         $value = preg_replace('/-{2,}/', '-', $value) ?? '';
 
-        return trim($value, '-.');
+        return trim($value, '-');
+    }
+
+    /**
+     * @throws RuntimeException if the file cannot be written.
+     */
+    private function write(EncodedFile $file, string $path): string
+    {
+        if (@file_put_contents($path, $file->getData(), LOCK_EX) === false) {
+            throw new RuntimeException(
+                Message::FILE_WRITE_FAILED->getMessage($path),
+            );
+        }
+
+        @chmod($path, $this->fileMode);
+
+        return $path;
     }
 }

@@ -118,7 +118,7 @@ application message source for the category.
 | Class                            | Purpose                                                                   |
 | -------------------------------- | ------------------------------------------------------------------------- |
 | `file\EncodedFile`               | Decodes File Encode payloads and exposes name, type, bytes, and metadata. |
-| `file\FileSaver`                 | Writes files with sanitized names into a directory or alias.              |
+| `file\FileSaver`                 | Writes files with sanitized names and content-derived extensions.         |
 | `file\ImageCropper`              | Applies `metadata.crop.rect` with GD, honoring EXIF orientation.          |
 | `validator\EncodedFileValidator` | Validates extensions, MIME types, sizes, and file count on the server.    |
 

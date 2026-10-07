@@ -36,6 +36,7 @@ use const DIRECTORY_SEPARATOR;
 #[Group('file')]
 final class FileSaverTest extends TestCase
 {
+    private const string GIF = "GIF89a\x01\x00\x01\x00\x00\x00\x00;";
     private const string PNG = "\x89PNG\r\n\x1a\n" . "\0\0\0\rIHDR\0\0\0\x01\0\0\0\x01\x08\x06\0\0\0\x1f\x15\xc4\x89";
 
     public function testSaveAllSuffixesCustomBaseName(): void
@@ -44,7 +45,7 @@ final class FileSaverTest extends TestCase
 
         $saver = new FileSaver(self::RUNTIME_PATH . '/uploads');
 
-        $files = [self::file('a.jpg', 'a'), self::file('b.png', 'b'), self::file('c.gif', 'c')];
+        $files = [self::file('a.jpg', self::jpeg()), self::file('b.png', self::PNG), self::file('c.gif', self::GIF)];
 
         $generator = static function () use ($files): Generator {
             yield 'first' => $files[0];
@@ -64,6 +65,26 @@ final class FileSaverTest extends TestCase
             ['a.jpg', 'b.png', 'c.gif'],
             array_map(basename(...), $original),
             'Client names kept.',
+        );
+    }
+
+    public function testSaveAllSuffixesDuplicatePaths(): void
+    {
+        $this->mockWebApplication();
+
+        $paths = (new FileSaver(self::RUNTIME_PATH . '/uploads/duplicates'))->saveAll(
+            [self::file('photo.txt', 'first'), self::file('photo.txt', 'second'), self::file('photo-1.txt', 'third')],
+        );
+
+        self::assertSame(
+            ['photo.txt', 'photo-1.txt', 'photo-1-1.txt'],
+            array_map(basename(...), $paths),
+            'Colliding paths must receive a free suffix.',
+        );
+        self::assertSame(
+            ['first', 'second', 'third'],
+            array_map(file_get_contents(...), $paths),
+            'No file in the batch may be overwritten.',
         );
     }
 
@@ -105,7 +126,7 @@ final class FileSaverTest extends TestCase
 
         Yii::setAlias('@uploads', self::RUNTIME_PATH . '/uploads');
 
-        $path = (new FileSaver('@uploads/avatars'))->save(self::file('My Photo (1).PNG', 'content'));
+        $path = (new FileSaver('@uploads/avatars'))->save(self::file('My Photo (1).PNG', self::PNG));
 
         self::assertSame(
             self::RUNTIME_PATH . '/uploads/avatars' . DIRECTORY_SEPARATOR . 'My-Photo-1.png',
@@ -113,9 +134,32 @@ final class FileSaverTest extends TestCase
             'Path must be sanitized.',
         );
         self::assertSame(
-            'content',
+            self::PNG,
             file_get_contents($path),
             'Content must be written.',
+        );
+    }
+
+    public function testSaveDerivesExtensionFromContentForSpoofedClientExtension(): void
+    {
+        $this->mockWebApplication();
+
+        $saver = new FileSaver(self::RUNTIME_PATH . '/uploads');
+
+        $polyglot = self::GIF . '<?php echo 1; ?>';
+
+        $named = $saver->save(self::file('avatar.php', $polyglot), 'user-5');
+        $derived = $saver->save(self::file('shell.php.jpg', $polyglot));
+
+        self::assertSame(
+            'user-5.gif',
+            basename($named),
+            'Extension must come from the detected MIME type.',
+        );
+        self::assertSame(
+            'shell-php.gif',
+            basename($derived),
+            'Base name must not carry a second extension.',
         );
     }
 
@@ -174,6 +218,19 @@ final class FileSaverTest extends TestCase
         );
     }
 
+    public function testSaveKeepsClientExtensionRegisteredForContent(): void
+    {
+        $this->mockWebApplication();
+
+        $path = (new FileSaver(self::RUNTIME_PATH . '/uploads'))->save(self::file('photo.JPEG', self::jpeg()));
+
+        self::assertSame(
+            'photo.jpeg',
+            basename($path),
+            'Registered client extension must be kept in lowercase.',
+        );
+    }
+
     public function testSaveMapsJpegAndPngExtensionsFromContent(): void
     {
         $this->mockWebApplication();
@@ -199,7 +256,7 @@ final class FileSaverTest extends TestCase
     {
         $this->mockWebApplication();
 
-        $path = (new FileSaver(self::RUNTIME_PATH . '/uploads'))->save(self::file('a.jpg', 'x'), 'user/42 avatar');
+        $path = (new FileSaver(self::RUNTIME_PATH . '/uploads'))->save(self::file('a.jpg', self::jpeg()), 'user/42 avatar');
 
         self::assertSame(
             'user-42-avatar.jpg',
@@ -262,7 +319,7 @@ final class FileSaverTest extends TestCase
             Message::FILE_WRITE_FAILED->getMessage(self::RUNTIME_PATH . '/uploads' . DIRECTORY_SEPARATOR . 'a.txt'),
         );
 
-        (new FileSaver(self::RUNTIME_PATH . '/uploads'))->save(self::file('a.txt', 'a'));
+        (new FileSaver(self::RUNTIME_PATH . '/uploads'))->save(self::file('a.txt', 'plain text'));
     }
 
     private static function file(string $name, string $content): EncodedFile

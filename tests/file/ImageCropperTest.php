@@ -231,6 +231,16 @@ final class ImageCropperTest extends TestCase
             $cropped->getMimeType(),
             'Unsupported encoders must fall back to PNG.',
         );
+        self::assertSame(
+            'image/png',
+            $cropped->type,
+            'Type must describe the PNG bytes.',
+        );
+        self::assertSame(
+            'image.png',
+            $cropped->name,
+            'Extension must describe the PNG bytes.',
+        );
     }
 
     public function testCropIgnoresJpegWithoutExif(): void
@@ -405,6 +415,33 @@ final class ImageCropperTest extends TestCase
             6,
             2,
             'Orientation 6 must rotate clockwise.',
+        );
+    }
+
+    public function testCropRenamesOnlyExtensionsThatDoNotMatchOutput(): void
+    {
+        $cropper = new ImageCropper();
+
+        $mismatched = $cropper->crop(
+            EncodedFile::fromArray(
+                [
+                    'name' => 'photo.jpg',
+                    'data' => base64_encode(self::encode('png')),
+                    'metadata' => ['crop' => ['rect' => self::fullRect()]],
+                ],
+            ),
+        );
+        $matched = $cropper->crop(self::image('jpeg', self::fullRect()));
+
+        self::assertSame(
+            'photo.png',
+            $mismatched->name,
+            'Extension must follow the detected content.',
+        );
+        self::assertSame(
+            'image.jpeg',
+            $matched->name,
+            'Registered extension must be preserved.',
         );
     }
 
