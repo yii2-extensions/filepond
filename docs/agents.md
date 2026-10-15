@@ -32,11 +32,11 @@ root. Install the skill explicitly. Guides excluded from Composer archives remai
 
 ## Paths and activation
 
-| Client | Project path | Explicit activation |
-| --- | --- | --- |
-| [Claude Code](https://code.claude.com/docs/en/skills) | `.claude/skills/yii2-filepond-uploads/SKILL.md` | `/yii2-filepond-uploads` |
-| [Codex](https://learn.chatgpt.com/docs/build-skills) | `.agents/skills/yii2-filepond-uploads/SKILL.md` | `$yii2-filepond-uploads` or the skill picker |
-| [OpenCode](https://opencode.ai/docs/skills/) | `.opencode/skills/yii2-filepond-uploads/SKILL.md`, or `.agents/skills/` | Ask it to load `yii2-filepond-uploads` through its skill tool |
+| Client                                                | Project path                                                            | Explicit activation                                           |
+| ----------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------- |
+| [Claude Code](https://code.claude.com/docs/en/skills) | `.claude/skills/yii2-filepond-uploads/SKILL.md`                         | `/yii2-filepond-uploads`                                      |
+| [Codex](https://learn.chatgpt.com/docs/build-skills)  | `.agents/skills/yii2-filepond-uploads/SKILL.md`                         | `$yii2-filepond-uploads` or the skill picker                  |
+| [OpenCode](https://opencode.ai/docs/skills/)          | `.opencode/skills/yii2-filepond-uploads/SKILL.md`, or `.agents/skills/` | Ask it to load `yii2-filepond-uploads` through its skill tool |
 
 The verified `skills` 1.7.2 installer uses `.agents/skills/` for Codex and OpenCode, and `.claude/skills/` for Claude.
 For manual installation, copy or link the complete skill directory, retaining `<name>/SKILL.md`. Avoid separately
@@ -50,10 +50,8 @@ handles the two aliases; the installer needs only its `.agents/skills/` installa
 
 1. **Installation:** the directory and frontmatter exist in the chosen client path.
 2. **Discovery:** open a fresh client session at the application root and check its skill list or picker.
-3. **Activation:** invoke the skill and verify the client loaded its body. Automatic selection is model-dependent;
-   reading `SKILL.md` manually is separate evidence.
-4. **Selective consultation:** use the relevant local guide, or the skill's direct published Markdown links, rather
-   than loading the entire documentation index.
+3. **Activation:** invoke the skill and verify the client loaded its body. Automatic selection is model-dependent; reading `SKILL.md` manually is separate evidence.
+4. **Selective consultation:** use the relevant local guide, or the skill's direct published Markdown links, rather than loading the entire documentation index.
 5. **Functional result:** test the generated form, effective plugins, invalid-input rejection, and validated storage.
 
 `--list` verifies the installer's discovery only; it does not run Claude, Codex, or OpenCode. Application instructions

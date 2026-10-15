@@ -2,7 +2,7 @@
 
 /** @type {import("@stryker-mutator/api/core").PartialStrykerOptions} */
 const config = {
-    ignorePatterns: ['/internal', '/reports', '/runtime', '/vendor'],
+    ignorePatterns: ['/.agents', '/.claude', '/internal', '/reports', '/runtime', '/skills', '/vendor'],
     mutate: ['src/asset/cropper/filepond-cropper.js', 'src/asset/widget/filepond-widget.js'],
     testRunner: 'vitest',
     vitest: {
