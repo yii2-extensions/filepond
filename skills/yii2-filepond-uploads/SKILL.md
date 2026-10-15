@@ -28,6 +28,18 @@ the relevant type/member from <https://yii2-framework.github.io/docs/reference/f
 <https://yii2-framework.github.io/docs/llms.txt> only when the needed page is unknown. Do not infer a signature from
 another FilePond wrapper or copy a full API catalogue into the task.
 
+## Install consumer assets
+
+Use the [installation guide](https://yii2-framework.github.io/docs/extensions/filepond/installation/index.md) for
+Foxy's native PHP setup, requirements, and lockfiles. The application must require and authorize Foxy and select
+its own manager; the extension's manager setting does not propagate to consumers.
+
+Native mode serves this extension's prebuilt assets without Node.js, but cannot run lifecycle scripts or provide
+executable links. Preserve a JavaScript manager when the application's build needs those features. Native mode
+owns its install directory; do not share it with another installer. Verify `@npm` against the actual install path
+in both Yii2 versions; `@app/node_modules` assumes `basePath` is the Composer root and default frontend paths.
+Keep npm for FilePond package development with Vitest, Stryker, and esbuild.
+
 ## Choose the widget and effective options
 
 - Use `FilePond::widget(['name' => ...])` for a plain input, or the application's active field with `FilePond::class`.
@@ -38,8 +50,8 @@ another FilePond wrapper or copy a full API catalogue into the task.
   `allowImageEdit` loads Cropper.js and its adapter; configure `cropper` only while that option is effectively enabled.
 - For an editor that opens when adding an image, use `config['imageEditInstantEdit']`. Decide whether the saved image
   uses client `allowImageTransform` or server `file\ImageCropper`; a preview alone does not transform uploaded bytes.
-- For Yii2 `2.0.x`, check that `@npm` resolves to the application `node_modules`. Preserve application bundle
-  overrides; setting widget `cdn` does not replace an already configured delivery mode.
+- Preserve application bundle overrides; setting widget `cdn` does not replace an already configured delivery
+  mode. CDN delivery still reads the installed package manifests under `@npm` to pin versions.
 
 ## Receive, validate, and save
 

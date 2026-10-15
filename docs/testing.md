@@ -3,6 +3,11 @@
 This package provides a consistent set of [Composer](https://getcomposer.org/) scripts for local validation, plus
 [npm](https://www.npmjs.com/) scripts for the JavaScript runtime and Cropper.js adapter.
 
+These are package development checks. Keep the repository's Foxy manager set to `npm` and use its Node.js toolchain
+for Vitest, Stryker, and esbuild. Applications consuming the published extension can install its ready-to-serve
+assets with Foxy's native PHP manager; see [installation](installation.md). Native installation does not replace
+this development toolchain.
+
 Tool references:
 
 - [Composer Require Checker](https://github.com/maglnet/ComposerRequireChecker) for dependency definition checks.
