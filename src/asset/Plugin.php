@@ -32,26 +32,60 @@ use function strtolower;
  */
 enum Plugin: string
 {
+    /**
+     * File Encode plugin, enabled by `allowFileEncode`: submits files as base64 JSON payloads.
+     */
     case FILE_ENCODE = 'FilePondPluginFileEncode';
 
+    /**
+     * File Poster plugin, enabled by `allowFilePoster`: renders `metadata.poster` images inside items.
+     */
     case FILE_POSTER = 'FilePondPluginFilePoster';
 
+    /**
+     * File Rename plugin, enabled by `allowFileRename`: renames files through `fileRenameFunction`.
+     */
     case FILE_RENAME = 'FilePondPluginFileRename';
 
+    /**
+     * File Validate Size plugin, enabled by `allowFileSizeValidation`: validates file sizes on the client.
+     */
     case FILE_VALIDATE_SIZE = 'FilePondPluginFileValidateSize';
 
+    /**
+     * File Validate Type plugin, enabled by `allowFileTypeValidation`: validates file types on the client.
+     */
     case FILE_VALIDATE_TYPE = 'FilePondPluginFileValidateType';
 
+    /**
+     * Image Crop plugin, enabled by `allowImageCrop`: crops previews to `imageCropAspectRatio`.
+     */
     case IMAGE_CROP = 'FilePondPluginImageCrop';
 
+    /**
+     * Image Edit plugin, enabled by `allowImageEdit`: opens the Cropper.js editor.
+     */
     case IMAGE_EDIT = 'FilePondPluginImageEdit';
 
+    /**
+     * Image EXIF Orientation plugin, enabled by `allowImageExifOrientation`: corrects orientation from EXIF data.
+     */
     case IMAGE_EXIF_ORIENTATION = 'FilePondPluginImageExifOrientation';
 
+    /**
+     * Image Preview plugin, enabled by `allowImagePreview`: renders image previews.
+     */
     case IMAGE_PREVIEW = 'FilePondPluginImagePreview';
 
+    /**
+     * Image Transform plugin, enabled by `allowImageTransform`: applies crop, resize, and output transforms before
+     * submission.
+     */
     case IMAGE_TRANSFORM = 'FilePondPluginImageTransform';
 
+    /**
+     * PDF Preview plugin, enabled by `allowPdfPreview`: renders PDF previews.
+     */
     case PDF_PREVIEW = 'FilePondPluginPdfPreview';
 
     /**

@@ -20,11 +20,12 @@ use function rtrim;
 use function str_replace;
 
 /**
- * Provides local or CDN delivery for asset bundles backed by an npm package installed through Asset Packagist.
+ * Provides local or CDN delivery for asset bundles backed by an npm package installed under the `@npm` alias.
  *
  * In local mode the bundle publishes the package `dist` files from the `@npm` alias. In CDN mode it links the same
- * files from {@see $cdnUrl}, pinned to the version installed by Composer, so both delivery modes always serve the
- * same release.
+ * files from {@see $cdnUrl}, pinned to the version read from the installed `package.json`, so both delivery modes
+ * always serve the same release. The delivery mode is set through the asset manager `bundles` configuration or
+ * through {@see registerWith()}.
  */
 abstract class AbstractNpmAsset extends AssetBundle
 {

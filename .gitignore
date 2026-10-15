@@ -1,6 +1,9 @@
 # AI agents (if present)
 .codex
-.claude
+.claude/*
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/yii2-filepond-uploads
 
 # codecoverage (if present)
 code_coverage
