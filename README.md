@@ -46,8 +46,8 @@ The widget initializes FilePond without jQuery and loads only enabled plugin ass
 
 ### Installation
 
-Requires PHP 8.3+, `fileinfo`, and Yii2 `2.0.55` or `22.x`. For a PHP application, Foxy 0.4's native manager
-installs the frontend assets without Node.js or npm; it requires PHP `zlib` and Composer 2.10.2+.
+Requires the `fileinfo` extension. Foxy 0.4's native manager installs the frontend assets without Node.js or npm;
+it requires PHP `zlib` and Composer 2.10.2+.
 
 Set the manager in the application's root `composer.json` before installing:
 
