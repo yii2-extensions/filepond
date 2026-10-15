@@ -3,6 +3,7 @@
     "scripts": {
         "build": "node tools/build-assets.mjs",
         "test:js": "vitest run --coverage",
+        "pretest:mutation": "node tools/patch-stryker-vitest5.mjs",
         "test:mutation": "stryker run"
     },
     "dependencies": {
