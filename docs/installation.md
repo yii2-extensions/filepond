@@ -72,28 +72,4 @@ installed in `node_modules`:
 echo \yii2\extensions\filepond\FilePond::widget(['name' => 'file', 'cdn' => true]);
 ```
 
-The delivery mode can also be fixed for the whole application through the asset manager:
-
-```php
-// config/web.php
-return [
-    'components' => [
-        'assetManager' => [
-            'bundles' => [
-                \yii2\extensions\filepond\asset\FilePondAsset::class => [
-                    'cdn' => true,
-                    'cdnUrl' => 'https://cdn.jsdelivr.net/npm',
-                ],
-            ],
-        ],
-    ],
-];
-```
-
-Bundles configured by the application keep their settings regardless of the widget `cdn` value.
-
-## Next steps
-
-- ⚙️ [Configuration Reference](configuration.md)
-- 💡 [Usage Examples](examples.md)
-- 🧪 [Testing Guide](testing.md)
+For application-wide CDN settings and precedence, see [asset delivery](configuration.md#asset-delivery).

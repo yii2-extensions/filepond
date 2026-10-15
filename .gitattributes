@@ -26,6 +26,8 @@
 /src/asset/**/*.min.js  linguist-generated=true -diff
 
 # Exclude files from the archive
+/.agents                        export-ignore
+/.claude                        export-ignore
 /.editorconfig                  export-ignore
 /.gitattributes                 export-ignore
 /.github                        export-ignore

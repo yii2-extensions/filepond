@@ -28,8 +28,11 @@ use function preg_split;
 /**
  * Renders a FilePond file input with plugin management, localized labels, and optional Cropper.js image editing.
  *
- * Plugins and their asset bundles are registered from the `allow*` flags. Every other FilePond option is passed
- * through {@see $config}, where JavaScript callbacks are expressed as {@see JsExpression}.
+ * Typed properties map to the FilePond options of the same name; `null` values and empty arrays are omitted. Every
+ * other FilePond option is passed through {@see $config}, where JavaScript callbacks are expressed as
+ * {@see JsExpression}. Options mapped by {@see Plugin::option()} register their plugin and asset bundle when `true`
+ * in the effective options; disabled plugins load nothing. Core options such as {@see $allowMultiple} do not register
+ * a plugin.
  *
  * @see https://pqina.nl/filepond/docs/api/instance/properties/
  */
@@ -64,11 +67,16 @@ final class FilePond extends InputWidget
      */
     public bool $allowFileTypeValidation = true;
     /**
-     * Whether to crop image previews to {@see}.
+     * Whether to crop image previews to {@see $imageCropAspectRatio}.
      */
     public bool $allowImageCrop = false;
     /**
      * Whether to open the Cropper.js editor for image items.
+     *
+     * The widget registers {@see CropperAsset} and {@see FilePondCropperAsset}, and sets the FilePond `imageEditEditor`
+     * option to `yii2FilePond.cropper.createEditor()` with the {@see $cropper} options unless {@see $config} sets it.
+     * The editor confirms a `crop` metadata object in source image pixels, which the Image Transform plugin applies on
+     * the client and {@see \yii2\extensions\filepond\file\ImageCropper} applies on the server.
      */
     public bool $allowImageEdit = false;
     /**
@@ -100,7 +108,16 @@ final class FilePond extends InputWidget
      */
     public array $config = [];
     /**
-     * @var array<string, mixed> Cropper.js editor options: `aspectRatio`, `aspectRatios`, `labels`, and `options`.
+     * Cropper.js editor options; requires {@see $allowImageEdit}.
+     *
+     * - `aspectRatio`: initial ratio as `width:height`, a number, or `null`/`free` for any selection; defaults to
+     *   {@see $imageCropAspectRatio}.
+     * - `aspectRatios`: preset buttons; defaults to `['free', '1:1', '16:9', '4:3', '3:2']`, where `free` renders the
+     *   translated label.
+     * - `labels`: texts replacing the translated `title`, `apply`, `cancel`, `reset`, `zoomIn`, `zoomOut`, and `free`.
+     * - `options`: options passed to the Cropper.js constructor, such as `template` or `container`.
+     *
+     * @var array<string, mixed>
      */
     public array $cropper = [];
     /**

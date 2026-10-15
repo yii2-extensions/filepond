@@ -30,6 +30,9 @@
     <em>Cropper.js image editing, previews, client and server validation, no jQuery</em>
 </p>
 
+File uploads with image previews, a Cropper.js editor, and server-side validation and storage helpers.
+The widget initializes FilePond without jQuery and loads only enabled plugin assets.
+
 ![FilePond widget with the Cropper.js editor](docs/images/filepond.png)
 
 ## Features
@@ -43,62 +46,71 @@
 
 ### Installation
 
-Requires PHP 8.3 or newer and Yii2 `2.0.54` or `22.x`.
+Requires PHP 8.3+, `fileinfo`, and Yii2 `2.0.54` or `22.x`.
 
 ```bash
 composer config allow-plugins.php-forge/foxy true
 composer require php-forge/foxy:^0.3 yii2-extensions/filepond:^0.1
 ```
 
-Yii2 `2.0.x` applications must point the `@npm` alias to `@app/node_modules`; see the
-[installation guide](docs/installation.md).
+Foxy installs FilePond, its plugins, and Cropper.js in the application's `node_modules` directory. Yii2 `2.0.x`
+applications must set `'aliases' => ['@npm' => '@app/node_modules']` in their configuration. See
+[installation](docs/installation.md) for bootstrap registration and asset delivery.
 
 ### Basic usage
+
+Place this in a Yii view, select a raster image, and edit it with a fixed square selection:
 
 ```php
 use yii2\extensions\filepond\FilePond;
 
-echo $form->field($model, 'avatar')->widget(
-    FilePond::class,
+echo FilePond::widget(
     [
+        'name' => 'avatar',
         'acceptedFileTypes' => ['image/jpeg', 'image/png', 'image/webp'],
         'allowImageEdit' => true,
         'allowImageTransform' => true,
         'imageCropAspectRatio' => '1:1',
+        'cropper' => ['aspectRatios' => ['1:1']],
         'maxFileSize' => '2MB',
+        'config' => ['imageEditInstantEdit' => true],
     ],
 );
 ```
 
-```php
-use yii2\extensions\filepond\file\{EncodedFile, FileSaver};
-use yii2\extensions\filepond\validator\EncodedFileValidator;
-
-// Model rules.
-[
-    ['avatar'],
-    EncodedFileValidator::class,
-    'mimeTypes' => ['image/jpeg', 'image/png', 'image/webp'],
-    'maxSize' => 2 * 1024 * 1024,
-];
-
-// Controller.
-foreach (EncodedFile::fromInput($model->avatar) as $file) {
-    (new FileSaver('@webroot/uploads'))->save($file, "user-{$model->id}");
-}
-```
-
-List raster MIME types explicitly for files stored beneath the web root: `image/*` also matches `image/svg+xml`,
-and an SVG served from your origin can run scripts.
+The editor opens when an image is added and offers only the `1:1` ratio preset. Image Transform applies the
+confirmed crop before form submission.
+Previewing a crop alone does not change the uploaded bytes. To receive, validate, and store the image, follow the
+[complete upload workflow](docs/uploads.md).
 
 ## Documentation
 
-For detailed configuration options and advanced usage.
+- 📚 [Installation Guide](docs/installation.md): requirements, npm alias, translations, and assets.
+- ⚙️ [Configuration Guide](docs/configuration.md): option precedence, plugins, and editor behavior.
+- 📤 [Upload Workflow](docs/uploads.md): active form, server validation, cropping, and storage.
+- 💡 [Usage Examples](docs/examples.md): runnable widgets and helper demonstrations.
+- 🧪 [Testing Guide](docs/testing.md): development checks.
 
-- 📚 [Installation Guide](docs/installation.md)
-- ⚙️ [Configuration Reference](docs/configuration.md)
-- 💡 [Usage Examples](docs/examples.md)
-- 🧪 [Testing Guide](docs/testing.md)
+The [documentation site](https://yii2-framework.github.io/docs/extensions/filepond/) renders the examples as live
+demos. Its [API reference](https://yii2-framework.github.io/docs/extensions/filepond/reference/) is generated from
+the PHPDoc in `src/`.
+
+Server validation inspects decoded bytes rather than trusting the browser's MIME type. List raster MIME types
+explicitly when serving uploads from your origin: `image/*` also accepts SVG. Encoded uploads increase request
+size; configure the application's request limits as explained in the upload guide.
+
+## AI assistance
+
+AI agents: read <https://yii2-framework.github.io/docs/llms.txt>, the index of the documentation site, and fetch the
+Markdown version of a page by appending `index.md` to its URL, for example
+<https://yii2-framework.github.io/docs/extensions/filepond/installation/index.md>. For the Yii conventions this
+package builds on, install the
+[`yii2-framework` agent skill](https://github.com/yii2-framework/docs/blob/main/skills/yii2-framework/SKILL.md) with
+`npx skills add yii2-framework/docs --skill yii2-framework`.
+
+- 🤖 [yii2-filepond-uploads skill](docs/agents.md): installation for Claude Code, Codex, and OpenCode.
+
+If the hosted sources are unavailable, use the repository guides and locally available skills.
 
 ## Package information
 

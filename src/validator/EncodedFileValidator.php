@@ -25,7 +25,8 @@ use function trim;
  * Validates FilePond File Encode payloads by inspecting the decoded content on the server.
  *
  * Extensions are checked against the client file name, MIME types against the bytes through `finfo`, and sizes
- * against the decoded content, so client-side plugin settings are never trusted.
+ * against the decoded content, so client-side plugin settings are never trusted. The inherited {@see $message}, shown
+ * for a malformed payload, defaults to a translated message of the `yii.filepond` category.
  */
 final class EncodedFileValidator extends Validator
 {
@@ -52,16 +53,16 @@ final class EncodedFileValidator extends Validator
      */
     public int|null $minSize = null;
     /**
-     * Error message for files larger than {@see}. Supports `{file}` and `{formattedLimit}`;
+     * Error message for files larger than {@see $maxSize}. Supports `{file}` and `{formattedLimit}`;
      * empty for the Yii default.
      */
     public string $tooBig = '';
     /**
-     * Error message for more files than {@see}. Supports `{limit}`; empty for the Yii default.
+     * Error message for more files than {@see $maxFiles}. Supports `{limit}`; empty for the Yii default.
      */
     public string $tooMany = '';
     /**
-     * Error message for files smaller than {@see}. Supports `{file}` and `{formattedLimit}`;
+     * Error message for files smaller than {@see $minSize}. Supports `{file}` and `{formattedLimit}`;
      * empty for the Yii default.
      */
     public string $tooSmall = '';
