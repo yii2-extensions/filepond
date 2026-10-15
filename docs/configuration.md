@@ -64,8 +64,9 @@ return [
 ```
 
 Application bundle settings take precedence over the widget's `cdn` value. Bundles already registered keep their
-delivery mode. The package's own runtime and editor files are bundled with the extension; npm supplies the upstream
-FilePond and Cropper.js distributions.
+delivery mode. The package's own runtime and editor files are bundled with the extension. Foxy installs the upstream
+FilePond and Cropper.js distributions through its native PHP manager or the application's chosen JavaScript manager;
+see [installation](installation.md). The `@npm` alias names their install location regardless of the manager.
 
 ## Cropper.js editor
 

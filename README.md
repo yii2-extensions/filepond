@@ -46,16 +46,30 @@ The widget initializes FilePond without jQuery and loads only enabled plugin ass
 
 ### Installation
 
-Requires PHP 8.3+, `fileinfo`, and Yii2 `2.0.54` or `22.x`.
+Requires PHP 8.3+, `fileinfo`, and Yii2 `2.0.54` or `22.x`. For a PHP application, Foxy 0.4's native manager
+installs the frontend assets without Node.js or npm; it requires PHP `zlib` and Composer 2.10.2+.
+
+Set the manager in the application's root `composer.json` before installing:
+
+```json
+{
+  "config": {
+    "foxy": {
+      "manager": "native"
+    }
+  }
+}
+```
 
 ```bash
 composer config allow-plugins.php-forge/foxy true
-composer require php-forge/foxy:^0.3 yii2-extensions/filepond:^0.1
+composer require php-forge/foxy:^0.4 yii2-extensions/filepond:^0.1
 ```
 
-Foxy installs FilePond, its plugins, and Cropper.js in the application's `node_modules` directory. Yii2 `2.0.x`
-applications must set `'aliases' => ['@npm' => '@app/node_modules']` in their configuration. See
-[installation](docs/installation.md) for bootstrap registration and asset delivery.
+Foxy installs FilePond, its plugins, and Cropper.js in `node_modules` beside the application's `package.json`.
+Commit the generated `foxy.lock` with the application's Composer files. Point Yii's `@npm` alias at that directory;
+`@app/node_modules` is correct only when the application `basePath` is the Composer project root. See
+[installation](docs/installation.md) for alias configuration, existing npm projects, and asset delivery.
 
 ### Basic usage
 
@@ -85,7 +99,7 @@ Previewing a crop alone does not change the uploaded bytes. To receive, validate
 
 ## Documentation
 
-- 📚 [Installation Guide](docs/installation.md): requirements, npm alias, translations, and assets.
+- 📚 [Installation Guide](docs/installation.md): native Composer setup, asset paths, translations, and assets.
 - ⚙️ [Configuration Guide](docs/configuration.md): option precedence, plugins, and editor behavior.
 - 📤 [Upload Workflow](docs/uploads.md): active form, server validation, cropping, and storage.
 - 💡 [Usage Examples](docs/examples.md): runnable widgets and helper demonstrations.
