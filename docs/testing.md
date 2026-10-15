@@ -60,6 +60,14 @@ Run mutation testing for the JavaScript sources (minimum score 100%).
 npm run test:mutation
 ```
 
+The `pretest:mutation` npm hook temporarily adapts Stryker 10.0.0's test-name filtering to Vitest 5's
+[`>` separator](https://vitest.dev/guide/migration/#testnamepattern-matches-the-joined-full-name). It runs
+automatically with the command above, including after a clean `npm ci`. The versioned patch checks the installed
+runner version, Vitest major version, and both helper copies before changing anything; repeated runs are safe.
+Unexpected versions or helper content stop the run so dependency upgrades cannot silently keep a stale patch.
+Remove the hook and `tools/patch-stryker-vitest5.mjs` after upgrading to an official runner with verified Vitest 5
+filtering support. The patch changes only the installed test runner; coverage and mutation thresholds stay at 100%.
+
 ## Minified assets
 
 Regenerate the committed `*.min.js` and `*.min.css` files after editing `src/asset/widget` or `src/asset/cropper`.
