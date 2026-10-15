@@ -48,6 +48,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
             ArrayHelper::merge(
                 [
                     'id' => 'test-app',
+                    'aliases' => ['@npm' => dirname(__DIR__, 2) . '/node_modules'],
                     'basePath' => dirname(__DIR__, 2),
                     'bootstrap' => [Bootstrap::class],
                     'components' => [
