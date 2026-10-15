@@ -9,7 +9,7 @@ metadata:
 # Compose FilePond uploads in Yii2
 
 Use `yii2\extensions\filepond` for the widget and its server helpers. Match the application's installed package
-revision and form conventions. The package supports Yii2 `2.0.54` and `22.x`, and requires PHP 8.3 with `fileinfo`.
+revision and form conventions. The package supports Yii2 `2.0.55` and `22.x`, and requires PHP 8.3 with `fileinfo`.
 Adding this skill does not install the PHP or frontend dependencies.
 
 ## Read the relevant guide

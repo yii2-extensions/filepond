@@ -3,11 +3,22 @@
 ## Requirements
 
 - PHP 8.3 or later with the `fileinfo` extension.
-- Yii2 `2.0.54` or later, or the Yii2 `22.x` development line.
+- Yii2 `2.0.55` or later, or the Yii2 `22.x` development line.
 - Composer `2.10.2` or later.
 - [`php-forge/foxy`](https://github.com/php-forge/foxy) `^0.4` in the consuming application, with PHP `zlib` for its
   native manager. Node.js and a JavaScript package manager are optional for installing this extension's assets.
 - The `gd` extension when images are cropped on the server with `ImageCropper`.
+
+Yii2 `2.0.x` also needs its Bower asset packages. If the application's root `composer.json` does not already
+configure an asset repository, add Asset Packagist:
+
+```json
+{
+  "repositories": [{ "type": "composer", "url": "https://asset-packagist.org" }]
+}
+```
+
+This setting belongs to the application root; Composer does not load repository settings from dependencies.
 
 ## Install the extension
 
