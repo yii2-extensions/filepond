@@ -14,8 +14,16 @@ Adding this skill does not install the PHP or frontend dependencies.
 
 ## Read the relevant guide
 
-When the task supplies local Markdown, read that version first. In a package source checkout, its `docs/` contains
-the guides below. Otherwise fetch the published page Markdown directly:
+Resolve the installed path, version and `source.reference` (or usable `dist.reference`) from Composer's installed
+metadata (`composer show <package> --format=json` or the vendor directory's `composer/installed.json`). Compare
+`composer.lock`; it records the locked resolution, which may differ from `vendor/`. Identify a lock-only state
+when no package files are installed. Resolve relevant dependencies separately. Use repository docs/code at that reference or a verified matching tag,
+not a branch alias. For a checkout with uncommitted changes, its local files are authoritative; no SHA includes
+those changes. Use hosted pages, catalogs or bundled snapshots only when their source revision matches.
+
+Prefer matching supplied Markdown or checkout `docs/`. Otherwise fetch the pages below after checking their
+revision, or the corresponding files at the resolved reference in <https://github.com/yii2-extensions/filepond>.
+If guides are unavailable or offline, inspect local source/PHPDoc and the changelog, and report the gap.
 
 - Setup and asset resolution: <https://yii2-framework.github.io/docs/extensions/filepond/installation/index.md>.
 - Option precedence, plugins, and editor: <https://yii2-framework.github.io/docs/extensions/filepond/configuration/index.md>.
