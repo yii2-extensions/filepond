@@ -99,15 +99,14 @@ Previewing a crop alone does not change the uploaded bytes. To receive, validate
 
 ## Documentation
 
+Practical guides and runnable examples for uploads, plugins, and image
+editing.
+
 - 📚 [Installation Guide](docs/installation.md): native Composer setup, asset paths, translations, and assets.
 - ⚙️ [Configuration Guide](docs/configuration.md): option precedence, plugins, and editor behavior.
-- 📤 [Upload Workflow](docs/uploads.md): active form, server validation, cropping, and storage.
 - 💡 [Usage Examples](docs/examples.md): runnable widgets and helper demonstrations.
 - 🧪 [Testing Guide](docs/testing.md): development checks.
-
-The [documentation site](https://yii2-framework.github.io/docs/extensions/filepond/) renders the examples as live
-demos. Its [API reference](https://yii2-framework.github.io/docs/extensions/filepond/reference/) is generated from
-the PHPDoc in `src/`.
+- 📤 [Upload Workflow](docs/uploads.md): active form, server validation, cropping, and storage.
 
 Server validation inspects decoded bytes rather than trusting the browser's MIME type. List raster MIME types
 explicitly when serving uploads from your origin: `image/*` also accepts SVG. Encoded uploads increase request
@@ -115,12 +114,11 @@ size; configure the application's request limits as explained in the upload guid
 
 ## AI assistance
 
-AI agents: read <https://yii2-framework.github.io/docs/llms.txt>, the index of the documentation site, and fetch the
-Markdown version of a page by appending `index.md` to its URL, for example
-<https://yii2-framework.github.io/docs/extensions/filepond/installation/index.md>. For the Yii conventions this
-package builds on, install the
-[`yii2-framework` agent skill](https://github.com/yii2-framework/docs/blob/main/skills/yii2-framework/SKILL.md) with
-`npx skills add yii2-framework/docs --skill yii2-framework`.
+AI agents: use the repository guides and source for the installed revision.
+For a [documentation deployment](https://yii2-framework.github.io/docs/) with
+`llms.txt`, read that index first. When Markdown export is enabled, append
+`index.md` to a page URL. For Yii conventions, use the `yii2-framework` skill
+from a local framework documentation checkout.
 
 - 🤖 [yii2-filepond-uploads skill](docs/agents.md): installation for Claude Code, Codex, and OpenCode.
 

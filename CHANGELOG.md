@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - docs: document Foxy 0.4 native consumer installation, frontend locks, and asset paths while retaining npm for package development.
 - fix: require Yii2 2.0.55 or later to exclude CVE-2026-39850 while retaining Yii 22 support.
 - chore: remove `README.md` requirements already shown in package badges.
+- docs: update documentation with practical guides and examples for uploads, plugins, and image editing.
 
 ## 0.1.0 October 7, 2026
 
