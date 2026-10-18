@@ -39,6 +39,29 @@ final class FileSaverTest extends TestCase
     private const string GIF = "GIF89a\x01\x00\x01\x00\x00\x00\x00;";
     private const string PNG = "\x89PNG\r\n\x1a\n" . "\0\0\0\rIHDR\0\0\0\x01\0\0\0\x01\x08\x06\0\0\0\x1f\x15\xc4\x89";
 
+    public function testSaveAllKeepsRepeatedStringKeys(): void
+    {
+        $this->mockWebApplication();
+
+        $files = static function (): Generator {
+            yield 'upload' => self::file('first.txt', 'first');
+            yield 'upload' => self::file('second.txt', 'second');
+        };
+
+        $paths = (new FileSaver(self::RUNTIME_PATH . '/uploads'))->saveAll($files(), 'batch');
+
+        self::assertSame(
+            ['batch.txt', 'batch-1.txt'],
+            array_map(basename(...), $paths),
+            'Every yielded value must be saved with a sequential suffix.',
+        );
+        self::assertSame(
+            ['first', 'second'],
+            array_map(file_get_contents(...), $paths),
+            'Repeated iterable keys must not discard uploads.',
+        );
+    }
+
     public function testSaveAllSuffixesCustomBaseName(): void
     {
         $this->mockWebApplication();

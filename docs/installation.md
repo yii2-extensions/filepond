@@ -39,7 +39,7 @@ Authorize and require Foxy in that application:
 
 ```bash
 composer config allow-plugins.php-forge/foxy true
-composer require php-forge/foxy:^0.4 yii2-extensions/filepond:^0.1
+composer require php-forge/foxy:^0.4 yii2-extensions/filepond:^0.2
 ```
 
 The extension declares `extra.foxy=true`, so Foxy reads its runtime frontend requirements, merges them into the

@@ -94,8 +94,9 @@ echo FilePond::widget(
 );
 ```
 
-The File Poster plugin renders the existing image inside the item, and `type: 'local'` keeps it from being
-re-submitted.
+The File Poster plugin renders the existing image inside the item. With `type: 'local'`, the form submits the
+`source` identifier (`logo.png` here) instead of new encoded bytes. Authorize and handle that identifier separately
+before encoded-upload validation; see [stored-image handling](uploads.md#multiple-files-and-stored-images).
 
 ## JavaScript callbacks and custom labels
 
@@ -220,19 +221,35 @@ $model->avatar = json_encode(
 );
 
 $saver = new FileSaver('@runtime/uploads/avatars');
-$cropper = new ImageCropper(quality: 85);
+$limits = Yii::$app->params['uploads'];
+$cropper = new ImageCropper(
+    maxPixels: $limits['maxPixels'],
+    maxDimension: $limits['maxDimension'],
+    maxInputBytes: $limits['maxInputBytes'],
+    quality: 85,
+);
 
-foreach (EncodedFile::fromInput($model->avatar) as $file) {
-    $path = $saver->save($cropper->crop($file), 'user-42');
+if ($model->validate(['avatar'])) {
+    try {
+        foreach (EncodedFile::fromInput($model->avatar) as $file) {
+            $path = $saver->save($cropper->crop($file), 'user-42');
 
-    [$width, $height] = getimagesize($path);
+            [$width, $height] = getimagesize($path);
 
-    echo basename($path), " ({$width}x{$height})";
+            echo basename($path), " ({$width}x{$height})";
+        }
+    } catch (\RuntimeException $exception) {
+        Yii::error($exception, __METHOD__);
+        $model->addError('avatar', 'The avatar could not be processed or stored.');
+    }
 }
 ```
 
-`ImageCropper::crop()` returns the file unchanged when no rectangle is present, rotates JPEG images by their EXIF
-orientation before cropping, and keeps PNG transparency.
+Configure the three positive `uploads` limits from the application's measured processing budget; see
+[server cropping](uploads.md#choose-where-to-crop) for the policy and worker-memory example. Source bytes, dimensions,
+and pixel counts are checked before decoding, including when the requested output crop is small.
+`ImageCropper::crop()` returns the file unchanged without decoding when no rectangle is present, rotates JPEG images
+by their EXIF orientation before cropping, and keeps PNG transparency.
 
 ### Storing every submitted file
 

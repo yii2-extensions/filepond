@@ -174,19 +174,50 @@ The form above enables Image Transform: the browser applies the confirmed crop, 
 saves those transformed bytes. Image Preview alone changes the thumbnail, not the submitted content.
 
 For server processing, set `allowImageTransform` to `false` in the form, keep `allowImageEdit` enabled, and apply
-`ImageCropper` to the validated original before saving:
+`ImageCropper` to the validated original before saving. Its required positive limits reject excessive input bytes,
+source dimensions, and source pixel count before GD decoding. There is no unlimited default.
+
+Configure the upload policy in the application's parameters. This example accepts at most 1,048,576 source pixels,
+no dimension above 2048, and the same 2,000,000-byte limit as the model:
+
+```php
+'uploads' => [
+    'maxPixels' => 1_048_576,
+    'maxDimension' => 2048,
+    'maxInputBytes' => 2_000_000,
+],
+```
 
 ```php
 use yii2\extensions\filepond\file\ImageCropper;
 
-// Inside the validated upload branch, before FileSaver::save().
-$file = (new ImageCropper(quality: 85))->crop($file);
+// Inside the upload-processing try block, before FileSaver::save().
+$limits = Yii::$app->params['uploads'];
+$file = (new ImageCropper(
+    maxPixels: $limits['maxPixels'],
+    maxDimension: $limits['maxDimension'],
+    maxInputBytes: $limits['maxInputBytes'],
+    quality: 85,
+))->crop($file);
 ```
+
+The example admits a 1024x1024 or 2048x512 original and rejects larger originals before decoding. It represents an
+avatar policy, not a universal memory limit. For example, a 256 MiB worker allocation could reserve 100 MiB for a
+measured application baseline, 16 MiB for byte buffers, 64 MiB for image processing, and 76 MiB of headroom. Confirm
+that allocation by profiling the complete application with its accepted formats, aspect ratios, EXIF rotations,
+full-size crops, and encoding. Retune the policy before accepting larger originals. Budget all concurrent workers
+within the deployment's available memory.
+
+Use process RSS or peak resident memory when profiling; native GD allocations may be absent from PHP's memory
+accounting. Enforce process or container memory limits separately when a failed image-processing worker must not
+exhaust the serving application. These predecode checks are not a hard limit on the whole process. Request and
+base64 body limits remain necessary before creating an `EncodedFile`.
 
 This requires `gd`. The editor supplies `metadata.crop.rect` in source-image pixels. The cropper intersects the
 rectangle with the image bounds and honors JPEG EXIF orientation when `exif` is available. It returns an unchanged
-file if no usable rectangle exists. If the application requires square output or fixed dimensions, enforce that
-requirement on the resulting image rather than relying on the preview or client metadata.
+file without decoding if no usable rectangle exists; this no-op does not validate the image. Limit or decode
+failures throw `RuntimeException`, handled by the upload-processing catch block. If the application requires square
+output or fixed dimensions, enforce that requirement on the resulting image rather than relying on client metadata.
 
 Do not apply the original crop rectangle again to bytes already transformed by the browser. If the application
 also limits the transformed output's size or format, validate those resulting bytes before saving.
@@ -199,9 +230,23 @@ entry remains an encoded payload. `maxSize` limits each decoded file, so enforce
 separately.
 
 To display an existing file, configure `files` with `type: 'local'` and a poster URL as shown in
-[the existing-image example](examples.md#showing-an-already-uploaded-image). The existing item is not resubmitted
-as a new encoded upload. Store and authorize its identifier on the server; an omitted upload does not itself mean
-the user requested deletion.
+[the existing-image example](examples.md#showing-an-already-uploaded-image). The form submits the item's `source`
+identifier, such as `logo.png`, rather than new encoded bytes. That identifier is not a valid File Encode payload.
+
+For an optional replacement form, omit `skipOnEmpty: false` and resolve the current stored identifier from the
+record the authenticated user is authorized to edit. After loading the request and before validation, convert only
+an exact match with that authorized identifier to `null`:
+
+```php
+// $currentAvatarId comes from the authorized record, never from the request.
+if ($currentAvatarId !== null && $model->avatar === $currentAvatarId) {
+    $model->avatar = null;
+}
+```
+
+Then validate normally and save only when `EncodedFile::fromInput()` returns a nonempty list. Other submitted values
+still go through the encoded validator; do not discard arbitrary non-JSON strings. An omitted upload or a retained
+stored identifier is not a deletion instruction. Handle deletion through a separate authorized application action.
 
 ## Request limits and delivery
 

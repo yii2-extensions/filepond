@@ -459,7 +459,7 @@ describe('filepond-cropper', () => {
                 'yii2FilePond: Cropper.js is not loaded; the image editor cannot open.',
             );
             expect(editor.oncancel, 'Editing must be cancelled.').toHaveBeenCalledOnce();
-            expect(editor.onclose, 'Nothing was opened.').not.toHaveBeenCalled();
+            expect(editor.onclose, 'Cancellation must complete the Image Edit close protocol.').toHaveBeenCalledOnce();
             expect(dialog, 'No dialog must be rendered.').toBeNull();
             expect(window.URL.createObjectURL, 'No object URL must be created.').not.toHaveBeenCalled();
         });

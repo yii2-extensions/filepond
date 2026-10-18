@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace yii2\extensions\filepond\tests\validator;
 
-use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\{Group, TestWith};
 use yii2\extensions\filepond\tests\support\stub\TestForm;
 use yii2\extensions\filepond\tests\support\TestCase;
 use yii2\extensions\filepond\validator\EncodedFileValidator;
@@ -134,6 +134,46 @@ final class EncodedFileValidatorTest extends TestCase
             'a.txt < 9 B (9)',
             $smallError,
             'Too small message must receive file and limits.',
+        );
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testHonorsConfiguredEmptyPredicate(bool $empty): void
+    {
+        $this->mockWebApplication();
+
+        $calls = 0;
+
+        $validator = new EncodedFileValidator(
+            [
+                'attributes' => ['avatar'],
+                'isEmpty' => static function (mixed $value) use (&$calls, $empty): bool {
+                    $calls++;
+
+                    self::assertNull(
+                        $value,
+                        'The predicate must receive the original attribute.',
+                    );
+
+                    return $empty;
+                },
+            ],
+        );
+
+        $model = new TestForm();
+
+        $validator->validateAttributes($model);
+
+        self::assertSame(
+            1,
+            $calls,
+            'The configured predicate must be consulted.',
+        );
+        self::assertSame(
+            !$empty,
+            $model->hasErrors('avatar'),
+            'Only a nonempty value must be validated.',
         );
     }
 

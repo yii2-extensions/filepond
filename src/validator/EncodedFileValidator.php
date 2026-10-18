@@ -141,6 +141,10 @@ final class EncodedFileValidator extends Validator
      */
     public function isEmpty($value): bool
     {
+        if ($this->isEmpty !== null) {
+            return parent::isEmpty($value);
+        }
+
         if (is_array($value)) {
             foreach ($value as $item) {
                 if ($item !== null && $item !== '') {

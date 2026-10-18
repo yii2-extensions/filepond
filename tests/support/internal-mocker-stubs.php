@@ -24,6 +24,11 @@ $stubs['fopen'] = [
     'arguments' => '$filename, $mode, $use_include_path, $context',
 ];
 
+$stubs['getimagesizefromstring'] = [
+    'signatureArguments' => 'string $string, &$image_info = null',
+    'arguments' => '$string, $image_info',
+];
+
 $stubs['imagecrop'] = [
     'signatureArguments' => '\GdImage $image, array $rectangle',
     'arguments' => '$image, $rectangle',

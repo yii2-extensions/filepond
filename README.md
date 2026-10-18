@@ -63,7 +63,7 @@ Set the manager in the application's root `composer.json` before installing:
 
 ```bash
 composer config allow-plugins.php-forge/foxy true
-composer require php-forge/foxy:^0.4 yii2-extensions/filepond:^0.1
+composer require php-forge/foxy:^0.4 yii2-extensions/filepond:^0.2
 ```
 
 Foxy installs FilePond, its plugins, and Cropper.js in `node_modules` beside the application's `package.json`.

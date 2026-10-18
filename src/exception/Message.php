@@ -70,11 +70,25 @@ enum Message: string
     case GD_EXTENSION_REQUIRED = "The 'gd' extension is required for server-side image cropping.";
 
     /**
+     * Error when source bytes exceed the processing budget before header parsing.
+     *
+     * Format: "Image '%s' exceeds the input byte limit of %d."
+     */
+    case IMAGE_BYTE_LIMIT_EXCEEDED = "Image '%s' exceeds the input byte limit of %d.";
+
+    /**
      * Error when image data cannot be decoded by GD.
      *
      * Format: "Unable to decode image data of file '%s'."
      */
     case IMAGE_DECODE_FAILED = "Unable to decode image data of file '%s'.";
+
+    /**
+     * Error when either source axis exceeds the processing budget.
+     *
+     * Format: "Image '%s' exceeds the source dimension limit of %d."
+     */
+    case IMAGE_DIMENSION_LIMIT_EXCEEDED = "Image '%s' exceeds the source dimension limit of %d.";
 
     /**
      * Error when a cropped image cannot be encoded to the requested MIME type.
@@ -84,12 +98,26 @@ enum Message: string
     case IMAGE_ENCODE_FAILED = "Unable to encode image data of file '%s' as '%s'.";
 
     /**
+     * Error when source area exceeds the processing budget before decoding.
+     *
+     * Format: "Image '%s' exceeds the source pixel limit of %d."
+     */
+    case IMAGE_PIXEL_LIMIT_EXCEEDED = "Image '%s' exceeds the source pixel limit of %d.";
+
+    /**
      * Error when a crop aspect ratio does not follow the `width:height` format.
      *
      * Format: "Crop aspect ratio must use the 'width:height' format with positive numbers; received '%s'."
      */
     case INVALID_CROP_ASPECT_RATIO = "Crop aspect ratio must use the 'width:height' format with positive numbers; "
         . "received '%s'.";
+
+    /**
+     * Error when a required image-processing budget is zero or negative.
+     *
+     * Format: "Image processing limit '%s' must be a positive integer."
+     */
+    case INVALID_IMAGE_PROCESSING_LIMIT = "Image processing limit '%s' must be a positive integer.";
 
     /**
      * Error when the version of an npm package cannot be read for CDN delivery.

@@ -11,6 +11,8 @@ use yii2\extensions\filepond\exception\Message;
 
 use function array_map;
 use function array_merge;
+use function array_unique;
+use function array_values;
 use function file_get_contents;
 use function is_array;
 use function is_string;
@@ -73,12 +75,14 @@ abstract class AbstractNpmAsset extends AssetBundle
      */
     public function init(): void
     {
-        $this->depends = static::dependencies();
+        $this->depends = array_values(array_unique([...static::dependencies(), ...$this->depends]));
 
         $this->minified ??= !YII_DEBUG;
 
-        $css = $this->distFiles($this->styles());
-        $js = $this->distFiles($this->scripts());
+        $styles = $this->styles();
+        $scripts = $this->scripts();
+        $css = $this->distFiles($styles, $this->minified);
+        $js = $this->distFiles($scripts, $this->minified);
 
         if ($this->cdn) {
             $baseUrl = rtrim($this->cdnUrl, '/') . '/' . $this->package() . '@' . $this->packageVersion() . '/';
@@ -89,7 +93,12 @@ abstract class AbstractNpmAsset extends AssetBundle
             $this->sourcePath = '@npm/' . $this->package();
             $this->css = $css;
             $this->js = $js;
-            $this->publishOptions['only'] ??= array_merge($css, $js);
+            $this->publishOptions['only'] ??= [
+                ...$this->distFiles($styles, false),
+                ...$this->distFiles($scripts, false),
+                ...$this->distFiles($styles, true),
+                ...$this->distFiles($scripts, true),
+            ];
         }
 
         parent::init();
@@ -126,13 +135,12 @@ abstract class AbstractNpmAsset extends AssetBundle
      * Resolves `dist` paths, selecting minified files when {@see $minified} is enabled.
      *
      * @param list<string> $files File names without the `.min` infix.
+     * @param bool $minified Whether to select the minified variant.
      *
      * @return list<string> Paths relative to the package root.
      */
-    private function distFiles(array $files): array
+    private function distFiles(array $files, bool $minified): array
     {
-        $minified = $this->minified === true;
-
         return array_map(
             static fn(string $file): string => 'dist/' . ($minified ? str_replace('.', '.min.', $file) : $file),
             $files,

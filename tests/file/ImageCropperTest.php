@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace yii2\extensions\filepond\tests\file;
 
 use GdImage;
-use PHPUnit\Framework\Attributes\{Group, RequiresOperatingSystem};
+use PHPUnit\Framework\Attributes\{Group, RequiresOperatingSystem, TestWith};
 use RuntimeException;
 use yii2\extensions\filepond\exception\Message;
 use yii2\extensions\filepond\file\{EncodedFile, ImageCropper};
@@ -65,7 +65,7 @@ final class ImageCropperTest extends TestCase
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testCropAppliesEachExifOrientation(): void
     {
-        $cropper = new ImageCropper();
+        $cropper = self::cropper();
 
         foreach (self::ORIENTATIONS as $orientation => [$width, $height, $red, $dark]) {
             MockerFunctions::override('exif_read_data', ['Orientation' => $orientation]);
@@ -99,7 +99,7 @@ final class ImageCropperTest extends TestCase
 
     public function testCropClampsNegativeOriginToImageBounds(): void
     {
-        $cropped = (new ImageCropper())->crop(self::png(['x' => -4, 'y' => -2, 'width' => 10, 'height' => 5]));
+        $cropped = (self::cropper())->crop(self::png(['x' => -4, 'y' => -2, 'width' => 10, 'height' => 5]));
 
         $image = self::decode($cropped);
 
@@ -123,7 +123,7 @@ final class ImageCropperTest extends TestCase
 
     public function testCropClampsRectangleBeforeImageToFirstPixel(): void
     {
-        $cropped = (new ImageCropper())->crop(self::png(['x' => -20, 'y' => -20, 'width' => 5, 'height' => 5]));
+        $cropped = (self::cropper())->crop(self::png(['x' => -20, 'y' => -20, 'width' => 5, 'height' => 5]));
 
         $image = self::decode($cropped);
 
@@ -141,7 +141,7 @@ final class ImageCropperTest extends TestCase
 
     public function testCropClampsRectanglePositionToImageBounds(): void
     {
-        $cropped = (new ImageCropper())->crop(self::png(['x' => 20, 'y' => 20, 'width' => 10, 'height' => 10]));
+        $cropped = (self::cropper())->crop(self::png(['x' => 20, 'y' => 20, 'width' => 10, 'height' => 10]));
 
         $image = self::decode($cropped);
 
@@ -164,7 +164,7 @@ final class ImageCropperTest extends TestCase
 
     public function testCropClampsRectangleSizeToImageBounds(): void
     {
-        $cropped = (new ImageCropper())->crop(self::png(['x' => 12, 'y' => 6, 'width' => 10, 'height' => 10]));
+        $cropped = (self::cropper())->crop(self::png(['x' => 12, 'y' => 6, 'width' => 10, 'height' => 10]));
 
         $image = self::decode($cropped);
 
@@ -182,7 +182,7 @@ final class ImageCropperTest extends TestCase
 
     public function testCropEncodesGifJpegAndWebp(): void
     {
-        $cropper = new ImageCropper(50);
+        $cropper = self::cropper(50);
 
         $rect = ['x' => 0, 'y' => 0, 'width' => 4, 'height' => 2];
 
@@ -224,7 +224,7 @@ final class ImageCropperTest extends TestCase
 
     public function testCropFallsBackToPngForUnknownTypes(): void
     {
-        $cropped = (new ImageCropper())->crop(self::image('bmp', ['x' => 0, 'y' => 0, 'width' => 1, 'height' => 1]));
+        $cropped = (self::cropper())->crop(self::image('bmp', ['x' => 0, 'y' => 0, 'width' => 1, 'height' => 1]));
 
         self::assertSame(
             'image/png',
@@ -245,7 +245,7 @@ final class ImageCropperTest extends TestCase
 
     public function testCropIgnoresJpegWithoutExif(): void
     {
-        $image = self::decode((new ImageCropper())->crop(self::image('jpeg', self::fullRect())));
+        $image = self::decode((self::cropper())->crop(self::image('jpeg', self::fullRect())));
 
         self::assertSame(
             self::WIDTH,
@@ -262,7 +262,7 @@ final class ImageCropperTest extends TestCase
 
     public function testCropIgnoresNonIntegerOrientation(): void
     {
-        $cropper = new ImageCropper();
+        $cropper = self::cropper();
 
         foreach (['6', '2', 6.0, true] as $tag) {
             MockerFunctions::override('exif_read_data', ['Orientation' => $tag]);
@@ -287,7 +287,7 @@ final class ImageCropperTest extends TestCase
     {
         MockerFunctions::override('exif_read_data', ['Orientation' => 6]);
 
-        $image = self::decode((new ImageCropper())->crop(self::png(self::fullRect())));
+        $image = self::decode((self::cropper())->crop(self::png(self::fullRect())));
 
         self::assertSame(
             self::WIDTH,
@@ -307,7 +307,7 @@ final class ImageCropperTest extends TestCase
         MockerFunctions::override('function_exists:exif_read_data', false);
         MockerFunctions::override('exif_read_data', ['Orientation' => 6]);
 
-        $image = self::decode((new ImageCropper())->crop(self::image('jpeg', self::fullRect())));
+        $image = self::decode((self::cropper())->crop(self::image('jpeg', self::fullRect())));
 
         self::assertSame(
             self::WIDTH,
@@ -321,7 +321,7 @@ final class ImageCropperTest extends TestCase
         MockerFunctions::override('exif_read_data', ['Orientation' => 6]);
         MockerFunctions::override('fopen', false);
 
-        $image = self::decode((new ImageCropper())->crop(self::image('jpeg', self::fullRect())));
+        $image = self::decode((self::cropper())->crop(self::image('jpeg', self::fullRect())));
 
         self::assertSame(
             self::WIDTH,
@@ -335,7 +335,7 @@ final class ImageCropperTest extends TestCase
         MockerFunctions::override('exif_read_data', ['Orientation' => 3]);
         MockerFunctions::override('imagerotate', false);
 
-        $image = self::decode((new ImageCropper())->crop(self::image('jpeg', self::fullRect())));
+        $image = self::decode((self::cropper())->crop(self::image('jpeg', self::fullRect())));
 
         self::assertRed(
             $image,
@@ -349,7 +349,7 @@ final class ImageCropperTest extends TestCase
     {
         $file = self::png(['x' => 8, 'y' => 0, 'width' => 8, 'height' => 8]);
 
-        $cropped = (new ImageCropper())->crop($file);
+        $cropped = (self::cropper())->crop($file);
 
         $image = self::decode($cropped);
 
@@ -394,7 +394,7 @@ final class ImageCropperTest extends TestCase
             ['name' => 'a.jpg', 'data' => base64_encode($jpeg), 'metadata' => ['crop' => ['rect' => self::fullRect()]]],
         );
 
-        $image = self::decode((new ImageCropper())->crop($file));
+        $image = self::decode((self::cropper())->crop($file));
 
         self::assertSame(
             'resource (stream)',
@@ -416,7 +416,7 @@ final class ImageCropperTest extends TestCase
             ['name' => 'a.jpg', 'data' => base64_encode($jpeg), 'metadata' => ['crop' => ['rect' => self::fullRect()]]],
         );
 
-        $image = self::decode((new ImageCropper())->crop($file));
+        $image = self::decode((self::cropper())->crop($file));
 
         self::assertSame(
             self::WIDTH,
@@ -431,33 +431,44 @@ final class ImageCropperTest extends TestCase
         );
     }
 
+    /**
+     * @param int<1, 8> $orientation EXIF orientation stored in the JPEG fixture.
+     */
     #[RequiresOperatingSystem('Linux')]
-    public function testCropReadsRealExifOrientation(): void
+    #[TestWith([1, 16, 8])]
+    #[TestWith([2, 16, 8])]
+    #[TestWith([3, 16, 8])]
+    #[TestWith([4, 16, 8])]
+    #[TestWith([5, 8, 16])]
+    #[TestWith([6, 8, 16])]
+    #[TestWith([7, 8, 16])]
+    #[TestWith([8, 8, 16])]
+    public function testCropReadsRealExifOrientation(int $orientation, int $width, int $height): void
     {
-        $jpeg = self::withExif(self::encode('jpeg'), [0x0112 => 6]);
+        $jpeg = self::withExif(self::encode('jpeg'), [0x0112 => $orientation]);
 
         $file = EncodedFile::fromArray(
             ['name' => 'a.jpg', 'data' => base64_encode($jpeg), 'metadata' => ['crop' => ['rect' => self::fullRect()]]],
         );
 
-        $image = self::decode((new ImageCropper())->crop($file));
+        $image = self::decode((self::cropper())->crop($file));
 
         self::assertSame(
-            self::HEIGHT,
-            imagesx($image),
-            'Orientation 6 must swap the dimensions.',
+            [$width, $height],
+            [imagesx($image), imagesy($image)],
+            'The actual EXIF orientation must determine the dimensions.',
         );
         self::assertRed(
             $image,
-            6,
-            2,
-            'Orientation 6 must rotate clockwise.',
+            self::ORIENTATIONS[$orientation][2][0],
+            self::ORIENTATIONS[$orientation][2][1],
+            'The actual EXIF orientation must move the red quadrant.',
         );
     }
 
     public function testCropRenamesOnlyExtensionsThatDoNotMatchOutput(): void
     {
-        $cropper = new ImageCropper();
+        $cropper = self::cropper();
 
         $mismatched = $cropper->crop(
             EncodedFile::fromArray(
@@ -488,7 +499,7 @@ final class ImageCropperTest extends TestCase
 
         self::assertSame(
             $file,
-            (new ImageCropper())->crop($file),
+            (self::cropper())->crop($file),
             'Files without a rectangle must be untouched.',
         );
     }
@@ -497,8 +508,8 @@ final class ImageCropperTest extends TestCase
     {
         $rect = ['x' => 0, 'y' => 0, 'width' => 8, 'height' => 4];
 
-        $default = (new ImageCropper())->crop(self::image('jpeg', $rect))->getData();
-        $custom = (new ImageCropper(50))->crop(self::image('jpeg', $rect))->getData();
+        $default = (self::cropper())->crop(self::image('jpeg', $rect))->getData();
+        $custom = (self::cropper(50))->crop(self::image('jpeg', $rect))->getData();
 
         self::assertSame(
             self::reference($rect, 90),
@@ -521,7 +532,7 @@ final class ImageCropperTest extends TestCase
             Message::IMAGE_DECODE_FAILED->getMessage('image.png'),
         );
 
-        (new ImageCropper())->crop(self::png(['x' => 0, 'y' => 0, 'width' => 1, 'height' => 1]));
+        (self::cropper())->crop(self::png(['x' => 0, 'y' => 0, 'width' => 1, 'height' => 1]));
     }
 
     public function testThrowRuntimeExceptionWhenEncodingFails(): void
@@ -533,7 +544,7 @@ final class ImageCropperTest extends TestCase
             Message::IMAGE_ENCODE_FAILED->getMessage('image.webp', 'image/webp'),
         );
 
-        (new ImageCropper())->crop(self::image('webp', ['x' => 0, 'y' => 0, 'width' => 1, 'height' => 1]));
+        (self::cropper())->crop(self::image('webp', ['x' => 0, 'y' => 0, 'width' => 1, 'height' => 1]));
     }
 
     public function testThrowRuntimeExceptionWhenGdIsMissing(): void
@@ -545,7 +556,7 @@ final class ImageCropperTest extends TestCase
             Message::GD_EXTENSION_REQUIRED->getMessage(),
         );
 
-        new ImageCropper();
+        self::cropper();
     }
 
     public function testThrowRuntimeExceptionWhenImageCannotBeDecoded(): void
@@ -563,7 +574,7 @@ final class ImageCropperTest extends TestCase
             Message::IMAGE_DECODE_FAILED->getMessage('broken.png'),
         );
 
-        (new ImageCropper())->crop($file);
+        (self::cropper())->crop($file);
     }
 
     public function testThrowRuntimeExceptionWhenWebpEncoderIsUnavailable(): void
@@ -575,7 +586,7 @@ final class ImageCropperTest extends TestCase
             Message::IMAGE_ENCODE_FAILED->getMessage('image.webp', 'image/webp'),
         );
 
-        (new ImageCropper())->crop(self::image('webp', ['x' => 0, 'y' => 0, 'width' => 1, 'height' => 1]));
+        (self::cropper())->crop(self::image('webp', ['x' => 0, 'y' => 0, 'width' => 1, 'height' => 1]));
     }
 
     private static function assertDark(GdImage $image, int $x, int $y, string $message): void
@@ -607,6 +618,19 @@ final class ImageCropperTest extends TestCase
             100,
             $rgb & 0xFF,
             $message,
+        );
+    }
+
+    /**
+     * Keeps the 16x8 fixtures inside an explicit test-only resource budget.
+     */
+    private static function cropper(int $quality = 90): ImageCropper
+    {
+        return new ImageCropper(
+            maxPixels: self::WIDTH * self::HEIGHT,
+            maxDimension: self::WIDTH,
+            maxInputBytes: 65_536,
+            quality: $quality,
         );
     }
 

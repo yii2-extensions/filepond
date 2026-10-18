@@ -209,6 +209,10 @@
                 editor.oncancel();
             }
 
+            if (typeof editor.onclose === 'function') {
+                editor.onclose();
+            }
+
             return;
         }
 
