@@ -347,6 +347,7 @@ final class AssetBundleTest extends TestCase
             'Core bundle must not depend on other bundles.',
         );
     }
+
     #[TestWith([false])]
     #[TestWith([true])]
     public function testPublishedAssetsSurviveMinificationModeChanges(bool $minified): void

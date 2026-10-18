@@ -25,12 +25,14 @@ abstract class AbstractLocalAsset extends AssetBundle
      * Whether to serve the minified files, or `null` to serve them outside debug mode.
      */
     public bool|null $minified = null;
+
     /**
      * Returns the script file names inside {@see $sourcePath}, without the `.min` infix.
      *
      * @return list<string> Script file names.
      */
     abstract protected function scripts(): array;
+
     /**
      * Returns the stylesheet file names inside {@see $sourcePath}, without the `.min` infix.
      *

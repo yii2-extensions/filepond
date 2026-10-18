@@ -58,7 +58,7 @@ final class ImageCropperLimitsProvider
     }
 
     /**
-     * @return iterable<string, array{int, int, int, 'maxPixels'|'maxDimension'|'maxInputBytes'}>
+     * @return iterable<string, array{int, int, int, 'maxDimension'|'maxInputBytes'|'maxPixels'}>
      */
     public static function nonPositiveBudgets(): iterable
     {
@@ -81,7 +81,7 @@ final class ImageCropperLimitsProvider
     }
 
     /**
-     * @return iterable<string, array{'png'|'jpeg'|'gif'|'webp'|'bmp'|'wbmp'|'avif'}>
+     * @return iterable<string, array{'avif'|'bmp'|'gif'|'jpeg'|'png'|'wbmp'|'webp'}>
      */
     public static function supportedFormats(): iterable
     {
