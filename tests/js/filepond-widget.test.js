@@ -12,7 +12,7 @@ async function loadRuntime() {
 }
 
 function createPond() {
-    return { destroy: vi.fn() };
+    return { destroy: vi.fn(), element: document.createElement('div') };
 }
 
 describe('filepond-widget', () => {
@@ -20,6 +20,7 @@ describe('filepond-widget', () => {
         document.body.innerHTML = '<input id="avatar" type="file"><input id="gallery" type="file">';
         window.FilePond = {
             create: vi.fn(() => createPond()),
+            destroy: vi.fn(),
             registerPlugin: vi.fn(),
         };
         window.FilePondPluginFileEncode = { name: 'encode' };
@@ -139,6 +140,9 @@ describe('filepond-widget', () => {
 
         expect(runtime.destroy('avatar'), 'Destroy must report success.').toBe(true);
         expect(pond.destroy, 'Instance must be destroyed.').toHaveBeenCalledOnce();
+        expect(window.FilePond.destroy, 'The original element must be restored.').toHaveBeenCalledExactlyOnceWith(
+            pond.element,
+        );
         expect(runtime.get('avatar'), 'Instance must be forgotten.').toBeNull();
         expect(runtime.destroy('avatar'), 'Second destroy must report nothing to do.').toBe(false);
     });

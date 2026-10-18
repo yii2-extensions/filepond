@@ -7,6 +7,8 @@ namespace yii2\extensions\filepond\asset;
 use yii\web\AssetBundle;
 
 use function array_map;
+use function array_unique;
+use function array_values;
 use function strrpos;
 use function substr_replace;
 
@@ -14,7 +16,8 @@ use function substr_replace;
  * Provides readable or minified delivery for the scripts and stylesheets shipped inside this package.
  *
  * Subclasses list the readable file names; the minified copies are generated next to them by `npm run build` with a
- * `.min` infix and are served when {@see $minified} is enabled. Only the selected files are published.
+ * `.min` infix and are served when {@see $minified} is enabled. Both variants are published so changing the delivery
+ * mode can reuse an existing asset directory.
  */
 abstract class AbstractLocalAsset extends AssetBundle
 {
@@ -44,10 +47,22 @@ abstract class AbstractLocalAsset extends AssetBundle
     {
         $this->minified ??= !YII_DEBUG;
 
-        $this->css = $this->files($this->styles());
-        $this->js = $this->files($this->scripts());
+        $styles = $this->styles();
+        $scripts = $this->scripts();
 
-        $this->publishOptions['only'] ??= [...$this->css, ...$this->js];
+        $this->css = $this->files($styles, $this->minified);
+        $this->js = $this->files($scripts, $this->minified);
+
+        $this->publishOptions['only'] ??= array_values(
+            array_unique(
+                [
+                    ...$this->files($styles, false),
+                    ...$this->files($scripts, false),
+                    ...$this->files($styles, true),
+                    ...$this->files($scripts, true),
+                ],
+            ),
+        );
 
         parent::init();
     }
@@ -56,13 +71,12 @@ abstract class AbstractLocalAsset extends AssetBundle
      * Resolves file names, selecting minified files when {@see $minified} is enabled.
      *
      * @param list<string> $files File names without the `.min` infix.
+     * @param bool $minified Whether to select the minified variant.
      *
      * @return list<string> File names relative to {@see $sourcePath}.
      */
-    private function files(array $files): array
+    private function files(array $files, bool $minified): array
     {
-        $minified = $this->minified === true;
-
         return array_map(
             static fn(string $file): string => $minified ? self::minifiedFile($file) : $file,
             $files,

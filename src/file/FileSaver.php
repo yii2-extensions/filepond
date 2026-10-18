@@ -9,8 +9,8 @@ use Yii;
 use yii\helpers\FileHelper;
 use yii2\extensions\filepond\exception\Message;
 
-use function array_values;
 use function chmod;
+use function count;
 use function in_array;
 use function is_dir;
 use function is_string;
@@ -84,7 +84,9 @@ final readonly class FileSaver
 
         $paths = [];
 
-        foreach (array_values([...$files]) as $index => $file) {
+        foreach ($files as $file) {
+            $index = count($paths);
+
             $baseName = self::baseName($file, $name === null || $index === 0 ? $name : "{$name}-{$index}");
             $extension = self::extension($file);
             $path = self::path($directory, $baseName, $extension);

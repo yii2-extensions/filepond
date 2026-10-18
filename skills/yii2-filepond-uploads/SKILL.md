@@ -34,8 +34,7 @@ If guides are unavailable or offline, inspect local source/PHPDoc and the change
 - Widget recipes and individual helper demos: <https://yii2-framework.github.io/docs/extensions/filepond/examples/index.md>.
 
 Read only the pages relevant to the requested change. For an exact property, enum mapping, helper signature, or
-exception, consult the PHPDoc API at <https://yii2-framework.github.io/docs/extensions/filepond/reference/> or filter
-the relevant type/member from <https://yii2-framework.github.io/docs/reference/filepond.json>. Use
+exception, inspect the relevant type/member and its PHPDoc in the resolved package files. Use
 <https://yii2-framework.github.io/docs/llms.txt> only when the needed page is unknown. Do not infer a signature from
 another FilePond wrapper or copy a full API catalogue into the task.
 
@@ -82,8 +81,10 @@ on the resulting dimensions, type, or size before saving.
 
 `FileSaver` returns a filesystem path and derives its extension from detected content. Choose a server-controlled
 base name and handle write failures. Keep private files outside the web root; associate the generated identifier
-with the authorized application record before reporting success. An existing `type: 'local'` item is not a new
-encoded upload, and missing upload input is not a deletion instruction.
+with the authorized application record before reporting success. An existing `type: 'local'` item submits its
+`source` identifier rather than new encoded bytes. For optional replacement, resolve the current identifier from
+the authorized record and normalize only its exact match to an empty upload before encoded validation. Validate
+all other values normally; do not ignore arbitrary non-JSON input. Missing upload input is not a deletion instruction.
 
 ## Verify the requested behavior
 

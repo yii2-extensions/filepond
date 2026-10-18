@@ -88,6 +88,16 @@ final class MockerExtension implements Extension
             ],
             [
                 'namespace' => $namespace,
+                'name' => 'getimagesizefromstring',
+                'function' => static fn(string $data): array|false => MockerFunctions::getimagesizefromstring($data),
+            ],
+            [
+                'namespace' => $namespace,
+                'name' => 'imagecreatefromstring',
+                'function' => static fn(string $data): GdImage|false => MockerFunctions::imagecreatefromstring($data),
+            ],
+            [
+                'namespace' => $namespace,
                 'name' => 'imagecrop',
                 'function' => static fn(GdImage $image, array $rectangle): GdImage|false => MockerFunctions::imagecrop(
                     $image,

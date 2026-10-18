@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace yii2\extensions\filepond\tests\asset;
 
-use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\{Group, TestWith};
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\web\AssetBundle;
 use yii2\extensions\filepond\asset\{
     AbstractLocalAsset,
     AbstractNpmAsset,
@@ -88,6 +89,36 @@ final class AssetBundleTest extends TestCase
         );
     }
 
+    public function testConfiguredDependenciesArePreservedAndDeduplicated(): void
+    {
+        $this->mockWebApplication(
+            [
+                'components' => [
+                    'assetManager' => [
+                        'bundles' => [
+                            ImageEditAsset::class => [
+                                'depends' => [FilePondAsset::class, AssetBundle::class, AssetBundle::class],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        );
+        $view = $this->view();
+        $bundle = ImageEditAsset::registerWith($view);
+
+        self::assertSame(
+            [FilePondAsset::class, AssetBundle::class],
+            $bundle->depends,
+            'Required and configured dependencies must each appear once.',
+        );
+        self::assertArrayHasKey(
+            AssetBundle::class,
+            $view->assetBundles,
+            'The additional dependency must actually be registered.',
+        );
+    }
+
     public function testLocalBundleMinifiedInsertsInfixBeforeLastExtension(): void
     {
         $this->mockWebApplication();
@@ -153,9 +184,14 @@ final class AssetBundleTest extends TestCase
             'Minified adapter script expected.',
         );
         self::assertSame(
-            ['filepond-cropper.min.css', 'filepond-cropper.min.js'],
+            [
+                'filepond-cropper.css',
+                'filepond-cropper.js',
+                'filepond-cropper.min.css',
+                'filepond-cropper.min.js',
+            ],
             $cropper->publishOptions['only'] ?? null,
-            'Only the minified files.',
+            'Both variants must be published independently of the selected mode.',
         );
         self::assertFileExists(
             "{$widget->basePath}/filepond-widget.min.js",
@@ -188,9 +224,9 @@ final class AssetBundleTest extends TestCase
             'Debug mode must serve readable scripts.',
         );
         self::assertSame(
-            ['dist/filepond.css', 'dist/filepond.js'],
+            ['dist/filepond.css', 'dist/filepond.js', 'dist/filepond.min.css', 'dist/filepond.min.js'],
             $bundle->publishOptions['only'] ?? null,
-            'Only dist.',
+            'Both dist variants must be published.',
         );
         self::assertStringEndsWith(
             '/node_modules/filepond',
@@ -220,9 +256,9 @@ final class AssetBundleTest extends TestCase
             'Readable stylesheet expected.',
         );
         self::assertSame(
-            ['filepond-widget.css', 'filepond-widget.js'],
+            ['filepond-widget.css', 'filepond-widget.js', 'filepond-widget.min.css', 'filepond-widget.min.js'],
             $bundle->publishOptions['only'] ?? null,
-            'Only the readable files.',
+            'Both variants must be published even when readable files are selected.',
         );
     }
 
@@ -310,6 +346,43 @@ final class AssetBundleTest extends TestCase
             FilePondAsset::dependencies(),
             'Core bundle must not depend on other bundles.',
         );
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testPublishedAssetsSurviveMinificationModeChanges(bool $minified): void
+    {
+        foreach ([$minified, !$minified] as $mode) {
+            $this->mockWebApplication(
+                [
+                    'components' => [
+                        'assetManager' => [
+                            'hashCallback' => null,
+                            'bundles' => [
+                                FilePondAsset::class => ['minified' => $mode],
+                                FilePondWidgetAsset::class => ['minified' => $mode],
+                                FilePondCropperAsset::class => ['minified' => $mode],
+                            ],
+                        ],
+                    ],
+                ],
+            );
+
+            foreach ([FilePondAsset::class, FilePondWidgetAsset::class, FilePondCropperAsset::class] as $class) {
+                $bundle = $class::register($this->view());
+
+                foreach ([...$bundle->js, ...$bundle->css] as $file) {
+                    self::assertIsString(
+                        $file,
+                        'The fixture must register local file paths.',
+                    );
+                    self::assertFileExists(
+                        "{$bundle->basePath}/{$file}",
+                        'A persistent publication directory must contain each selected variant.',
+                    );
+                }
+            }
+        }
     }
 
     public function testPublishOptionsOnlyIsNotOverridden(): void

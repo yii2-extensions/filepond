@@ -96,6 +96,33 @@ final class MockerFunctions
     }
 
     /**
+     * @return array<array-key, mixed>|false
+     */
+    public static function getimagesizefromstring(string $data): array|false
+    {
+        self::$arguments['getimagesizefromstring'] = get_debug_type($data);
+
+        if (array_key_exists('getimagesizefromstring', self::$overrides)) {
+            /** @var array<array-key, mixed>|false */
+            return self::$overrides['getimagesizefromstring'];
+        }
+
+        return @\getimagesizefromstring($data);
+    }
+
+    public static function imagecreatefromstring(string $data): GdImage|false
+    {
+        self::$arguments['imagecreatefromstring'] = get_debug_type($data);
+
+        if (array_key_exists('imagecreatefromstring', self::$overrides)) {
+            /** @var false|GdImage */
+            return self::$overrides['imagecreatefromstring'];
+        }
+
+        return @\imagecreatefromstring($data);
+    }
+
+    /**
      * @param array<array-key, mixed> $rectangle
      */
     public static function imagecrop(GdImage $image, array $rectangle): GdImage|false

@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace yii2\extensions\filepond\file;
 
 use GdImage;
+use InvalidArgumentException;
 use RuntimeException;
 use yii\helpers\FileHelper;
 use yii2\extensions\filepond\exception\Message;
 
 use function fclose;
 use function fwrite;
-use function imagecreatefromstring;
 use function imageflip;
 use function imagegif;
 use function imagejpeg;
@@ -20,6 +20,7 @@ use function imagesavealpha;
 use function imagesx;
 use function imagesy;
 use function in_array;
+use function intdiv;
 use function is_array;
 use function is_int;
 use function max;
@@ -33,7 +34,8 @@ use function pathinfo;
  *
  * Use it when the Image Transform plugin is disabled, so the browser uploads the original image and the server
  * produces the cropped file from `metadata.crop.rect`. JPEG orientation metadata is honored before cropping when the
- * `exif` extension is available, matching the orientation the editor displayed.
+ * `exif` extension is available, matching the orientation the editor displayed. Source byte, axis, and pixel limits
+ * are required; configure them from the application's processing budget. They do not impose a hard process-memory cap.
  */
 final readonly class ImageCropper
 {
@@ -57,12 +59,30 @@ final readonly class ImageCropper
     private const array ROTATION_ANGLES = [3 => 180, 4 => 180, 5 => 90, 6 => -90, 7 => -90, 8 => 90];
 
     /**
+     * @param int $maxPixels Maximum source pixel count before decoding.
+     * @param int $maxDimension Maximum source width or height, in pixels.
+     * @param int $maxInputBytes Maximum source byte count before header parsing.
      * @param int $quality Output quality for lossy formats, from `0` to `100`.
      *
+     * @throws InvalidArgumentException if any processing limit is not positive.
      * @throws RuntimeException if the `gd` extension is not loaded.
      */
-    public function __construct(private int $quality = 90)
-    {
+    public function __construct(
+        private int $maxPixels,
+        private int $maxDimension,
+        private int $maxInputBytes,
+        private int $quality = 90,
+    ) {
+        foreach (
+            ['maxPixels' => $maxPixels, 'maxDimension' => $maxDimension, 'maxInputBytes' => $maxInputBytes] as $name => $limit
+        ) {
+            if ($limit < 1) {
+                throw new InvalidArgumentException(
+                    Message::INVALID_IMAGE_PROCESSING_LIMIT->getMessage($name),
+                );
+            }
+        }
+
         if (!extension_loaded('gd')) {
             throw new RuntimeException(
                 Message::GD_EXTENSION_REQUIRED->getMessage(),
@@ -79,7 +99,7 @@ final readonly class ImageCropper
      *
      * @param EncodedFile $file Image file carrying crop metadata.
      *
-     * @throws RuntimeException if the image cannot be decoded or encoded.
+     * @throws RuntimeException if the source exceeds a processing limit or cannot be decoded or encoded.
      *
      * @return EncodedFile Cropped copy, or the same instance when no crop rectangle is present.
      */
@@ -91,6 +111,8 @@ final readonly class ImageCropper
             return $file;
         }
 
+        $this->assertSourceLimits($file);
+
         $image = @imagecreatefromstring($file->getData());
 
         if ($image === false) {
@@ -98,6 +120,8 @@ final readonly class ImageCropper
                 Message::IMAGE_DECODE_FAILED->getMessage($file->name),
             );
         }
+
+        $this->assertDimensions([imagesx($image), imagesy($image)], $file->name);
 
         $mimeType = $file->getMimeType();
 
@@ -122,6 +146,8 @@ final readonly class ImageCropper
                 Message::IMAGE_DECODE_FAILED->getMessage($file->name),
             );
         }
+
+        unset($image);
 
         $extension = self::OUTPUT_EXTENSIONS[$mimeType] ?? 'png';
         $outputType = $extension === 'png' ? 'image/png' : $mimeType;
@@ -166,6 +192,57 @@ final readonly class ImageCropper
         $rotated = imagerotate($image, $angle, 0);
 
         return $rotated === false ? $image : $rotated;
+    }
+
+    /**
+     * Checks axis and area limits without multiplying possibly overflowing dimensions.
+     *
+     * @param array<array-key, mixed> $dimensions Dimensions from the parser or decoded image.
+     */
+    private function assertDimensions(array $dimensions, string $name): void
+    {
+        $width = $dimensions[0] ?? null;
+        $height = $dimensions[1] ?? null;
+
+        if (!is_int($width) || !is_int($height) || $width < 1 || $height < 1) {
+            throw new RuntimeException(
+                Message::IMAGE_DECODE_FAILED->getMessage($name),
+            );
+        }
+
+        if ($width > $this->maxDimension || $height > $this->maxDimension) {
+            throw new RuntimeException(
+                Message::IMAGE_DIMENSION_LIMIT_EXCEEDED->getMessage($name, $this->maxDimension),
+            );
+        }
+
+        if ($width > intdiv($this->maxPixels, $height)) {
+            throw new RuntimeException(
+                Message::IMAGE_PIXEL_LIMIT_EXCEEDED->getMessage($name, $this->maxPixels),
+            );
+        }
+    }
+
+    /**
+     * Rejects excessive byte counts before parsing dimensions or allocating a GD image.
+     */
+    private function assertSourceLimits(EncodedFile $file): void
+    {
+        if ($file->getSize() > $this->maxInputBytes) {
+            throw new RuntimeException(
+                Message::IMAGE_BYTE_LIMIT_EXCEEDED->getMessage($file->name, $this->maxInputBytes),
+            );
+        }
+
+        $dimensions = @getimagesizefromstring($file->getData());
+
+        if ($dimensions === false) {
+            throw new RuntimeException(
+                Message::IMAGE_DECODE_FAILED->getMessage($file->name),
+            );
+        }
+
+        $this->assertDimensions($dimensions, $file->name);
     }
 
     /**

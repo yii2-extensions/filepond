@@ -37,7 +37,7 @@
      * @returns {Object} FilePond instance.
      */
     runtime.create = function (id, plugins, options) {
-        const input = document.getElementById(id);
+        let input = document.getElementById(id);
 
         if (input === null) {
             throw new Error(`FilePond input "${id}" was not found.`);
@@ -45,6 +45,7 @@
 
         registerPlugins(plugins);
         runtime.destroy(id);
+        input = document.getElementById(id);
 
         const pond = window.FilePond.create(input, options);
 
@@ -77,6 +78,7 @@
         }
 
         pond.destroy();
+        window.FilePond.destroy(pond.element);
         ponds.delete(id);
 
         return true;
