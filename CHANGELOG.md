@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - docs: update documentation with practical guides and examples for uploads, plugins, and image editing.
 - docs(skills): resolve documentation against the installed package reference and preserve local fallbacks.
 - feat!: require crop budgets; fix widget lifecycle, Image Edit cancellation, iterable uploads, assets, encoded validation, and stored-image IDs.
+- docs: make the server-cropping example standalone with explicit image processing limits.
 
 ## 0.1.0 October 7, 2026
 
