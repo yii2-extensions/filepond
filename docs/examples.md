@@ -224,8 +224,8 @@ $saver = new FileSaver('@runtime/uploads/avatars');
 
 // Limits for this 400x300 demo image; applications need their own measured processing budget.
 $limits = [
-    'maxPixels' => 1_048_576, 
-    'maxDimension' => 2048, 
+    'maxPixels' => 1_048_576,
+    'maxDimension' => 2048,
     'maxInputBytes' => 2_000_000,
 ];
 
