@@ -221,7 +221,14 @@ $model->avatar = json_encode(
 );
 
 $saver = new FileSaver('@runtime/uploads/avatars');
-$limits = Yii::$app->params['uploads'];
+
+// Limits for this 400x300 demo image; applications need their own measured processing budget.
+$limits = [
+    'maxPixels' => 1_048_576, 
+    'maxDimension' => 2048, 
+    'maxInputBytes' => 2_000_000,
+];
+
 $cropper = new ImageCropper(
     maxPixels: $limits['maxPixels'],
     maxDimension: $limits['maxDimension'],
