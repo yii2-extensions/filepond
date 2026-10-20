@@ -124,3 +124,5 @@ echo \yii2\extensions\filepond\FilePond::widget(['name' => 'file', 'cdn' => true
 ```
 
 For application-wide CDN settings and precedence, see [asset delivery](configuration.md#asset-delivery).
+
+[Back to documentation](../README.md#documentation)

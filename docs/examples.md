@@ -282,3 +282,5 @@ if ($model->validate(['documents'])) {
 
 With a base name, the first file keeps it and the following ones receive a numeric suffix (`order-42.pdf`,
 `order-42-1.pdf`). Store uploads outside the web root unless they must be served directly.
+
+[Back to documentation](../README.md#documentation)
