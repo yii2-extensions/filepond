@@ -126,7 +126,7 @@ final class AssetBundleTest extends TestCase
         $bundle = new DottedLocalAsset(['minified' => true]);
 
         self::assertSame(
-            ['filepond.cropper.min.js', 'worker'],
+            ['worker', 'filepond.cropper.min.js'],
             $bundle->js,
             'Infix must precede the last extension only; extensionless names stay unchanged.',
         );
@@ -237,6 +237,25 @@ final class AssetBundleTest extends TestCase
             '/assets/filepond',
             str_replace('\\', '/', (string) $bundle->basePath),
             'Bundle must be published.',
+        );
+    }
+
+    public function testLocalBundlePublishesExtensionlessFilesOnce(): void
+    {
+        $this->mockWebApplication();
+
+        $bundle = new DottedLocalAsset(['minified' => true]);
+
+        self::assertSame(
+            [
+                'filepond.cropper.theme.css',
+                'worker',
+                'filepond.cropper.js',
+                'filepond.cropper.theme.min.css',
+                'filepond.cropper.min.js',
+            ],
+            $bundle->publishOptions['only'] ?? null,
+            'Extensionless names must be published once and the list reindexed.',
         );
     }
 
