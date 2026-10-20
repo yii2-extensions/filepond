@@ -269,3 +269,5 @@ not a URL.
 
 The [API reference](https://yii2-framework.github.io/docs/extensions/filepond/reference/) documents exact helper
 signatures, property types, defaults, and exceptions.
+
+[Back to documentation](../README.md#documentation)

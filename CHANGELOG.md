@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.2.1 Under development
 
+- chore: document and sync bundled skills via Composer; pin CI actions to `v2.0.1` and align scripts, linters and testing docs with the template.
+
 ## 0.2.0 October 18, 2026
 
 - docs: improve upload guides, runnable examples, PHPDoc, avatar recipe, documentation links, and FilePond skill distribution.

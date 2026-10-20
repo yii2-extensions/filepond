@@ -7,7 +7,7 @@ namespace yii2\extensions\filepond\tests\support\stub;
 use yii2\extensions\filepond\asset\AbstractLocalAsset;
 
 /**
- * Local asset bundle with dotted and extensionless file names for minified name resolution tests.
+ * Local asset bundle with dotted and extensionless file names for minified name resolution and publish list tests.
  */
 final class DottedLocalAsset extends AbstractLocalAsset
 {
@@ -15,7 +15,7 @@ final class DottedLocalAsset extends AbstractLocalAsset
 
     protected function scripts(): array
     {
-        return ['filepond.cropper.js', 'worker'];
+        return ['worker', 'filepond.cropper.js'];
     }
 
     protected function styles(): array

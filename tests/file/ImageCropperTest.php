@@ -508,7 +508,18 @@ final class ImageCropperTest extends TestCase
     {
         $rect = ['x' => 0, 'y' => 0, 'width' => 8, 'height' => 4];
 
-        $default = self::cropper()->crop(self::image('jpeg', $rect))->getData();
+        $defaultCropper = (
+            new ImageCropper(
+                maxPixels: self::WIDTH * self::HEIGHT,
+                maxDimension: self::WIDTH,
+                maxInputBytes: 65_536,
+            )
+        );
+
+        $default = $defaultCropper
+            ->crop(self::image('jpeg', $rect))
+            ->getData();
+
         $custom = self::cropper(50)->crop(self::image('jpeg', $rect))->getData();
 
         self::assertSame(

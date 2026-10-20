@@ -31,18 +31,21 @@ nbproject
 # node_modules (if present)
 node_modules
 
-# phpstorm project (if present)
-.idea
-
 # phpactor (if present)
 .phpactor.*
+
+# phpstorm project (if present)
+.idea
 
 # phpunit (if present)
 .phpunit.cache
 .phpunit.result.cache
 phpunit.xml*
 
-# stryker mutation testing
+# private maintainer files (if present)
+/internal/
+
+# stryker mutation testing (if present)
 .stryker-tmp
 reports/mutation
 
@@ -62,6 +65,3 @@ Thumbs.db
 .buildpath
 .project
 .settings
-
-# Private maintainer files
-/internal/

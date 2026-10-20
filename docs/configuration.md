@@ -122,3 +122,5 @@ application message source for the category.
 The File Encode plugin submits JSON payloads with base64 content and metadata. Server validation detects MIME types
 from decoded bytes with `finfo`. Client restrictions improve feedback but do not replace model validation.
 The [upload guide](uploads.md) combines the validator, decoder, optional GD cropper, and saver in a complete request.
+
+[Back to documentation](../README.md#documentation)
