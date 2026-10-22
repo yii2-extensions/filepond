@@ -11,11 +11,21 @@ namespace yii2\extensions\filepond\asset;
  */
 final class CropperAsset extends AbstractNpmAsset
 {
+    /**
+     * Returns the npm package that ships Cropper.js.
+     *
+     * @return string npm package name.
+     */
     protected function package(): string
     {
         return 'cropperjs';
     }
 
+    /**
+     * Returns the Cropper.js script file name.
+     *
+     * @return list<string> Script file names.
+     */
     protected function scripts(): array
     {
         return ['cropper.js'];

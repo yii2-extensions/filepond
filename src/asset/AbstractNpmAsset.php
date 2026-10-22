@@ -150,6 +150,8 @@ abstract class AbstractNpmAsset extends AssetBundle
      * Reads the installed package version from its `package.json`.
      *
      * @throws InvalidConfigException if the package manifest is missing or has no version.
+     *
+     * @return string Installed package version.
      */
     private function packageVersion(): string
     {
@@ -171,7 +173,9 @@ abstract class AbstractNpmAsset extends AssetBundle
     /**
      * Stores the delivery mode of a bundle and its npm-backed dependencies before they are instantiated.
      *
+     * @param AssetManager $assetManager Asset manager whose `bundles` configuration receives the delivery mode.
      * @param class-string<self> $class Bundle class to seed.
+     * @param bool $cdn Whether to link the files from the CDN.
      */
     private static function seed(AssetManager $assetManager, string $class, bool $cdn): void
     {

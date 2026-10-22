@@ -3,10 +3,10 @@
 This package provides a consistent set of [Composer](https://getcomposer.org/) scripts for local validation, plus
 [npm](https://www.npmjs.com/) scripts for the JavaScript runtime and Cropper.js adapter.
 
-These are package development checks. Keep the repository's Foxy manager set to `npm` and use its Node.js toolchain
-for Vitest, Stryker, and esbuild. Applications consuming the published extension can install its ready-to-serve
-assets with Foxy's native PHP manager; see [installation](installation.md). Native installation does not replace
-this development toolchain.
+These are package development checks. Keep the repository's Foxy manager set to `npm` and use its Node.js toolchain for
+Vitest, Stryker, and esbuild. Applications consuming the published extension can install its ready-to-serve assets with
+Foxy's native PHP manager; see [installation](installation.md). Native installation does not replace this development
+toolchain.
 
 Tool references:
 
@@ -82,9 +82,8 @@ Thresholds, thread count and memory options live in `infection.json5`. CI enforc
 
 ## Repository quality checks
 
-Make the CLI tools used by the shared quality workflow available on `PATH`:
-actionlint with its ShellCheck helper, codespell, EditorConfig Checker, markdownlint-cli2, Prettier and
-yamllint. Run all checks:
+Make the CLI tools used by the shared quality workflow available on `PATH`: actionlint with its ShellCheck helper,
+codespell, EditorConfig Checker, markdownlint-cli2, Prettier and yamllint. Run all checks:
 
 ```bash
 composer quality
@@ -122,8 +121,8 @@ composer tests
 
 ## Workflow security checks
 
-Make zizmor and Gitleaks available on `PATH`. Audit the current workflow files
-with the same pedantic persona used by the shared security workflow:
+Make zizmor and Gitleaks available on `PATH`. Audit the current workflow files with the same pedantic persona used by
+the shared security workflow:
 
 ```bash
 composer zizmor
@@ -135,22 +134,21 @@ Scan Git history for secrets with the repository's Gitleaks configuration:
 composer gitleaks
 ```
 
-Run both checks. Findings make the command fail; inspect them rather than
-disabling the checks.
+Run both checks. Findings make the command fail; inspect them rather than disabling the checks.
 
 ```bash
 composer security
 ```
 
-Zizmor needs GitHub API access for its online audits. If the tool runs offline,
-report that limit separately. To request an offline audit explicitly:
+Zizmor needs GitHub API access for its online audits. If the tool runs offline, report that limit separately. To request
+an offline audit explicitly:
 
 ```bash
 composer zizmor -- --offline
 ```
 
-Report hosted CI execution and its PHP/OS matrix separately from these local
-commands. Keep generated reports in ignored `internal/`.
+Report hosted CI execution and its PHP/OS matrix separately from these local commands. Keep generated reports in ignored
+`internal/`.
 
 ## Passing extra arguments
 
@@ -185,17 +183,17 @@ npm run test:mutation
 ```
 
 The `pretest:mutation` npm hook temporarily adapts Stryker 10.0.0's test-name filtering to Vitest 5's
-[`>` separator](https://vitest.dev/guide/migration/#testnamepattern-matches-the-joined-full-name). It runs
-automatically with the command above, including after a clean `npm ci`. The versioned patch checks the installed
-runner version, Vitest major version, and both helper copies before changing anything; repeated runs are safe.
-Unexpected versions or helper content stop the run so dependency upgrades cannot silently keep a stale patch.
-Remove the hook and `tools/patch-stryker-vitest5.mjs` after upgrading to an official runner with verified Vitest 5
-filtering support. The patch changes only the installed test runner; coverage and mutation thresholds stay at 100%.
+[`>` separator](https://vitest.dev/guide/migration/#testnamepattern-matches-the-joined-full-name). It runs automatically
+with the command above, including after a clean `npm ci`. The versioned patch checks the installed runner version,
+Vitest major version, and both helper copies before changing anything; repeated runs are safe. Unexpected versions or
+helper content stop the run so dependency upgrades cannot silently keep a stale patch. Remove the hook and
+`tools/patch-stryker-vitest5.mjs` after upgrading to an official runner with verified Vitest 5 filtering support. The
+patch changes only the installed test runner; coverage and mutation thresholds stay at 100%.
 
 ## Minified assets
 
-Regenerate the committed `*.min.js` and `*.min.css` files after editing `src/asset/widget` or `src/asset/cropper`.
-The `assets` workflow fails when the committed files differ from a fresh build.
+Regenerate the committed `*.min.js` and `*.min.css` files after editing `src/asset/widget` or `src/asset/cropper`. The
+`assets` workflow fails when the committed files differ from a fresh build.
 
 ```bash
 npm run build

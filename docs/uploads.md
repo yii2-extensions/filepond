@@ -1,12 +1,12 @@
 # Receive and store uploads
 
-This workflow uses the File Encode plugin to submit files with a normal Yii form. The browser sends JSON with
-base64 content in the model attribute, rather than a PHP `UploadedFile`. Keep `allowFileEncode` enabled and load
-the posted value with `Model::load()`.
+This workflow uses the File Encode plugin to submit files with a normal Yii form. The browser sends JSON with base64
+content in the model attribute, rather than a PHP `UploadedFile`. Keep `allowFileEncode` enabled and load the posted
+value with `Model::load()`.
 
-The example accepts one avatar, validates its decoded bytes, saves it outside the web root, and redirects after
-success. Use the application's existing authentication and namespace layout; the paths below follow a Yii 22
-application with `src/` and `resources/views/`.
+The example accepts one avatar, validates its decoded bytes, saves it outside the web root, and redirects after success.
+Use the application's existing authentication and namespace layout; the paths below follow a Yii 22 application with
+`src/` and `resources/views/`.
 
 ## Validate the model attribute
 
@@ -48,10 +48,10 @@ final class AvatarUploadForm extends Model
 }
 ```
 
-`skipOnEmpty: false` makes an upload required. Omit it for an optional replacement and save only when the decoded
-file list is nonempty. MIME validation uses `finfo` on the bytes; `extensions` checks the client name. Client widget
-limits do not replace either check. FilePond interprets `2MB` as 2,000,000 bytes; `maxSize` uses bytes, so the example
-sets the same decimal limit on both sides. Use an explicit raster allow-list when images will be served from your origin:
+`skipOnEmpty: false` makes an upload required. Omit it for an optional replacement and save only when the decoded file
+list is nonempty. MIME validation uses `finfo` on the bytes; `extensions` checks the client name. Client widget limits
+do not replace either check. FilePond interprets `2MB` as 2,000,000 bytes; `maxSize` uses bytes, so the example sets the
+same decimal limit on both sides. Use an explicit raster allow-list when images will be served from your origin:
 `image/*` also admits SVG.
 
 ## Load, validate, then save
@@ -114,13 +114,13 @@ final class AvatarController extends Controller
 }
 ```
 
-The required validator guarantees one valid file before the decoder is indexed. `FileSaver` creates the target
-directory and derives the extension from the detected MIME type. Passing a generated base name avoids using the
-client name as the stored identifier; saving to the same path would replace the file.
+The required validator guarantees one valid file before the decoder is indexed. `FileSaver` creates the target directory
+and derives the extension from the detected MIME type. Passing a generated base name avoids using the client name as the
+stored identifier; saving to the same path would replace the file.
 
-In a profile application, persist the returned path or storage identifier against the authenticated user's record
-before redirecting. Handle any database failure and remove the new file if the record cannot be saved; keep the
-previous avatar until its replacement is committed. The example above only stores the file and reports its name.
+In a profile application, persist the returned path or storage identifier against the authenticated user's record before
+redirecting. Handle any database failure and remove the new file if the record cannot be saved; keep the previous avatar
+until its replacement is committed. The example above only stores the file and reports its name.
 
 ## Render the form
 
@@ -161,24 +161,24 @@ use yii2\extensions\filepond\FilePond;
 <?php ActiveForm::end(); ?>
 ```
 
-Open the `avatar/index` route while signed in. The form retains Yii's CSRF input and uses server validation; its
-client script is disabled so this example needs no jQuery form-validation layer. The FilePond widget initializes
-its own runtime. See [installation](installation.md) for the npm alias and assets.
+Open the `avatar/index` route while signed in. The form retains Yii's CSRF input and uses server validation; its client
+script is disabled so this example needs no jQuery form-validation layer. The FilePond widget initializes its own
+runtime. See [installation](installation.md) for the npm alias and assets.
 
 This avatar form offers only a square crop. Other uploads can offer several ratios; see
 [editor configuration](configuration.md#cropperjs-editor).
 
 ## Choose where to crop
 
-The form above enables Image Transform: the browser applies the confirmed crop, and the server validates and
-saves those transformed bytes. Image Preview alone changes the thumbnail, not the submitted content.
+The form above enables Image Transform: the browser applies the confirmed crop, and the server validates and saves those
+transformed bytes. Image Preview alone changes the thumbnail, not the submitted content.
 
 For server processing, set `allowImageTransform` to `false` in the form, keep `allowImageEdit` enabled, and apply
 `ImageCropper` to the validated original before saving. Its required positive limits reject excessive input bytes,
 source dimensions, and source pixel count before GD decoding. There is no unlimited default.
 
-Configure the upload policy in the application's parameters. This example accepts at most 1,048,576 source pixels,
-no dimension above 2048, and the same 2,000,000-byte limit as the model:
+Configure the upload policy in the application's parameters. This example accepts at most 1,048,576 source pixels, no
+dimension above 2048, and the same 2,000,000-byte limit as the model:
 
 ```php
 'uploads' => [
@@ -205,37 +205,36 @@ The example admits a 1024x1024 or 2048x512 original and rejects larger originals
 avatar policy, not a universal memory limit. For example, a 256 MiB worker allocation could reserve 100 MiB for a
 measured application baseline, 16 MiB for byte buffers, 64 MiB for image processing, and 76 MiB of headroom. Confirm
 that allocation by profiling the complete application with its accepted formats, aspect ratios, EXIF rotations,
-full-size crops, and encoding. Retune the policy before accepting larger originals. Budget all concurrent workers
-within the deployment's available memory.
+full-size crops, and encoding. Retune the policy before accepting larger originals. Budget all concurrent workers within
+the deployment's available memory.
 
 Use process RSS or peak resident memory when profiling; native GD allocations may be absent from PHP's memory
-accounting. Enforce process or container memory limits separately when a failed image-processing worker must not
-exhaust the serving application. These predecode checks are not a hard limit on the whole process. Request and
-base64 body limits remain necessary before creating an `EncodedFile`.
+accounting. Enforce process or container memory limits separately when a failed image-processing worker must not exhaust
+the serving application. These predecode checks are not a hard limit on the whole process. Request and base64 body
+limits remain necessary before creating an `EncodedFile`.
 
 This requires `gd`. The editor supplies `metadata.crop.rect` in source-image pixels. The cropper intersects the
-rectangle with the image bounds and honors JPEG EXIF orientation when `exif` is available. It returns an unchanged
-file without decoding if no usable rectangle exists; this no-op does not validate the image. Limit or decode
-failures throw `RuntimeException`, handled by the upload-processing catch block. If the application requires square
-output or fixed dimensions, enforce that requirement on the resulting image rather than relying on client metadata.
+rectangle with the image bounds and honors JPEG EXIF orientation when `exif` is available. It returns an unchanged file
+without decoding if no usable rectangle exists; this no-op does not validate the image. Limit or decode failures throw
+`RuntimeException`, handled by the upload-processing catch block. If the application requires square output or fixed
+dimensions, enforce that requirement on the resulting image rather than relying on client metadata.
 
-Do not apply the original crop rectangle again to bytes already transformed by the browser. If the application
-also limits the transformed output's size or format, validate those resulting bytes before saving.
+Do not apply the original crop rectangle again to bytes already transformed by the browser. If the application also
+limits the transformed output's size or format, validate those resulting bytes before saving.
 
 ## Multiple files and stored images
 
-For multiple uploads, set `allowMultiple` and `maxFiles` on the widget, raise the validator's `maxFiles`, and pass
-the validated `EncodedFile::fromInput()` list to `FileSaver::saveAll()`. The input receives a `[]` suffix; each
-entry remains an encoded payload. `maxSize` limits each decoded file, so enforce any aggregate application quota
-separately.
+For multiple uploads, set `allowMultiple` and `maxFiles` on the widget, raise the validator's `maxFiles`, and pass the
+validated `EncodedFile::fromInput()` list to `FileSaver::saveAll()`. The input receives a `[]` suffix; each entry
+remains an encoded payload. `maxSize` limits each decoded file, so enforce any aggregate application quota separately.
 
 To display an existing file, configure `files` with `type: 'local'` and a poster URL as shown in
 [the existing-image example](examples.md#showing-an-already-uploaded-image). The form submits the item's `source`
 identifier, such as `logo.png`, rather than new encoded bytes. That identifier is not a valid File Encode payload.
 
-For an optional replacement form, omit `skipOnEmpty: false` and resolve the current stored identifier from the
-record the authenticated user is authorized to edit. After loading the request and before validation, convert only
-an exact match with that authorized identifier to `null`:
+For an optional replacement form, omit `skipOnEmpty: false` and resolve the current stored identifier from the record
+the authenticated user is authorized to edit. After loading the request and before validation, convert only an exact
+match with that authorized identifier to `null`:
 
 ```php
 // $currentAvatarId comes from the authorized record, never from the request.
@@ -254,10 +253,9 @@ Base64 adds roughly one third to the binary size, plus JSON and form overhead. S
 server's body limit for the total encoded request, including all files. `upload_max_filesize` does not bound these
 ordinary POST fields. Keep the model's decoded size and count limits independently of the request limit.
 
-Files under `@runtime/uploads` have no public URL. Serve them through an authorized application action, or move
-approved public assets to a dedicated storage location and save their generated identifier. Set delivery headers
-from the stored content and encode client names whenever displaying them. `FileSaver` returns a filesystem path,
-not a URL.
+Files under `@runtime/uploads` have no public URL. Serve them through an authorized application action, or move approved
+public assets to a dedicated storage location and save their generated identifier. Set delivery headers from the stored
+content and encode client names whenever displaying them. `FileSaver` returns a filesystem path, not a URL.
 
 ## Verify the flow
 

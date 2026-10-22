@@ -87,6 +87,10 @@ abstract class AbstractLocalAsset extends AssetBundle
      * Returns the file name with the `.min` infix before its last extension, or unchanged when it has no extension.
      *
      * For example, `filepond.cropper.js` becomes `filepond.cropper.min.js`.
+     *
+     * @param string $file File name with its extension.
+     *
+     * @return string File name with the `.min` infix, or unchanged when it has no extension.
      */
     private static function minifiedFile(string $file): string
     {

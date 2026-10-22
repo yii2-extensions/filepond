@@ -14,18 +14,34 @@ use yii2\extensions\filepond\asset\plugin\ImageEditAsset;
  */
 final class FilePondCropperAsset extends AbstractLocalAsset
 {
+    /**
+     * Bundles the adapter requires: Cropper.js, the widget runtime, and the Image Edit plugin.
+     */
     public $depends = [
         CropperAsset::class,
         FilePondWidgetAsset::class,
         ImageEditAsset::class,
     ];
+    /**
+     * Published source directory of the packaged editor adapter files.
+     */
     public $sourcePath = __DIR__ . '/cropper';
 
+    /**
+     * Returns the editor adapter script file name.
+     *
+     * @return list<string> Script file names.
+     */
     protected function scripts(): array
     {
         return ['filepond-cropper.js'];
     }
 
+    /**
+     * Returns the editor adapter stylesheet file name.
+     *
+     * @return list<string> Stylesheet file names.
+     */
     protected function styles(): array
     {
         return ['filepond-cropper.css'];

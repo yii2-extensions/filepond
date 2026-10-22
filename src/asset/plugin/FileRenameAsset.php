@@ -13,6 +13,11 @@ use yii2\extensions\filepond\asset\{AbstractPluginAsset, Plugin};
  */
 final class FileRenameAsset extends AbstractPluginAsset
 {
+    /**
+     * Returns the File Rename plugin delivered by this bundle.
+     *
+     * @return Plugin Delivered plugin.
+     */
     public function plugin(): Plugin
     {
         return Plugin::FILE_RENAME;

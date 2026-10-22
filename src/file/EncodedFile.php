@@ -29,15 +29,26 @@ use function strtolower;
 final readonly class EncodedFile
 {
     /**
-     * @param string $name Client file name.
-     * @param string $type Client MIME type as reported by the browser.
-     * @param array<string, mixed> $metadata FilePond item metadata, such as `crop` or `poster`.
-     * @param string $data Decoded binary content.
+     * Creates a file from validated payload values.
      */
     private function __construct(
+        /**
+         * Client file name.
+         */
         public string $name,
+        /**
+         * Client MIME type as reported by the browser.
+         */
         public string $type,
+        /**
+         * FilePond item metadata, such as `crop` or `poster`.
+         *
+         * @var array<string, mixed>
+         */
         public array $metadata,
+        /**
+         * Decoded binary content.
+         */
         private string $data,
     ) {}
 

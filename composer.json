@@ -2,6 +2,7 @@
     "name": "yii2-extensions/filepond",
     "type": "yii2-extension",
     "description": "FilePond file upload widget for Yii2 with Cropper.js image editing, previews, validation plugins, and server-side helpers for encoded uploads.",
+    "homepage": "https://yii2-framework.github.io/docs/extensions/filepond/",
     "keywords": [
         "cropper",
         "cropperjs",
@@ -14,6 +15,11 @@
         "yii2-extension"
     ],
     "license": "BSD-3-Clause",
+    "support": {
+        "docs": "https://yii2-framework.github.io/docs/extensions/filepond/",
+        "issues": "https://github.com/yii2-extensions/filepond/issues",
+        "source": "https://github.com/yii2-extensions/filepond"
+    },
     "authors": [
         {
             "name": "Wilmer Arambula",
