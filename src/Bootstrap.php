@@ -18,6 +18,8 @@ use function dirname;
 final class Bootstrap implements BootstrapInterface
 {
     /**
+     * Registers the PHP message source of the package unless the category is already configured.
+     *
      * @param Application $app Application being bootstrapped.
      */
     public function bootstrap($app): void

@@ -218,6 +218,8 @@ final class FilePond extends InputWidget
     }
 
     /**
+     * Initializes the input ID and validates the crop and editor configuration.
+     *
      * @throws InvalidConfigException if {@see $imageCropAspectRatio} or {@see $cropper} is misconfigured.
      */
     public function init(): void
@@ -239,6 +241,13 @@ final class FilePond extends InputWidget
         }
     }
 
+    /**
+     * Registers the assets and the initialization script for the effective options, and renders the file input.
+     *
+     * @throws InvalidConfigException if an npm package version cannot be resolved in CDN mode.
+     *
+     * @return string Rendered file input element.
+     */
     public function run(): string
     {
         $options = $this->getOptions();
@@ -249,6 +258,10 @@ final class FilePond extends InputWidget
     }
 
     /**
+     * Validates the crop aspect ratio format.
+     *
+     * @param string $value Crop aspect ratio in `width:height` format.
+     *
      * @throws InvalidConfigException if the value is not a `width:height` pair of positive numbers.
      */
     private static function assertAspectRatio(string $value): void
@@ -265,6 +278,8 @@ final class FilePond extends InputWidget
     }
 
     /**
+     * Returns the plugins enabled by the given options.
+     *
      * @param array<string, mixed> $options Effective FilePond options.
      *
      * @return list<Plugin> Plugins whose option is `true`, in registration order.
@@ -280,6 +295,8 @@ final class FilePond extends InputWidget
     }
 
     /**
+     * Returns the Cropper.js editor options, merging {@see $cropper} over the defaults and localized labels.
+     *
      * @param mixed $aspectRatio Effective `imageCropAspectRatio`, used as the initial editor ratio.
      *
      * @return array<string, mixed> Editor options with localized labels.
@@ -312,6 +329,11 @@ final class FilePond extends InputWidget
         return $options;
     }
 
+    /**
+     * Returns the input name of the model attribute, or {@see $name} when the widget has no model.
+     *
+     * @return string Input name, or an empty string when neither a model attribute nor a name is set.
+     */
     private function getInputName(): string
     {
         if ($this->model instanceof Model && is_string($this->attribute)) {
@@ -322,6 +344,8 @@ final class FilePond extends InputWidget
     }
 
     /**
+     * Returns the localized FilePond labels for the given options.
+     *
      * @param array<string, mixed> $options Typed properties merged with {@see $config}.
      *
      * @return array<string, string> Localized labels for the core and the enabled validation plugins.
@@ -360,8 +384,12 @@ final class FilePond extends InputWidget
     }
 
     /**
+     * Returns the script that creates the FilePond instance through `yii2FilePond.create()`.
+     *
      * @param array<string, mixed> $options Effective FilePond options.
      * @param list<Plugin> $plugins Plugins enabled by the options.
+     *
+     * @return string JavaScript statement that initializes the input.
      */
     private function getScript(array $options, array $plugins): string
     {
@@ -375,7 +403,12 @@ final class FilePond extends InputWidget
     }
 
     /**
+     * Returns whether the option is set to `true`.
+     *
      * @param array<string, mixed> $options Effective FilePond options.
+     * @param string $option FilePond option name.
+     *
+     * @return bool `true` when the option is exactly `true`, `false` otherwise.
      */
     private static function isEnabled(array $options, string $option): bool
     {
@@ -383,6 +416,8 @@ final class FilePond extends InputWidget
     }
 
     /**
+     * Registers the core, enabled plugin, runtime, and editor bundles, followed by the initialization script.
+     *
      * @param array<string, mixed> $options Effective FilePond options.
      */
     private function registerAssets(array $options): void
@@ -408,7 +443,11 @@ final class FilePond extends InputWidget
     }
 
     /**
+     * Renders the file input with the `filepond` class in place of `form-control`.
+     *
      * @param array<string, mixed> $options Effective FilePond options.
+     *
+     * @return string Rendered file input element.
      */
     private function renderInput(array $options): string
     {

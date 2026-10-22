@@ -7,22 +7,22 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { transform } from 'esbuild';
 
 const SOURCES = [
-    'src/asset/cropper/filepond-cropper.css',
-    'src/asset/cropper/filepond-cropper.js',
-    'src/asset/widget/filepond-widget.css',
-    'src/asset/widget/filepond-widget.js',
+  'src/asset/cropper/filepond-cropper.css',
+  'src/asset/cropper/filepond-cropper.js',
+  'src/asset/widget/filepond-widget.css',
+  'src/asset/widget/filepond-widget.js',
 ];
 
 for (const source of SOURCES) {
-    const loader = source.endsWith('.css') ? 'css' : 'js';
-    const target = source.replace(/\.(css|js)$/, '.min.$1');
-    const { code } = await transform(await readFile(source, 'utf8'), {
-        legalComments: 'none',
-        loader,
-        minify: true,
-        target: loader === 'js' ? 'es2020' : 'esnext',
-    });
+  const loader = source.endsWith('.css') ? 'css' : 'js';
+  const target = source.replace(/\.(css|js)$/, '.min.$1');
+  const { code } = await transform(await readFile(source, 'utf8'), {
+    legalComments: 'none',
+    loader,
+    minify: true,
+    target: loader === 'js' ? 'es2020' : 'esnext',
+  });
 
-    await writeFile(target, code);
-    console.log(`${source} -> ${target} (${code.length} bytes)`);
+  await writeFile(target, code);
+  console.log(`${source} -> ${target} (${code.length} bytes)`);
 }

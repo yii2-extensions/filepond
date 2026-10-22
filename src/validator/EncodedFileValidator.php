@@ -81,6 +81,9 @@ final class EncodedFileValidator extends Validator
      */
     public string $wrongMimeType = '';
 
+    /**
+     * Normalizes the extension and MIME type lists and resolves the default error messages.
+     */
     public function init(): void
     {
         parent::init();
@@ -137,7 +140,13 @@ final class EncodedFileValidator extends Validator
     }
 
     /**
+     * Returns whether the value is empty, including a list of only `null` or empty-string entries.
+     *
+     * A configured {@see $isEmpty} callback takes precedence.
+     *
      * @param mixed $value Request value of the FilePond input.
+     *
+     * @return bool `true` when the value carries no submitted file, `false` otherwise.
      */
     public function isEmpty($value): bool
     {
@@ -159,6 +168,8 @@ final class EncodedFileValidator extends Validator
     }
 
     /**
+     * Validates the decoded payloads against the file count, size, extension, and MIME type rules.
+     *
      * @param mixed $value Request value of the FilePond input.
      *
      * @return array{0: string, 1: array<string, mixed>}|null Error message and parameters, or `null` when valid.
@@ -191,7 +202,12 @@ final class EncodedFileValidator extends Validator
     }
 
     /**
+     * Returns whether the MIME type matches one of the patterns, ignoring case.
+     *
+     * @param string $mimeType MIME type detected from the content.
      * @param list<string> $patterns Allowed MIME type patterns.
+     *
+     * @return bool `true` when a pattern matches, `false` otherwise.
      */
     private static function matchesMimeType(string $mimeType, array $patterns): bool
     {
@@ -205,6 +221,8 @@ final class EncodedFileValidator extends Validator
     }
 
     /**
+     * Normalizes a list option to lowercase, trimmed entries.
+     *
      * @param list<string>|string|null $value List, comma-separated string, or `null`.
      *
      * @return list<string>|null Lowercase, trimmed entries, or `null`.
@@ -224,7 +242,11 @@ final class EncodedFileValidator extends Validator
     }
 
     /**
-     * @return array{0: string, 1: array<string, mixed>}|null
+     * Validates one file against the size, extension, and MIME type rules.
+     *
+     * @param EncodedFile $file Decoded file to validate.
+     *
+     * @return array{0: string, 1: array<string, mixed>}|null Error message and parameters, or `null` when valid.
      */
     private function validateFile(EncodedFile $file): array|null
     {

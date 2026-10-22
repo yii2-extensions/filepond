@@ -13,9 +13,9 @@ use yii2\extensions\filepond\FilePond;
 echo FilePond::widget(['name' => 'attachment']);
 ```
 
-The widget renders `<input class="filepond" id="w0" name="attachment" type="file">`, registers the default plugins
-(File Encode, File Validate Size, File Validate Type, Image EXIF Orientation, and Image Preview), and creates the
-FilePond instance at the end of the page.
+The widget renders `<input class="filepond" id="w0" name="attachment" type="file">`, registers the default plugins (File
+Encode, File Validate Size, File Validate Type, Image EXIF Orientation, and Image Preview), and creates the FilePond
+instance at the end of the page.
 
 ## Avatar with the image editor
 
@@ -38,8 +38,8 @@ echo FilePond::widget(
 );
 ```
 
-`allowImageEdit` loads Cropper.js and the editor adapter. `imageEditInstantEdit` opens the editor as soon as an
-image is added, and `allowImageTransform` applies the confirmed crop before the encoded file is submitted.
+`allowImageEdit` loads Cropper.js and the editor adapter. `imageEditInstantEdit` opens the editor as soon as an image is
+added, and `allowImageTransform` applies the confirmed crop before the encoded file is submitted.
 
 In an active form, pass the same options without `name` to the field:
 `$form->field($model, 'avatar')->widget(FilePond::class, [...])`.
@@ -94,9 +94,9 @@ echo FilePond::widget(
 );
 ```
 
-The File Poster plugin renders the existing image inside the item. With `type: 'local'`, the form submits the
-`source` identifier (`logo.png` here) instead of new encoded bytes. Authorize and handle that identifier separately
-before encoded-upload validation; see [stored-image handling](uploads.md#multiple-files-and-stored-images).
+The File Poster plugin renders the existing image inside the item. With `type: 'local'`, the form submits the `source`
+identifier (`logo.png` here) instead of new encoded bytes. Authorize and handle that identifier separately before
+encoded-upload validation; see [stored-image handling](uploads.md#multiple-files-and-stored-images).
 
 ## JavaScript callbacks and custom labels
 
@@ -135,10 +135,10 @@ yii2FilePond.destroy("uploadform-avatar");
 
 ## Handling uploads on the server
 
-The File Encode plugin submits every file as a JSON string with the name, the client type, the base64 content, and
-the metadata (such as the crop rectangle of the editor). The snippets of this section build those values by hand, so
-they run without a browser; in an application they come from `$model->load(Yii::$app->request->post())`.
-The [upload guide](uploads.md) shows that application flow; the snippets below demonstrate the individual helpers.
+The File Encode plugin submits every file as a JSON string with the name, the client type, the base64 content, and the
+metadata (such as the crop rectangle of the editor). The snippets of this section build those values by hand, so they
+run without a browser; in an application they come from `$model->load(Yii::$app->request->post())`. The
+[upload guide](uploads.md) shows that application flow; the snippets below demonstrate the individual helpers.
 
 ### Validating uploads in the model
 
@@ -194,10 +194,10 @@ $model->validate();
 echo Html::errorSummary($model);
 ```
 
-The validator decodes the payload, so the renamed file is rejected by its real MIME type. `extensions` checks the
-client file name while `FileSaver` derives the stored extension from the content, so `mimeTypes` is the rule that
-decides what reaches the disk. Avoid `image/*` for files stored beneath the web root: it also accepts SVG, which can
-carry scripts that run on your origin.
+The validator decodes the payload, so the renamed file is rejected by its real MIME type. `extensions` checks the client
+file name while `FileSaver` derives the stored extension from the content, so `mimeTypes` is the rule that decides what
+reaches the disk. Avoid `image/*` for files stored beneath the web root: it also accepts SVG, which can carry scripts
+that run on your origin.
 
 ### Cropping on the server
 
@@ -254,9 +254,9 @@ if ($model->validate(['avatar'])) {
 
 Configure the three positive `uploads` limits from the application's measured processing budget; see
 [server cropping](uploads.md#choose-where-to-crop) for the policy and worker-memory example. Source bytes, dimensions,
-and pixel counts are checked before decoding, including when the requested output crop is small.
-`ImageCropper::crop()` returns the file unchanged without decoding when no rectangle is present, rotates JPEG images
-by their EXIF orientation before cropping, and keeps PNG transparency.
+and pixel counts are checked before decoding, including when the requested output crop is small. `ImageCropper::crop()`
+returns the file unchanged without decoding when no rectangle is present, rotates JPEG images by their EXIF orientation
+before cropping, and keeps PNG transparency.
 
 ### Storing every submitted file
 

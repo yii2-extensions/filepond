@@ -59,6 +59,8 @@ final readonly class ImageCropper
     private const array ROTATION_ANGLES = [3 => 180, 4 => 180, 5 => 90, 6 => -90, 7 => -90, 8 => 90];
 
     /**
+     * Creates a cropper with the source processing limits and output quality.
+     *
      * @param int $maxPixels Maximum source pixel count before decoding.
      * @param int $maxDimension Maximum source width or height, in pixels.
      * @param int $maxInputBytes Maximum source byte count before header parsing.
@@ -161,6 +163,12 @@ final readonly class ImageCropper
 
     /**
      * Rotates and flips the image according to its EXIF orientation tag.
+     *
+     * @param GdImage $image Decoded image.
+     * @param string $data Original binary content, used to read the EXIF orientation.
+     * @param string $mimeType MIME type detected from the content.
+     *
+     * @return GdImage Oriented image, or the same instance when no correction applies.
      */
     private function applyOrientation(GdImage $image, string $data, string $mimeType): GdImage
     {
@@ -198,6 +206,9 @@ final readonly class ImageCropper
      * Checks axis and area limits without multiplying possibly overflowing dimensions.
      *
      * @param array<array-key, mixed> $dimensions Dimensions from the parser or decoded image.
+     * @param string $name Client file name, used in error messages.
+     *
+     * @throws RuntimeException if the dimensions are invalid or exceed the axis or pixel limit.
      */
     private function assertDimensions(array $dimensions, string $name): void
     {
@@ -225,6 +236,10 @@ final readonly class ImageCropper
 
     /**
      * Rejects excessive byte counts before parsing dimensions or allocating a GD image.
+     *
+     * @param EncodedFile $file Image file to inspect.
+     *
+     * @throws RuntimeException if the source exceeds a processing limit or its header cannot be parsed.
      */
     private function assertSourceLimits(EncodedFile $file): void
     {
@@ -246,7 +261,15 @@ final readonly class ImageCropper
     }
 
     /**
+     * Encodes the image as GIF, JPEG, or WebP when the MIME type requests it, and as PNG otherwise.
+     *
+     * @param GdImage $image Image to encode.
+     * @param string $mimeType Requested output MIME type.
+     * @param string $name Client file name, used in error messages.
+     *
      * @throws RuntimeException if the image cannot be encoded as the given MIME type.
+     *
+     * @return string Encoded binary content.
      */
     private function encode(GdImage $image, string $mimeType, string $name): string
     {
@@ -270,6 +293,13 @@ final readonly class ImageCropper
         return $output;
     }
 
+    /**
+     * Writes the image to the output buffer as PNG, preserving its alpha channel.
+     *
+     * @param GdImage $image Image to encode.
+     *
+     * @return bool `true` on success, `false` on failure.
+     */
     private static function encodePng(GdImage $image): bool
     {
         imagesavealpha($image, true);
@@ -279,6 +309,12 @@ final readonly class ImageCropper
 
     /**
      * Keeps the client name when its extension is registered for the output type, otherwise replaces the extension.
+     *
+     * @param EncodedFile $file Source file.
+     * @param string $outputType Output MIME type.
+     * @param string $extension Output extension without the dot.
+     *
+     * @return string Output file name.
      */
     private static function outputName(EncodedFile $file, string $outputType, string $extension): string
     {

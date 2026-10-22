@@ -13,6 +13,11 @@ use yii2\extensions\filepond\asset\{AbstractPluginAsset, Plugin};
  */
 final class FileValidateTypeAsset extends AbstractPluginAsset
 {
+    /**
+     * Returns the File Validate Type plugin delivered by this bundle.
+     *
+     * @return Plugin Delivered plugin.
+     */
     public function plugin(): Plugin
     {
         return Plugin::FILE_VALIDATE_TYPE;

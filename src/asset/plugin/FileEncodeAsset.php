@@ -13,6 +13,11 @@ use yii2\extensions\filepond\asset\{AbstractPluginAsset, Plugin};
  */
 final class FileEncodeAsset extends AbstractPluginAsset
 {
+    /**
+     * Returns the File Encode plugin delivered by this bundle.
+     *
+     * @return Plugin Delivered plugin.
+     */
     public function plugin(): Plugin
     {
         return Plugin::FILE_ENCODE;

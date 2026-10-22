@@ -13,6 +13,11 @@ use yii2\extensions\filepond\asset\{AbstractPluginAsset, Plugin};
  */
 final class ImageCropAsset extends AbstractPluginAsset
 {
+    /**
+     * Returns the Image Crop plugin delivered by this bundle.
+     *
+     * @return Plugin Delivered plugin.
+     */
     public function plugin(): Plugin
     {
         return Plugin::IMAGE_CROP;

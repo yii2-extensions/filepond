@@ -33,6 +33,8 @@ final readonly class FileSaver
     ];
 
     /**
+     * Creates a saver for the target directory and permissions.
+     *
      * @param string $directory Target directory, optionally as a registered Yii alias; created when missing.
      * @param int $directoryMode Permissions applied to directories created by the saver.
      * @param int $fileMode Permissions applied to written files.
@@ -101,6 +103,14 @@ final readonly class FileSaver
         return $paths;
     }
 
+    /**
+     * Returns the sanitized `$name` or client base name, or `file` when sanitizing leaves it empty.
+     *
+     * @param EncodedFile $file File whose client name is the fallback.
+     * @param string|null $name Requested base name, or `null` to use the client file name.
+     *
+     * @return string Sanitized base name without extension.
+     */
     private static function baseName(EncodedFile $file, string|null $name): string
     {
         $baseName = self::sanitize($name ?? pathinfo($file->name, PATHINFO_FILENAME));
@@ -111,6 +121,10 @@ final readonly class FileSaver
     /**
      * Returns the client extension when it is registered for the detected MIME type, otherwise the preferred extension
      * of that type, or an empty string for unmapped types.
+     *
+     * @param EncodedFile $file File whose content and client extension are inspected.
+     *
+     * @return string Extension without the dot, or an empty string.
      */
     private static function extension(EncodedFile $file): string
     {
@@ -127,13 +141,26 @@ final readonly class FileSaver
         return is_string($extension) ? $extension : '';
     }
 
+    /**
+     * Builds the target path, omitting the extension separator when the extension is empty.
+     *
+     * @param string $directory Resolved target directory.
+     * @param string $baseName Sanitized base name without extension.
+     * @param string $extension Extension without the dot, or an empty string.
+     *
+     * @return string Target file path.
+     */
     private static function path(string $directory, string $baseName, string $extension): string
     {
         return $directory . DIRECTORY_SEPARATOR . $baseName . ($extension === '' ? '' : ".{$extension}");
     }
 
     /**
+     * Resolves the target directory alias and creates the directory when missing.
+     *
      * @throws RuntimeException if the directory cannot be created or is not writable.
+     *
+     * @return string Absolute path of the writable target directory.
      */
     private function resolveDirectory(): string
     {
@@ -155,6 +182,10 @@ final readonly class FileSaver
     /**
      * Keeps `[A-Za-z0-9_-]`, collapsing other characters, dots included, to a dash and trimming dashes, so the base
      * name cannot carry a second extension.
+     *
+     * @param string $value Raw base name.
+     *
+     * @return string Sanitized base name, empty when no allowed character remains.
      */
     private static function sanitize(string $value): string
     {
@@ -165,7 +196,14 @@ final readonly class FileSaver
     }
 
     /**
+     * Writes the content under an exclusive lock, applies the file permissions, and returns the path.
+     *
+     * @param EncodedFile $file File to write.
+     * @param string $path Target file path.
+     *
      * @throws RuntimeException if the file cannot be written.
+     *
+     * @return string Path of the written file.
      */
     private function write(EncodedFile $file, string $path): string
     {
