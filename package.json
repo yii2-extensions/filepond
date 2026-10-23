@@ -7,7 +7,7 @@
         "test:mutation": "stryker run"
     },
     "dependencies": {
-        "cropperjs": "^2.2.0",
+        "cropperjs": "^2.3.1",
         "filepond": "^4.32.12",
         "filepond-plugin-file-encode": "^2.1.14",
         "filepond-plugin-file-poster": "^2.5.2",
