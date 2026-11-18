@@ -1,0 +1,4 @@
+interface:
+  display_name: "Yii2 FilePond Uploads"
+  short_description: "Add FilePond uploads with validated server storage"
+  default_prompt: "Use $yii2-filepond-uploads to add a FilePond upload field that validates and stores files on the server."

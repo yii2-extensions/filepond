@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.2.2 Under development
 
+- docs: align `README.md` badges and Security section with the standard, add skill prompts and contracts, and add Scorecard.
+
 ## 0.2.1 October 22, 2026
 
 - chore: document and sync bundled skills via Composer; pin CI actions to `v2.0.1` and align scripts, linters and testing docs with the template.
