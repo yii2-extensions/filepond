@@ -77,4 +77,34 @@ two aliases; the installer needs only its `.agents/skills/` installation.
 `--list` verifies the installer's discovery only; it does not run Claude, Codex, or OpenCode. Application instructions
 and permissions still apply when a skill is activated.
 
+## Example prompts
+
+Start a fresh client session at the application root. The explicit example uses Codex's `$skill-name` notation; use
+`/yii2-filepond-uploads` in Claude Code or the installed client's native skill mechanism. Do not paste the skill body
+and count that as native activation. These are tasks to execute and verify, not claims that an evaluation has passed.
+
+### Explicit invocation
+
+```text
+$yii2-filepond-uploads
+Show an encoded FilePond model field that validates decoded bytes before saving to a server-controlled destination.
+Include an invalid payload that must write nothing, and distinguish encoded input from UploadedFile.
+Inspect the installed revision first. Do not install dependencies or change files without authorization.
+```
+
+### Natural selection
+
+```text
+An existing FilePond item submits its stored identifier instead of base64 JSON. How can optional replacement preserve
+the authorized existing file while rejecting an arbitrary identifier?
+```
+
+### Verify the outcome
+
+Verify decoded MIME/size validation, authorized existing identifiers and actual storage effects. Preview success alone
+does not prove valid saved bytes. Record native loading evidence separately from configuration review, executable checks
+and browser/runtime results. For a negative selection control, ask an unrelated question in a fresh session and confirm
+this package skill is not loaded. Keep evaluation traces private; report unavailable checks rather than treating
+discovery as execution.
+
 [Back to documentation](../README.md#documentation)

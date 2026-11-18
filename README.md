@@ -14,14 +14,14 @@
     <a href="https://github.com/yii2-extensions/filepond/actions/workflows/build.yml" target="_blank">
         <img src="https://img.shields.io/github/actions/workflow/status/yii2-extensions/filepond/build.yml?style=for-the-badge&label=PHPUnit&logo=github" alt="PHPUnit">
     </a>
+    <a href="https://codecov.io/github/yii2-extensions/filepond" target="_blank">
+        <img src="https://img.shields.io/codecov/c/github/yii2-extensions/filepond.svg?style=for-the-badge&logo=codecov&logoColor=white&label=Coverage" alt="Coverage">
+    </a>
     <a href="https://dashboard.stryker-mutator.io/reports/github.com/yii2-extensions/filepond/main" target="_blank">
         <img src="https://img.shields.io/endpoint?style=for-the-badge&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2Fyii2-extensions%2Ffilepond%2Fmain" alt="Mutation Testing">
     </a>
     <a href="https://github.com/yii2-extensions/filepond/actions/workflows/static.yml" target="_blank">
         <img src="https://img.shields.io/github/actions/workflow/status/yii2-extensions/filepond/static.yml?style=for-the-badge&label=PHPStan&logo=github" alt="PHPStan">
-    </a>
-    <a href="https://github.com/yii2-extensions/filepond/actions/workflows/security.yml" target="_blank">
-        <img src="https://img.shields.io/github/actions/workflow/status/yii2-extensions/filepond/security.yml?style=for-the-badge&label=Security&logo=github" alt="Security">
     </a>
 </p>
 
@@ -38,8 +38,8 @@ initializes FilePond without jQuery and loads only enabled plugin assets.
 ## Features
 
 <picture>
-    <source media="(min-width: 768px)" srcset="./docs/svgs/features.svg">
-    <img src="./docs/svgs/features-mobile.svg" alt="Feature Overview" style="width: 100%;">
+    <source media="(min-width: 768px)" srcset="https://raw.githubusercontent.com/yii2-extensions/filepond/main/docs/svgs/features.svg">
+    <img src="https://raw.githubusercontent.com/yii2-extensions/filepond/main/docs/svgs/features-mobile.svg" alt="Feature Overview" style="width: 100%;">
 </picture>
 
 ## Quick start
@@ -69,7 +69,8 @@ composer require php-forge/foxy:^0.4 yii2-extensions/filepond:^0.2
 Foxy installs FilePond, its plugins, and Cropper.js in `node_modules` beside the application's `package.json`. Commit
 the generated `foxy.lock` with the application's Composer files. Point Yii's `@npm` alias at that directory;
 `@app/node_modules` is correct only when the application `basePath` is the Composer project root. See
-[installation](docs/installation.md) for alias configuration, existing npm projects, and asset delivery.
+[installation](https://github.com/yii2-extensions/filepond/blob/main/docs/installation.md) for alias configuration,
+existing npm projects, and asset delivery.
 
 ### Basic usage
 
@@ -94,17 +95,21 @@ echo FilePond::widget(
 
 The editor opens when an image is added and offers only the `1:1` ratio preset. Image Transform applies the confirmed
 crop before form submission. Previewing a crop alone does not change the uploaded bytes. To receive, validate, and store
-the image, follow the [complete upload workflow](docs/uploads.md).
+the image, follow the [complete upload workflow](https://github.com/yii2-extensions/filepond/blob/main/docs/uploads.md).
 
 ## Documentation
 
 Practical guides and runnable examples for uploads, plugins, and image editing.
 
-- 📚 [Installation Guide](docs/installation.md): native Composer setup, asset paths, translations, and assets.
-- ⚙️ [Configuration Guide](docs/configuration.md): option precedence, plugins, and editor behavior.
-- 💡 [Usage Examples](docs/examples.md): runnable widgets and helper demonstrations.
-- 🧪 [Testing Guide](docs/testing.md): development checks.
-- 📤 [Upload Workflow](docs/uploads.md): active form, server validation, cropping, and storage.
+- 📚 [Installation Guide](https://github.com/yii2-extensions/filepond/blob/main/docs/installation.md): native Composer
+  setup, asset paths, translations, and assets.
+- ⚙️ [Configuration Guide](https://github.com/yii2-extensions/filepond/blob/main/docs/configuration.md): option
+  precedence, plugins, and editor behavior.
+- 💡 [Usage Examples](https://github.com/yii2-extensions/filepond/blob/main/docs/examples.md): runnable widgets and
+  helper demonstrations.
+- 🧪 [Testing Guide](https://github.com/yii2-extensions/filepond/blob/main/docs/testing.md): development checks.
+- 📤 [Upload Workflow](https://github.com/yii2-extensions/filepond/blob/main/docs/uploads.md): active form, server
+  validation, cropping, and storage.
 
 Server validation inspects decoded bytes rather than trusting the browser's MIME type. List raster MIME types explicitly
 when serving uploads from your origin: `image/*` also accepts SVG. Encoded uploads increase request size; configure the
@@ -120,7 +125,8 @@ of a page by appending `index.md` to its URL. The
 [AI agents guide](https://yii2-framework.github.io/docs/project/ai-agents/) covers skill installation, client setup and
 verification.
 
-- 🤖 [`yii2-filepond-uploads` skill](docs/agents.md): FilePond uploads.
+- 🤖 [`yii2-filepond-uploads` skill](https://github.com/yii2-extensions/filepond/blob/main/docs/agents.md): FilePond
+  widget options and image editing, Foxy asset setup, and server validation, cropping and storage of encoded uploads.
 - 🧭 [`yii2-framework` skill](https://yii2-framework.github.io/docs/guide/skills/yii2-framework/): Yii 22.0 application
   conventions.
 
@@ -138,10 +144,20 @@ the [changelog](CHANGELOG.md).
 
 ## Project status
 
-[![Codecov](https://img.shields.io/codecov/c/github/yii2-extensions/filepond.svg?style=for-the-badge&logo=codecov&logoColor=white&label=Coverage)](https://codecov.io/github/yii2-extensions/filepond)
 [![PHPStan Level Max](https://img.shields.io/badge/PHPStan-Level%20Max-4F5D95.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/yii2-extensions/filepond/actions/workflows/static.yml)
 [![Quality](https://img.shields.io/github/actions/workflow/status/yii2-extensions/filepond/quality.yml?style=for-the-badge&label=Quality&logo=github)](https://github.com/yii2-extensions/filepond/actions/workflows/quality.yml)
-[![StyleCI](https://img.shields.io/badge/StyleCI-Passed-44CC11.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.styleci.io/repos/719070630?branch=main)
+[![StyleCI](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Fgithub.styleci.io%2Frepos%2F719070630%2Fshield%3Fbranch%3Dmain&query=%2F%2F*%5Blocal-name%28%29%3D%27text%27%5D%5B2%5D&label=StyleCI&style=for-the-badge&logo=github&logoColor=white&color=4F5D95)](https://github.styleci.io/repos/719070630?branch=main)
+
+## Security
+
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/yii2-extensions/filepond/badge?style=for-the-badge)](https://scorecard.dev/viewer/?uri=github.com/yii2-extensions/filepond)
+[![Zizmor](https://img.shields.io/github/actions/workflow/status/yii2-extensions/filepond/security.yml?style=for-the-badge&label=Zizmor&logo=github)](https://github.com/yii2-extensions/filepond/actions/workflows/security.yml)
+
+## Built with AI
+
+[![Built with Claude Code](https://img.shields.io/badge/Built%20with-Claude%20Code-D97757.svg?style=for-the-badge&logo=claude&logoColor=white)](https://claude.com/claude-code)
+[![Built with Codex](https://img.shields.io/badge/Built%20with-Codex-10A37F.svg?style=for-the-badge&logo=openaigym&logoColor=white)](https://openai.com/codex)
+[![Reviewed by CodeRabbit](https://img.shields.io/badge/Reviewed%20by-CodeRabbit-FF570A.svg?style=for-the-badge&logo=coderabbit&logoColor=white)](https://www.coderabbit.ai)
 
 ## Our social networks
 

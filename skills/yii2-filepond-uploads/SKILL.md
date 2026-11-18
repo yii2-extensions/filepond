@@ -1,6 +1,6 @@
 ---
 name: yii2-filepond-uploads
-description: Use when adding or changing FilePond upload inputs, image editing, or encoded upload validation and storage in a Yii2 application using yii2-extensions/filepond.
+description: Add or change FilePond upload inputs, Cropper.js image editing, and server validation, cropping and storage of encoded uploads in Yii2 applications using yii2-extensions/filepond. Not for multipart UploadedFile handling without FilePond, FilePond server process endpoints (the package provides none), or other FilePond wrappers.
 license: BSD-3-Clause
 metadata:
   guide: https://yii2-framework.github.io/docs/extensions/filepond/
@@ -88,6 +88,29 @@ authorized application record before reporting success. An existing `type: 'loca
 rather than new encoded bytes. For optional replacement, resolve the current identifier from the authorized record and
 normalize only its exact match to an empty upload before encoded validation. Validate all other values normally; do not
 ignore arbitrary non-JSON input. Missing upload input is not a deletion instruction.
+
+## Intended behavior
+
+These look like bugs and are package contracts; do not "fix" them in package or application code:
+
+- `EncodedFileValidator::$maxFiles` defaults to `1`, while the widget's `maxFiles` defaults to no limit. A multiple
+  input fails validation on its second file until the validator's limit is raised.
+- `extensions` is checked against the client file name and `mimeTypes` against the decoded bytes, so PNG bytes named
+  `a.jpg` fail an `extensions => ['png']` rule. A value that is not File Encode JSON, such as a stored identifier, fails
+  with the payload message.
+- `EncodedFile::fromInput()` returns no files for `null`, `''` or `[]`, and skips empty entries in a list.
+- `FileSaver::save()` replaces an existing file at the same path. The base name keeps only `[A-Za-z0-9_-]`
+  (`my file.tar.png` becomes `my-file-tar.png`) and the extension follows the detected content. `saveAll()` adds `-1`,
+  `-2`, ... only to collisions within one batch.
+- `ImageCropper` has no default limits: pass positive `maxPixels`, `maxDimension` and `maxInputBytes`. A rectangle
+  outside the image is clamped to at least one edge pixel. Formats other than GIF, JPEG, PNG and WebP are re-encoded as
+  PNG with a `.png` name.
+- Widget labels and validator messages use the `yii.filepond` category. The package `Bootstrap` registers it through
+  Composer `extra.bootstrap` unless the application already configures it; an application that does not load
+  `@vendor/yiisoft/extensions.php` must register the category, or creating `EncodedFileValidator` throws.
+
+The asset base classes, the bundles under `asset\plugin` and `exception\Message` support the widget and helpers; read
+their PHPDoc only when overriding a bundle or matching an error message.
 
 ## Verify the requested behavior
 
