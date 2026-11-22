@@ -11,7 +11,9 @@ use yii2\extensions\filepond\exception\Message;
 use yii2\extensions\filepond\file\EncodedFile;
 
 use function base64_encode;
+use function json_decode;
 use function json_encode;
+use function json_last_error_msg;
 use function str_repeat;
 
 /**
@@ -232,9 +234,11 @@ final class EncodedFileTest extends TestCase
 
     public function testThrowInvalidArgumentExceptionForInvalidJson(): void
     {
+        json_decode('{');
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
-            Message::ENCODED_FILE_INVALID_JSON->getMessage('Syntax error'),
+            Message::ENCODED_FILE_INVALID_JSON->getMessage(json_last_error_msg()),
         );
 
         EncodedFile::fromJson('{');
