@@ -82,26 +82,15 @@ Thresholds, thread count and memory options live in `infection.json5`. CI enforc
 
 ## Repository quality checks
 
-Make the CLI tools used by the shared quality workflow available on `PATH`: actionlint with its ShellCheck helper,
-codespell, EditorConfig Checker, markdownlint-cli2, Prettier and yamllint. Run all checks:
+CI runs actionlint, codespell, EditorConfig Checker, markdownlint-cli2, Prettier and yamllint through the shared quality
+workflow. It uses the shared configuration with FilePond-specific spelling exceptions and EditorConfig Checker
+exclusions for minified assets and the npm lockfile. The repository's formatting rules remain in `.editorconfig`.
 
-```bash
-composer quality
-```
-
-Each tool also has its own script:
+To lint workflows locally, make actionlint and ShellCheck available on `PATH`:
 
 ```bash
 composer actionlint
-composer codespell
-composer editorconfig-checker
-composer markdownlint
-composer prettier
-composer yamllint
 ```
-
-The linter configuration lives in `.github/linters`, and the Prettier configuration in `.prettierrc.json` and
-`.prettierignore`. CI uses the same files.
 
 ## Static analysis (PHPStan)
 
@@ -121,23 +110,14 @@ composer tests
 
 ## Workflow security checks
 
-Make zizmor and Gitleaks available on `PATH`. Audit the current workflow files with the same pedantic persona used by
-the shared security workflow:
+CI runs zizmor and Gitleaks through the shared security workflow. Gitleaks uses the default rules plus an allowlist for
+the dummy credentials in the test fixture. The scan step is skipped if `GITLEAKS_LICENSE` is unavailable to the
+workflow.
+
+To audit workflow files locally with the same pedantic persona, make zizmor available on `PATH`:
 
 ```bash
 composer zizmor
-```
-
-Scan Git history for secrets with the repository's Gitleaks configuration:
-
-```bash
-composer gitleaks
-```
-
-Run both checks. Findings make the command fail; inspect them rather than disabling the checks.
-
-```bash
-composer security
 ```
 
 Zizmor needs GitHub API access for its online audits. If the tool runs offline, report that limit separately. To request

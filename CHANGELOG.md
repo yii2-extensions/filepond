@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - docs: align `README.md` badges and Security section with the standard, add skill prompts and contracts, and add Scorecard.
 - ci: update shared workflows, simplify asset checks and add PHP `8.6` to the test matrix.
+- ci: use the shared quality and security defaults and remove the local lint configuration files and their Composer scripts.
 
 ## 0.2.1 October 22, 2026
 
