@@ -50,7 +50,7 @@ final class BootstrapTest extends TestCase
 
     public function testRegistersMessageSourceWhenMissing(): void
     {
-        $this->mockWebApplication(['bootstrap' => new ReplaceArrayValue([]), 'language' => 'de']);
+        $this->mockWebApplication(['bootstrap' => new ReplaceArrayValue([]), 'language' => 'es']);
 
         self::assertArrayNotHasKey(
             FilePond::TRANSLATION_CATEGORY,
@@ -61,7 +61,7 @@ final class BootstrapTest extends TestCase
         (new Bootstrap())->bootstrap(Yii::$app);
 
         self::assertSame(
-            'Datei ist zu groß',
+            'El archivo es demasiado grande',
             Yii::t(FilePond::TRANSLATION_CATEGORY, 'File is too large'),
             'Messages must resolve from the package translations.',
         );
