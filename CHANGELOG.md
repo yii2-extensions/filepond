@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ci: update shared workflows, simplify asset checks and add PHP `8.6` to the test matrix.
 - ci: use the shared quality and security defaults and remove the local lint configuration files and their Composer scripts.
 - ci: remove unused configuration options from quality workflow.
+- chore: update `ui-awesome/html` dependency version to `^0.7`.
 
 ## 0.2.1 October 22, 2026
 
